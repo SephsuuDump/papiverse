@@ -1,0 +1,30 @@
+.thead {
+    background: #e2e8f0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.th {
+    border-right: 1px solid #fff;
+    padding: 8px 10px 8px 10px;
+}
+
+.tdata {
+    background: #f8f8ff;
+    font-size: 14px;
+    border-bottom: 1px solid rgb(201, 201, 201);
+}
+
+.td {
+    padding: 10px;
+    margin-block: auto;
+}
+
+.td-wrap {
+    padding: 10px;
+    display: block;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    margin-block: auto;
+}

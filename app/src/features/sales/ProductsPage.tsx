@@ -1,0 +1,126 @@
+"use client"
+
+import { AppHeader } from "@/components/shared/AppHeader";
+import { TableFilter } from "@/components/shared/TableFilter";
+import { TablePagination } from "@/components/shared/TablePagination";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger } from "@/components/ui/select";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { usePagination } from "@/hooks/use-pagination";
+import { useSearchFilter } from "@/hooks/use-search-filter";
+import { formatToPeso } from "@/lib/formatter";
+import { ProductService } from "@/services/product.service";
+import { Product } from "@/types/products";
+import { Info, SquarePen, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import { CreateProduct } from "./CreateProduct";
+import { UpdateProduct } from "./UpdateProduct";
+import { DeleteProduct } from "./DeleteProduct";
+
+const columns = [
+    { title: 'Product Name', style: '' },
+    { title: 'Price', style: '' },
+    { title: 'Category', style: '' },
+    { title: 'Items Needed', style: '' },
+    { title: 'Action', style: '' },
+]
+
+export function ProductsPage() {
+    const [reload, setReload] = useState(false);
+    const { data, loading, error } = useFetchData<Product>(ProductService.getAllProducts, [reload]);
+    const { search, setSearch, filteredItems } = useSearchFilter(data, ['name']);
+    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
+
+    const [open, setOpen] = useState(false);
+    const [toUpdate, setUpdate] = useState<Product | undefined>();
+    const [toDelete, setDelete]  = useState<Product | undefined>();
+
+    return (
+        <section className="flex flex-col gap-2">
+            <AppHeader label="All Products" />
+            <TableFilter
+                setSearch={ setSearch }
+                searchPlaceholder="Search for a product"
+                size={ size }
+                setSize={ setSize }
+                buttonLabel="Add a product"
+                setOpen={ setOpen }
+            />
+
+            <div>
+                <div className="thead grid grid-cols-5">
+                    {columns.map((item, _) => (
+                        <div key={_} className={`th ${item.style}`}>{ item.title }</div>
+                    ))}
+                </div>
+                {paginated.length > 0 ?
+                    paginated.map((item, i) => (
+                        <div className="tdata grid grid-cols-5" key={i}>
+                            <div className="td">{ item.name }</div>
+                            <div className="td">{ formatToPeso(item.price) }</div>
+                            <div className="td">{ item.category }</div>
+                            <Select>
+                                <SelectTrigger className="w-full font-semibold underline text-dark data-[state=open]:text-dark">
+                                    Supplies Needed
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Supplies needed for { item.name }</SelectLabel>
+                                        {item.itemsNeeded.map((subItem, index) => (
+                                            <SelectItem 
+                                                key={ index } 
+                                                value={ subItem.code! }
+                                                className="flex"
+                                            >
+                                                <div className="text-sm">{ subItem.name }</div>
+                                                <div className="text-sm flex items-center ms-auto"><X /><div>{ `${subItem.quantity} ${subItem.unitMeasurement}` }</div></div>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <div className="td flex-center-y gap-2">
+                                <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                                <button><Info className="w-4 h-4" /></button>
+                                <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
+                            </div>
+                        </div>
+                    ))
+                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing products yet.</div>)
+                }
+            </div>
+
+            <TablePagination 
+                data={ data }
+                paginated={ paginated }
+                page={ page }
+                size={ size }
+                setPage={ setPage }
+            />
+
+            {open && 
+                <CreateProduct
+                    setOpen={ setOpen }
+                    setReload={ setReload }
+                />
+            }
+
+            {toUpdate && 
+                <UpdateProduct
+                    setUpdate={ setUpdate }
+                    toUpdate={ toDelete! }
+                    setReload={ setReload }
+                />
+            }
+
+            {toDelete && 
+                <DeleteProduct
+                    toDelete={ toDelete! }
+                    setDelete={ setDelete }
+                    setReload={ setReload }
+                />
+            }
+
+
+        </section>
+    )
+}
