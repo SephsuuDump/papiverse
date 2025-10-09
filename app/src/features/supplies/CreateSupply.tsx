@@ -13,7 +13,7 @@ import { handleChange } from "@/lib/form-handle";
 import { SupplyService } from "@/services/supply.service";
 
 const categories = ["MEAT", "SNOWFROST"];
-const units = ["kilograms", "grams", "milligrams", "piece", "oz", "pack"]
+const units = ["kilograms", "grams", "milligrams", "piece", "oz", "pack", "can", "tray", "liter", "gallon", "bar", "bottle", "bundle", "set", "roll", "box"]
 
 interface Props {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,26 +21,30 @@ interface Props {
 }
 
 export function CreateSupply({ setOpen, setReload }: Props) {
-    const [loading, setLoading] = useState(true);
     const [onProcess, setProcess] = useState(false);
 
     const [supply, setSupply] = useState<Supply>(supplyInit);
-    const [date, setDate] = useState<Date | undefined>();
-    const [dateOpen, setDateOpen] = useState(false);
 
     async function handleSubmit() {
         try{         
             setProcess(true);
             let invalid = false;
+
             for (const field of supplyFields) {
-                if (!supply[field]) {
+            const value = supply[field];
+            if (value === "" || value === undefined || value === null) {
+                invalid = true;
+            }
+            if (typeof value === "number" && value === 0) {
+                if (supply.isDeliverables) {
                     invalid = true;
                 }
+            }
             }
             if (invalid) {
                 toast.info("Please fill up all fields!");
                 setProcess(false);
-                return
+                return;
             }
             const data = await SupplyService.addSupply(supply);
             if (data) {
@@ -51,8 +55,13 @@ export function CreateSupply({ setOpen, setReload }: Props) {
             }   
         }
         catch(error){ toast.error(`${error}`) }
+        finally { setProcess(false) }
     }
 
+    useEffect(() => {
+        console.log(supply);
+        
+    }, [supply])
     return(
         <Dialog open onOpenChange={ setOpen }>
             <DialogContent className="overflow-y-auto">
@@ -140,29 +149,56 @@ export function CreateSupply({ setOpen, setReload }: Props) {
                         <div className="flex flex-col gap-1">
                             <div>Internal Price</div>
                             <div className="flex border-1 border-gray rounded-md">
-                                <input disabled value="₱" className="w-10 text-center" /> 
+                                <input disabled value="₱" className={`${!supply.isDeliverables && "text-gray"} w-10 text-center`} /> 
                                 <Input 
                                     type="number"
                                     className="w-full max-md:w-full" 
                                     name ="unitPriceInternal"  
                                     value={supply.unitPriceInternal}
                                     onChange={ e => handleChange(e, setSupply) }
+                                    disabled={ !supply.isDeliverables }
                                 />
                             </div>
                         </div>
                         <div className="flex flex-col gap-1">
                             <div>External Price</div>
                             <div className="flex border-1 border-gray rounded-md">
-                                <input disabled value="₱" className="w-10 text-center" /> 
+                                <input disabled value="₱" className={`${!supply.isDeliverables && "text-gray"} w-10 text-center`} /> 
                                 <Input 
                                     type="number"
                                     className="w-full max-md:w-full" 
                                     name ="unitPriceExternal"  
                                     value={supply.unitPriceExternal}
                                     onChange={ e => handleChange(e, setSupply) }
+                                    disabled={ !supply.isDeliverables }
                                 />
                             </div>
                         </div>
+                        <div className="flex flex-col gap-1 col-span-2">
+                            <div className="mt-2">Select Delivery Type</div>
+                            <RadioGroup
+                                className="mt-2 flex"
+                                value={supply.isDeliverables ? "true" : "false"}
+                                name="isDeliverables"
+                                onValueChange={(value: string) => {
+                                setSupply((prev) => ({
+                                        ...prev,
+                                        isDeliverables: value === "true",
+                                    }));
+                                }}
+                            >
+                                <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="true" className="border border-gray-300" id="deliverable" />
+                                <Label htmlFor="deliverable">Deliverable</Label>
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="false" className="border border-gray-300" id="non-deliverable" />
+                                <Label htmlFor="non-deliverable">Non-Deliverable</Label>
+                                </div>
+                            </RadioGroup>
+                            </div>
+
                     </div>
                     <div className="flex justify-end gap-4">
                         <DialogClose className="text-sm">Close</DialogClose>

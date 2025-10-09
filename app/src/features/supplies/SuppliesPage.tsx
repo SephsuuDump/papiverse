@@ -3,7 +3,7 @@
 import { PapiverseLoading } from "@/components/ui/loader";
 import { formatToPeso } from "@/lib/formatter";
 import { Supply } from "@/types/supply";
-import { Ham, Info, Snowflake, SquarePen, Trash2 } from "lucide-react";
+import { Ham, Info, Snowflake, SquarePen, Trash2, Truck } from "lucide-react";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSearchFilter } from "@/hooks/use-search-filter";
@@ -29,7 +29,9 @@ const columns = [
 export function SuppliesPage() {
     const [reload, setReload] = useState(false);
 
-    const { data, loading, error } = useFetchData(SupplyService.getAllSupplies, [reload]);
+    const { data, loading, error } = useFetchData<Supply>(SupplyService.getAllSupplies, [reload]);
+    console.log(data);
+    
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['code', 'name']); 
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);    
 
@@ -57,35 +59,47 @@ export function SuppliesPage() {
                     ))}
                 </div>
                 
-                {paginated.length > 0 ?
-                    paginated.map((item, index) => (
-                        <div className="tdata grid grid-cols-6" key={ index }>
-                            <div className="td">{ item.code }</div>
-                            <div className="td flex gap-2">
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        {item.category === 'MEAT' ? <Ham className="w-4 h-4 text-darkbrown"/> : <Snowflake className="w-4 h-4 text-blue" />}
-                                    </TooltipTrigger>
-                                    <TooltipContent>{ item.category === 'MEAT' ? "MEAT Category" : "SNOW FROST Category"}</TooltipContent>
-                                </Tooltip>
-                                <div>{ item.name }</div>
+                <div className="animate-fade-in-up" key={page}>
+                    {paginated.length > 0 ?
+                        paginated.map((item, index) => (
+                            <div className="tdata grid grid-cols-6" key={ index }>
+                                <div className="td">{ item.code }</div>
+                                <div className="td flex gap-2">
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            {item.category === 'MEAT' ? <Ham className="w-4 h-4 text-darkbrown"/> : <Snowflake className="w-4 h-4 text-blue" />}
+                                        </TooltipTrigger>
+                                        <TooltipContent>{ item.category === 'MEAT' ? "MEAT Category" : "SNOW FROST Category"}</TooltipContent>
+                                    </Tooltip>
+                                    <div>{ item.name }</div>
+                                </div>
+                                <div className="td flex gap-2">
+                                    {item.isDeliverables && (
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Truck className="w-4 h-4 text-darkorange" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>Deliverable</TooltipContent>
+                                        </Tooltip>
+                                    )}
+                                    <div>{ `${item.unitQuantity} ${item.unitMeasurement}` }</div>
+                                </div>
+                                <div className="td">{ formatToPeso(item.unitPriceInternal!) }</div>
+                                <div className="td">{ formatToPeso(item.unitPriceExternal!) }</div>
+                                <div className="td flex-center-y gap-2">
+                                    <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                                    <button><Info className="w-4 h-4" /></button>
+                                    <button
+                                        onClick={ () => setDelete(item) }
+                                    >
+                                        <Trash2 className="w-4 h-4 text-darkred" />
+                                    </button>
+                                </div>
                             </div>
-                            <div className="td">{ `${item.unitQuantity} ${item.unitMeasurement}` }</div>
-                            <div className="td">{ formatToPeso(item.unitPriceInternal!) }</div>
-                            <div className="td">{ formatToPeso(item.unitPriceExternal!) }</div>
-                            <div className="td flex-center-y gap-2">
-                                <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                <button><Info className="w-4 h-4" /></button>
-                                <button
-                                    onClick={ () => setDelete(item) }
-                                >
-                                    <Trash2 className="w-4 h-4 text-darkred" />
-                                </button>
-                            </div>
-                        </div>
-                    ))
-                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing supplies yet.</div>)
-                }
+                        ))
+                        : (<div className="my-2 text-sm text-center col-span-6">There are no existing supplies yet.</div>)
+                    }
+                </div>
             </div>
           
             <TablePagination

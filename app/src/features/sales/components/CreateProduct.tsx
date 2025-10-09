@@ -10,7 +10,7 @@ import { ProductService } from "@/services/product.service";
 import { SupplyService } from "@/services/supply.service";
 import { Product, productFields, productInit } from "@/types/products";
 import { SupplyItem } from "@/types/supplyOrder";
-import { Plus, X } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -152,27 +152,30 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                             </Select>
                             <div className="mt-6">
                                 {selectedItems.map((item, index) => (
-                                    <div className="grid grid-cols-5 border-b-1" key={ index }>
-                                        <div className="data-table-td col-span-2">{ item.name }</div>
-                                        <div className="data-table-td flex items-center col-span-2">
-                                            <X className="w-3 h-3" />
-                                            <input 
-                                                min="1"
-                                                type="number"
-                                                value={item.quantity}
-                                                onChange={(e) => handleQuantityChange(item.code!, Number(e.target.value))}
-                                                className="text-sm w-15 border-0 pl-2 py-1"
-                                            />
-                                            <div>{ item.unitMeasurement }</div>
+                                    <div className="flex tdata">
+                                        <div className="w-full grid grid-cols-2" key={ index }>
+                                            <div className="td">{ item.name }</div>
+                                            <div className="td flex-center-y gap-2">
+                                                <X className="w-3 h-3" />
+                                                <Input 
+                                                    min={0.00001} 
+                                                    type="number"
+                                                    value={item.quantity}
+                                                    onChange={(e) => handleQuantityChange(item.code!, Number(e.target.value))}
+                                                    className="text-sm w-20 pl-2 py-1 bg-white h-8"
+                                                />
+                                                <div>{ item.unitMeasurement }</div>
+                                            </div>       
                                         </div>
                                         <button 
                                             onClick={ () => handleRemove(item.code!) }
-                                            className="data-table-td underline text-darkred !text-[12px]"
+                                            className="w-10 flex-center td underline text-darkred !text-[12px]"
                                         >
-                                            Remove
+                                            <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
                                 ))}
+                                
                             </div>
                         </div>
                     </div>

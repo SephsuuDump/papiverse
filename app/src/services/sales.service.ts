@@ -6,7 +6,7 @@ const importationUrl = `${IMPORTATION_URL}/api`;
 
 
 export class SalesService {
-    static async generatOverallSummary(start: string, end: string) {
+    static async getOverallSummary(start: string, end: string) {
         return await requestData(
             `${salesUrl}/get-overall?start=${start}&end=${end}`,
             'GET'

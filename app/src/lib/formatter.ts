@@ -151,6 +151,45 @@ export const fromatMessageDateTime = (messageDateTime: string): string => {
     }
 };
 
+export function formatCustomDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+
+    // Helper: format time as 3:00 PM
+    const formatTime = (d: Date) =>
+        d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+
+    // Strip time for comparisons
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const weekAgo = new Date(today);
+    weekAgo.setDate(today.getDate() - 7);
+
+    const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+    if (target.getTime() === today.getTime()) {
+        return `Today at ${formatTime(date)}`;
+    }
+
+    if (target.getTime() === yesterday.getTime()) {
+        return `Yesterday at ${formatTime(date)}`;
+    }
+
+    if (target >= weekAgo) {
+        // within the last 7 days
+        return `${date.toLocaleDateString("en-US", { weekday: "short" })} at ${formatTime(date)}`;
+    }
+
+    // Fallback: Full date (September 28, 2025 at 3:00 PM)
+    return `${date.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+    })} at ${formatTime(date)}`;
+}
+
 export function displayCurrentDate() {
     const d = new Date();
 

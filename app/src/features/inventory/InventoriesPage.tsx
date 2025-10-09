@@ -66,29 +66,31 @@ export function InventoriesPage() {
                     ))}
                 </div>
 
-                {paginated.length > 0 ?
-                    paginated.map((item, index) => (
-                        <div className="tdata grid grid-cols-5" key={ index }>
-                            <div className="td">{ item.code }</div>
-                            <div className="td flex gap-2">
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        {item.category === 'MEAT' ? <Ham className="w-4 h-4 text-darkbrown"/> : <Snowflake className="w-4 h-4 text-blue" />}
-                                    </TooltipTrigger>
-                                    <TooltipContent>{ item.category === 'MEAT' ? "MEAT Category" : "SNOW FROST Category"}</TooltipContent>
-                                </Tooltip>
-                                <div>{ item.name }</div>
+                <div className="animate-fade-in-up" key={page}>
+                    {paginated.length > 0 ?
+                        paginated.map((item, index) => (
+                            <div className="tdata grid grid-cols-5" key={ index }>
+                                <div className="td">{ item.code }</div>
+                                <div className="td flex gap-2">
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            {item.category === 'MEAT' ? <Ham className="w-4 h-4 text-darkbrown"/> : <Snowflake className="w-4 h-4 text-blue" />}
+                                        </TooltipTrigger>
+                                        <TooltipContent>{ item.category === 'MEAT' ? "MEAT Category" : "SNOW FROST Category"}</TooltipContent>
+                                    </Tooltip>
+                                    <div>{ item.name }</div>
+                                </div>
+                                <div className="td">{ item.quantity }</div>
+                                <div className="td">{ formatToPeso(item.unitPrice!) }</div>
+                                <div className="td flex-center-y gap-2">
+                                    <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                                    <button><Info className="w-4 h-4" /></button>
+                                </div>
                             </div>
-                            <div className="td">{ item.quantity }</div>
-                            <div className="td">{ formatToPeso(item.unitPrice!) }</div>
-                            <div className="td flex-center-y gap-2">
-                                <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                <button><Info className="w-4 h-4" /></button>
-                            </div>
-                        </div>
-                    ))
-                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing supplies yet.</div>)
-                }
+                        ))
+                        : (<div className="my-2 text-sm text-center col-span-6">There are no existing supplies yet.</div>)
+                    }
+                </div>
             </div>
 
             <TablePagination 

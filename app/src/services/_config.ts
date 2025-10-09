@@ -28,6 +28,10 @@ export async function requestData(
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || "Request failed");
     }
+    const response = await res.json();
 
-    return res.json();
+    console.log('Response Body:', response);
+    
+
+    return response;
 }

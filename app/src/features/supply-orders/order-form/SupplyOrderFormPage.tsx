@@ -14,7 +14,9 @@ import { OrderReceipt } from "./OrderReceipt";
 
 export function SupplyOrderFormPage() {
     const { claims, loading: authLoading } = useAuth();
-    const { data, loading, error } = useFetchData<Supply>(SupplyService.getAllSupplies);
+    const { data, loading, error } = useFetchData<Supply>(SupplyService.getDeliverableSupplies);
+    console.log(data);
+    
     const { supplies, selectedItems, handleSelect, handleQuantityChange, handleRemove } = useSupplySelection(claims, data);
     
     const [tab, setTab] = useState('meat');

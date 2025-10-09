@@ -12,9 +12,9 @@ import { ProductService } from "@/services/product.service";
 import { Product } from "@/types/products";
 import { Info, SquarePen, Trash2, X } from "lucide-react";
 import { useState } from "react";
-import { CreateProduct } from "./CreateProduct";
-import { UpdateProduct } from "./UpdateProduct";
-import { DeleteProduct } from "./DeleteProduct";
+import { CreateProduct } from "./components/CreateProduct";
+import { UpdateProduct } from "./components/UpdateProduct";
+import { DeleteProduct } from "./components/DeleteProduct";
 
 const columns = [
     { title: 'Product Name', style: '' },

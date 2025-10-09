@@ -39,7 +39,7 @@ export const adminRoute = [
         title: 'Sales', 
         icon: ChartNoAxesCombined,
         children: [
-            { title: 'Overview', href: '/admin/sales' },
+            { title: 'Overview', href: '/sales' },
             { title: 'Products', href: '/sales/products' },
             { title: 'Paid Orders', href: '/sales/paid-orders' },
             { title: 'Branch Sales', href: '/admin/sales/branches' },

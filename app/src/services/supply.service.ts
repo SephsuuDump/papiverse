@@ -20,6 +20,13 @@ export class SupplyService {
     );
   }
 
+  static async getDeliverableSupplies(page: number, size: number) {
+    return await requestData(
+        `${url}/get-deliverables?page=${page}&size=${size}`,
+        "GET"
+    );
+  }
+
   static async addSupply(supply: Supply) {
     const payload = {
         ...supply,

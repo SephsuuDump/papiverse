@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "@/styles/styles.css";
 import "@/styles/table.css";
+import "@/styles/animation.css";
 import { AuthProvider } from "@/hooks/use-auth";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/shared/AppSidebar";
