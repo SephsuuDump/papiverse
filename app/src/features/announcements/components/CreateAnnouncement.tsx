@@ -19,9 +19,10 @@ interface Preview {
 
 interface Props {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function CreateAnnouncement({ setOpen }: Props) {
+export function CreateAnnouncement({ setOpen, setReload }: Props) {
     const { claims, loading } = useAuth();
     const [announcement, setAnnouncement] = useState<Announcement>(announcementInit);
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -109,16 +110,14 @@ export function CreateAnnouncement({ setOpen }: Props) {
             toast.error("Please enter announcement content");
             return;
         }
-
         setIsUploading(true);
-
         try {
-
             const data = await AnnouncementService.createAnnouncement(announcement, selectedImages);
-
             if (data) {
                 toast.success("Successfully created a post!");
                 resetForm();
+                setReload(prev => !prev);
+                setOpen(false);
             }
         } catch (error) {
             toast.error("Failed to create announcement");
@@ -141,20 +140,7 @@ export function CreateAnnouncement({ setOpen }: Props) {
         <Dialog open onOpenChange={ setOpen }>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <ModalTitle label="Post Announcement" />
-                <label className="w-fit bg-slate-50 px-3 py-2 rounded-md flex items-center gap-2 transition-colors text-sm">
-                    <FileImage className="h-4 w-4" />
-                    Add Images
-                    <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="hidden"
-                    />
-                </label>
-
                 <div className="space-y-4">
-                    <div>
                     <Textarea
                         name="content"
                         placeholder="Type your announcement here"
@@ -163,13 +149,11 @@ export function CreateAnnouncement({ setOpen }: Props) {
                         value={announcement.content}
                         required
                     />
-                    </div>
-
-                    {/* Image previews */}
-                    {previews.length > 0 && (
-                        <div>
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-sm font-medium text-gray-700">
+                    
+                    {previews.length > 0 ? (
+                        <div className="border border-gray-200 rounded-lg p-4 bg-slate-50">
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-sm font-semibold text-gray-700">
                                     Selected Images ({previews.length})
                                 </span>
                                 <button
@@ -179,46 +163,61 @@ export function CreateAnnouncement({ setOpen }: Props) {
                                     setSelectedImages([]);
                                     setPreviews([]);
                                     }}
-                                    className="text-xs text-red-500 hover:text-red-700"
+                                    className="text-xs font-medium text-red-500 hover:text-red-700 transition-colors"
                                 >
                                     Remove All
                                 </button>
                             </div>
+
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            {previews.map((preview, idx) => (
-                                <div key={idx} className="relative group">
-                                <img
-                                    src={preview.url}
-                                    alt={`Preview ${idx + 1}`}
-                                    className="w-full h-24 object-cover rounded-md border border-gray-200"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => removeImage(idx)}
-                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                                >
-                                    <X className="h-3 w-3" />
-                                </button>
-                                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 rounded-b-md">
-                                    <div className="truncate">{preview.name}</div>
-                                    <div className="text-gray-300">{formatFileSize(preview.size)}</div>
-                                </div>
-                                </div>
-                            ))}
+                                {previews.map((preview, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="relative group rounded-md overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow"
+                                    >
+                                        <img
+                                            src={preview.url}
+                                            alt={`Preview ${idx + 1}`}
+                                            className="w-full h-28 object-cover"
+                                        />
+
+                                        {/* Remove button */}
+                                        <button
+                                            type="button"
+                                            onClick={() => removeImage(idx)}
+                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-sm"
+                                            title="Remove"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+
+                                        {/* Image info overlay */}
+                                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] p-1.5 leading-tight">
+                                            <div className="truncate font-medium">{preview.name}</div>
+                                            <div className="text-gray-300">{formatFileSize(preview.size)}</div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
+                        ) : (
+                        // 🟢 Clean empty upload area
+                        <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors">
+                            <input
+                                type="file"
+                                multiple
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+                            <Upload className="h-10 w-10 text-gray-400 mb-3" />
+                            <p className="text-gray-700 font-medium text-sm">Click to upload images</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                                You can upload multiple images (max 10MB each)
+                            </p>
+                        </label>
                     )}
 
-                    {/* Upload area when no images */}
-                    {previews.length === 0 && (
-                        <button className="w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                            <Upload className="h-10 w-10 text-gray-400 mx-auto mb-2" />
-                            <p className="text-gray-500 text-sm mb-1">No images selected</p>
-                            <p className="text-xs text-gray-400">
-                            Click "Add Images" to upload multiple images (max 10MB each)
-                            </p>
-                        </button>
-                    )}
 
                     <form
                         className="flex justify-end gap-4"

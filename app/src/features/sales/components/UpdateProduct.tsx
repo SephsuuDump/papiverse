@@ -1,5 +1,6 @@
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { UpdateButton } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ModalLoader } from "@/components/ui/loader";
@@ -73,6 +74,17 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
     const handleRemove = async (id: number) => {
         setSelectedItems(selectedItems.filter((item: SupplyItem) => item.id !== id));
     };
+
+    const handleForTakeout = async (id: number) => {
+        const foundItem = selectedItems.find(i => i.id === id);
+        setSelectedItems(prev => 
+            prev.map(item =>
+                item.id === id
+                    ? { ...item, forTakeOut: foundItem!.forTakeOut ? false : true } 
+                    : item
+            )
+        )
+    }
 
     async function handleSubmit() {
         try {
@@ -168,13 +180,16 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                         <Plus strokeWidth={ 2 } className="w-5 h-5 text-dark" />
                                         <div className="text-dark">Select Supplies</div>
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="relative">
                                         <SelectGroup>
-                                            <Input 
-                                                placeholder="Search for a supply"
-                                                onChange={ e => setSearch(e.target.value) }
-                                                onKeyDown={ e => e.stopPropagation() } 
-                                            />
+                                            <div className="sticky top-0 z-10 bg-white">
+                                                <Input
+                                                    placeholder="Search for a supply"
+                                                    className="!bg-white !text-black shadow-sm"
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                    onKeyDown={(e) => e.stopPropagation()}
+                                                />
+                                            </div>
                                             <SelectLabel>All Supplies</SelectLabel>
                                             {filteredItems.map((item) => (
                                                 <SelectItem key={item.code} value={item.code!}>{item.code} - {item.name}</SelectItem>
@@ -190,13 +205,16 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                         <Plus strokeWidth={ 2 } className="w-5 h-5 text-dark" />
                                         <div className="text-dark">Select Products</div>
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="relative">
                                         <SelectGroup>
-                                            <Input 
-                                                placeholder="Search for a product"
-                                                onChange={ e => setSearch(e.target.value) }
-                                                onKeyDown={ e => e.stopPropagation() } 
-                                            />
+                                            <div className="sticky top-0 z-10 bg-white">
+                                                <Input
+                                                    placeholder="Search for a product"
+                                                    className="!bg-white !text-black shadow-sm"
+                                                    onChange={(e) => setSearchProduct(e.target.value)}
+                                                    onKeyDown={(e) => e.stopPropagation()}
+                                                />
+                                            </div>
                                             <SelectLabel>All Products</SelectLabel>
                                             {filteredProducts.map((item) => (
                                                 <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
@@ -208,7 +226,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                             <div>
                                 {selectedItems.map((item, index) => (
                                     <div className="flex tdata" key={index}>
-                                        <div className="w-full grid grid-cols-2" key={ index }>
+                                        <div className="w-full grid grid-cols-3" key={ index }>
                                             <div className="td">{ item.name }</div>
                                             <div className="td flex-center-y gap-2">
                                                 <X className="w-3 h-3" />
@@ -236,7 +254,17 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                                         : item.unitMeasurement ?? 'N/A'
                                                     }
                                                 </div>
-                                            </div>       
+                                            </div>  
+                                            <div className="text-xs flex-center">
+                                                <Checkbox
+                                                    className="mr-1 bg-white shadow-sm"
+                                                    checked={ item.forTakeOut! }
+                                                    onCheckedChange={ () => handleForTakeout(item.id!) }
+                                                >
+
+                                                </Checkbox>
+                                                Take-out
+                                            </div>          
                                         </div>
                                         <button 
                                             onClick={ () => handleRemove(item.id!) }

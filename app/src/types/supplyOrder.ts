@@ -45,6 +45,7 @@ export interface SupplyItem {
     unitPrice?: number;
     unitQuantity?: number;
     type?: string;
+    forTakeOut?: boolean;
 }
 
 export interface CompleteOrder {

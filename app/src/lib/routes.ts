@@ -54,6 +54,12 @@ export const adminRoute = [
 
 export const franchiseeRoute = [
     { 
+        title: 'Announcements', 
+        icon: Megaphone,
+        href: '/announcements',
+        children: []
+    },
+    { 
         title: 'Employees', 
         icon: UsersRound,
         href: '/employees',

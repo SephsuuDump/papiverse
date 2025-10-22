@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ModalLoader } from "../../../components/ui/loader";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const categories = ["A'LA CARTE", "AFFORDABLE RICE MEALS", "BIG EVENT? WE GOT YOU", "BILAO BLOW OUT", "BINALOT NI PAPI", "BURGERS", "CHEF'S PASTA", "CHEF'S PASTA 4-5 PAX", "COMBO A", "COMBO B", "COMBO C", "COMBO D", "COMBO E", "CRUNCHY BAGNET", "EXTRAS", "GRILLED SIZZLING BBQ DEALS", "KRISPY DELIGHTS", "KRISPY SISIG", "OVERLOAD SARAP", "PREMIUM BUNDLE DEALS", "QUENCHERS", "SALO SALO SPECIAL", "SIGNATURE PLATES", "SIZZLING MEALS", "SNOWFROST HALO MIX", "UNLI DEALS"];
 
@@ -41,7 +42,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
             if (selectedItem) {
             setSelectedItems([
                 ...selectedItems,
-                { id: selectedItem.id, code: selectedItem.code, name: selectedItem.name, quantity: 1, unitMeasurement: selectedItem.convertedMeasurement, unitPrice: selectedItem.unitPrice, category: selectedItem.category, type: "RAW" }
+                { id: selectedItem.id, code: selectedItem.code, name: selectedItem.name, quantity: 1, unitMeasurement: selectedItem.convertedMeasurement, unitPrice: selectedItem.unitPrice, category: selectedItem.category, type: "RAW", forTakeOut: false }
             ]);
             } else {
                 console.warn(`Item with code ${code} not found.`);
@@ -55,7 +56,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
             if (selectedItem) {
             setSelectedItems([
                 ...selectedItems,
-                { id: selectedItem.id, code: "", name: selectedItem.name, quantity: 1, type: "PRODUCT" }
+                { id: selectedItem.id, code: "", name: selectedItem.name, quantity: 1, type: "PRODUCT", forTakeOut: false }
             ]);
             } else {
                 console.warn(`Item with code ${id} not found.`);
@@ -70,6 +71,17 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                 : item
         ));
     };
+
+    const handleForTakeout = async (id: number) => {
+        const foundItem = selectedItems.find(i => i.id === id);
+        setSelectedItems(prev => 
+            prev.map(item =>
+                item.id === id
+                    ? { ...item, forTakeOut: foundItem!.forTakeOut ? false : true } 
+                    : item
+            )
+        )
+    }
 
     const handleRemove = async (id: number) => {
         setSelectedItems(selectedItems.filter((item: SupplyItem) => item.id !== id));
@@ -148,6 +160,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                 </SelectContent>
                             </Select>
                         </div>
+
                         <div className="flex flex-col gap-1">
                             <div>Price</div>
                             <div className="flex border-1 border-gray rounded-md max-md:w-full">
@@ -174,11 +187,14 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <Input 
-                                                placeholder="Search for a supply"
-                                                onChange={ e => setSearch(e.target.value) }
-                                                onKeyDown={ e => e.stopPropagation() } 
-                                            />
+                                            <div className="sticky top-0 z-10 bg-white">
+                                                <Input
+                                                    placeholder="Search for a supply"
+                                                    className="!bg-white !text-black shadow-sm"
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                    onKeyDown={(e) => e.stopPropagation()}
+                                                />
+                                            </div>
                                             <SelectLabel>All Supplies</SelectLabel>
                                             {filteredItems.map((item) => (
                                                 <SelectItem key={item.code} value={item.code!}>{item.code} - {item.name}</SelectItem>
@@ -194,13 +210,16 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                         <Plus strokeWidth={ 2 } className="w-5 h-5 text-dark" />
                                         <div className="text-dark">Select Products</div>
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="relative">
                                         <SelectGroup>
-                                            <Input 
-                                                placeholder="Search for a product"
-                                                onChange={ e => setSearch(e.target.value) }
-                                                onKeyDown={ e => e.stopPropagation() } 
-                                            />
+                                            <div className="sticky top-0 z-10 bg-white">
+                                                <Input
+                                                    placeholder="Search for a product"
+                                                    className="!bg-white !text-black shadow-sm"
+                                                    onChange={(e) => setSearchProduct(e.target.value)}
+                                                    onKeyDown={(e) => e.stopPropagation()}
+                                                />
+                                            </div>
                                             <SelectLabel>All Products</SelectLabel>
                                             {filteredProducts.map((item) => (
                                                 <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
@@ -212,7 +231,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                             <div>
                                 {selectedItems.map((item, index) => (
                                     <div className="flex tdata" key={index}>
-                                        <div className="w-full grid grid-cols-2" key={ index }>
+                                        <div className="w-full grid grid-cols-3" key={ index }>
                                             <div className="td">{ item.name }</div>
                                             <div className="td flex-center-y gap-2">
                                                 <X className="w-3 h-3" />
@@ -240,7 +259,17 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                                         : item.unitMeasurement ?? 'N/A'
                                                     }
                                                 </div>
-                                            </div>       
+                                            </div> 
+                                            <div className="text-xs flex-center">
+                                                <Checkbox
+                                                    className="mr-1 bg-white shadow-sm"
+                                                    checked={ item.forTakeOut! }
+                                                    onCheckedChange={ () => handleForTakeout(item.id!) }
+                                                >
+
+                                                </Checkbox>
+                                                Take-out
+                                            </div>      
                                         </div>
                                         <button 
                                             onClick={ () => handleRemove(item.id!) }

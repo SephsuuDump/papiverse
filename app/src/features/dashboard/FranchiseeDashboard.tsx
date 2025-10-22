@@ -16,7 +16,7 @@ export function FranchiseeDashboard() {
             <AppHeader label="Welcome Back, User!" />
             <div className="row-md">
                 {tabs.map((item, i) => (
-                    <div className={`w-full stack-sm p-4 bg-white rounded-md shadow-sm ${tab === item && "!bg-gradient-to-r from-orange-50 to-yellow-50"}`}>
+                    <div className={`w-full stack-sm p-4 bg-white rounded-md shadow-sm ${tab === item && "!bg-gradient-to-r from-orange-50 to-yellow-50"}`} key={i}>
                         <div className="flex justify-between">
                             <div className="text-sm font-semibold">{ item } Summary</div>
                             <button><Info className="w-4 h-4" /></button>
