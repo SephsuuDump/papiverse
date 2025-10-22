@@ -1,5 +1,4 @@
-import { ChartNoAxesCombined, Container, Ham, MessageCircleMore, Store, UserRound, UsersRound, Wallet } from "lucide-react";
-import { hrtime } from "process";
+import { ChartNoAxesCombined, Container, Ham, Megaphone, MessageCircleMore, Store, UserRound, UsersRound, Wallet } from "lucide-react";
 
 export const adminRoute = [
     { 
@@ -21,6 +20,12 @@ export const adminRoute = [
         children: []
     },
     { 
+        title: 'Announcement', 
+        icon: Megaphone,
+        href: '/announcements',
+        children: []
+    },
+    { 
         title: 'Supplies', 
         icon: Ham,
         href: '/supplies',
@@ -32,7 +37,7 @@ export const adminRoute = [
         children: [
             { title: 'Inventories', href: '/inventory/inventories' },
             { title: 'Inventory Logs', href: '/inventory/logs' },
-            { title: 'Order Request', href: '/inventory/supply-orders' },
+            { title: 'Supply Orders', href: '/inventory/supply-orders' },
         ]
     },
     { 

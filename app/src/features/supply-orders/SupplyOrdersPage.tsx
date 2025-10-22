@@ -14,6 +14,8 @@ import { TablePagination } from "@/components/shared/TablePagination";
 import { PapiverseLoading } from "@/components/ui/loader";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
+import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
+import { CompletedOrders } from "./CompletedOrders";
 
 const tabs = ['Pending', 'Completed', 'Rejected']
 
@@ -41,19 +43,13 @@ export default function SupplyOrdersPage() {
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
-        <section className="flex flex-col gap-2">
+        <section className="stack-md animate-fade-in-up">
             <AppHeader label='Supply Orders' />
-            <div className="w-fit flex-center bg-slate-50 shadow-sm rounded-full">
-                {tabs.map((item, i) => (
-                    <Button
-                        key={i}
-                        onClick={ () => setTab(item) }
-                        className={`w-30 rounded-full !bg-slate-50 text-dark hover:opacity-50 ${tab === item && "!bg-darkbrown text-light hover:opacity-100"}`}
-                    >
-                        { item }
-                    </Button>
-                ))}
-            </div>
+            <AppTabSwitcher
+                tabs={ tabs }
+                selectedTab={ tab }
+                setSelectedTab={ setTab }
+            />
 
             <TableFilter
                 setSearch={ setSearch }
@@ -67,7 +63,16 @@ export default function SupplyOrdersPage() {
 
             {tab === 'Pending' && (
                 <PendingOrders 
+                    claims={ claims }
                     paginated={ paginated.filter(i => i.status === 'PENDING' || i.status === 'TO FOLLOW') } 
+                    setReload={ setReload }
+                />
+            )}
+
+            {tab === 'Completed' && (
+                <CompletedOrders 
+                    claims={ claims }
+                    paginated={ paginated.filter(i => i.status === 'APPROVED' || i.status === 'DELIVERED') } 
                     setReload={ setReload }
                 />
             )}

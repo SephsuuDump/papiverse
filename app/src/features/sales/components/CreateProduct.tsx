@@ -2,7 +2,7 @@ import { ModalTitle } from "@/components/shared/ModalTitle";
 import { AddButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { handleChange } from "@/lib/form-handle";
@@ -14,9 +14,9 @@ import { Plus, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { toast } from "sonner";
+import { ModalLoader } from "../../../components/ui/loader";
 
-const categories = ["MEAT", "SNOWFROST"];
-const units = ["kilograms", "grams", "milligrams", "piece", "oz", "pack"]
+const categories = ["A'LA CARTE", "AFFORDABLE RICE MEALS", "BIG EVENT? WE GOT YOU", "BILAO BLOW OUT", "BINALOT NI PAPI", "BURGERS", "CHEF'S PASTA", "CHEF'S PASTA 4-5 PAX", "COMBO A", "COMBO B", "COMBO C", "COMBO D", "COMBO E", "CRUNCHY BAGNET", "EXTRAS", "GRILLED SIZZLING BBQ DEALS", "KRISPY DELIGHTS", "KRISPY SISIG", "OVERLOAD SARAP", "PREMIUM BUNDLE DEALS", "QUENCHERS", "SALO SALO SPECIAL", "SIGNATURE PLATES", "SIZZLING MEALS", "SNOWFROST HALO MIX", "UNLI DEALS"];
 
 interface Props {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,8 +27,10 @@ export function CreateProduct({ setOpen, setReload }: Props) {
     const [onProcess, setProcess] = useState(false);
     const [product, setProduct] = useState<Product>(productInit);
     const [selectedItems, setSelectedItems] = useState<SupplyItem[]>([]);
+    const [quantityInput, setQuantityInput] = useState("1");
 
-    const { data: supplies, loading, error } = useFetchData(SupplyService.getAllSupplies, [], []);
+    const { data: supplies, loading, error } = useFetchData(SupplyService.getAllSupplies, [], [], 0, 1000);
+    const { data: products, loading: productLoading, error: productsError } = useFetchData(ProductService.getAllProducts, [], [], 0, 1000);
     const { search, setSearch, filteredItems } = useSearchFilter(supplies, ['name', 'code']);
     
     const handleSelect = async (code: string) => {
@@ -37,7 +39,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
             if (selectedItem) {
             setSelectedItems([
                 ...selectedItems,
-                { code, name: selectedItem.name, quantity: 1, unitMeasurement: selectedItem.unitMeasurement, unitPrice: selectedItem.unitPrice, category: selectedItem.category }
+                { code, name: selectedItem.name, quantity: 1, unitMeasurement: selectedItem.convertedMeasurement, unitPrice: selectedItem.unitPrice, category: selectedItem.category }
             ]);
             } else {
                 console.warn(`Item with code ${code} not found.`);
@@ -84,6 +86,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
         finally { setProcess(false) }
     }
 
+    if (loading || productLoading) return <ModalLoader />
     return(
         <Dialog open onOpenChange={ setOpen }>
             <DialogContent className="overflow-y-auto">
@@ -107,12 +110,22 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                         </div>
                         <div className="flex flex-col gap-1">
                             <div>Category</div>
-                            <Input    
-                                className="w-full border-1 border-gray rounded-md max-md:w-full" 
-                                name ="category"  
-                                value={product.category}
-                                onChange={ e => handleChange(e, setProduct)}
-                            />  
+                            <Select
+                                value={ product.category }
+                                onValueChange={ (value) => setProduct(prev => ({
+                                    ...prev,
+                                    category: value
+                                })) }
+                            >
+                                <SelectTrigger className="w-full border-1 border-gray">
+                                    <SelectValue placeholder="Select Category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categories.map((item, index) => (
+                                        <SelectItem value={ item } key={ index }>{ item }</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="flex flex-col gap-1">
                             <div>Price</div>
@@ -142,6 +155,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                         <Input 
                                             placeholder="Search for a supply"
                                             onChange={ e => setSearch(e.target.value) }
+                                            onKeyDown={ e => e.stopPropagation() } 
                                         />
                                         <SelectLabel>All Supplies</SelectLabel>
                                         {filteredItems.map((item) => (
@@ -152,7 +166,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                             </Select>
                             <div className="mt-6">
                                 {selectedItems.map((item, index) => (
-                                    <div className="flex tdata">
+                                    <div className="flex tdata" key={index}>
                                         <div className="w-full grid grid-cols-2" key={ index }>
                                             <div className="td">{ item.name }</div>
                                             <div className="td flex-center-y gap-2">
@@ -160,8 +174,16 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                                 <Input 
                                                     min={0.00001} 
                                                     type="number"
-                                                    value={item.quantity}
-                                                    onChange={(e) => handleQuantityChange(item.code!, Number(e.target.value))}
+                                                    step="any"
+                                                    defaultValue={1}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                                                            if (value !== "" && !isNaN(Number(value))) {
+                                                                handleQuantityChange(item.code!, Number(value));
+                                                            }
+                                                        }
+                                                    }}
                                                     className="text-sm w-20 pl-2 py-1 bg-white h-8"
                                                 />
                                                 <div>{ item.unitMeasurement }</div>

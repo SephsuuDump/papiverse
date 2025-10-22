@@ -4,8 +4,8 @@ import { PapiverseLoading } from "@/components/ui/loader";
 import { useAuth } from "@/hooks/use-auth";
 import { InventoryLog } from "@/types/inventory-log";
 import { useState } from "react";
-import { OrderLogs } from "./OrderLogs";
-import { InputLogs } from "./InputLogs";
+import { OrderLogs } from "./components/OrderLogs";
+import { InputLogs } from "./components/InputLogs";
 import { InventoryService } from "@/services/inventory.service";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { useSearchFilter } from "@/hooks/use-search-filter";
@@ -13,6 +13,8 @@ import { AppHeader } from "@/components/shared/AppHeader";
 import { usePagination } from "@/hooks/use-pagination";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { TableFilter } from "@/components/shared/TableFilter";
+import { Button } from "@/components/ui/button";
+import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
 
 const tabs = ['Input Logs', 'Order Logs'];
 
@@ -30,7 +32,7 @@ export function LogsPage() {
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
-        <section className="flex flex-col gap-2">
+        <section className="stack-md animate-fade-in-up">
             <AppHeader label="Inventory Logs" />
 
             <TableFilter 
@@ -41,17 +43,11 @@ export function LogsPage() {
                 removeAdd={true}
             />
 
-            <div className="flex w-fit rounded-full bg-light shadow-xs">
-                {tabs.map((item, index) => (
-                    <button 
-                        onClick={ () => setActiveTab(item) }
-                        key={ index }
-                        className={ `w-30 py-0.5 rounded-full text-sm ${activeTab === item && "bg-darkorange text-light"}` }
-                    >
-                        { item }
-                    </button>
-                ))}
-            </div>
+            <AppTabSwitcher 
+                tabs={ tabs }
+                selectedTab={ activeTab }
+                setSelectedTab={ setActiveTab }
+            />
 
             {activeTab === 'Order Logs' && (
                 <OrderLogs logs={ paginated.filter(i => i.source === 'ORDER') } />

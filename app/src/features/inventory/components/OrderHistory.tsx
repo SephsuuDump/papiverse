@@ -5,7 +5,7 @@ import { SetStateAction } from "react";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { SupplyOrder } from "@/types/supplyOrder";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
-import { ViewOrderModal } from "../supply-orders/ViewOrderModal";
+import { ViewOrderModal } from "../../supply-orders/ViewOrderModal";
 import { ViewFullOrder } from "./ViewFullOrder";
 
 interface Props {

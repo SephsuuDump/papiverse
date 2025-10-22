@@ -4,12 +4,16 @@ import { AppHeader } from "@/components/shared/AppHeader";
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { AddButton, Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
+import { PapiverseLoading } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
+import { useFetchOne } from "@/hooks/use-fetch-one";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
+import { DeliveryService } from "@/services/delivery.service";
 import { SupplyOrderService } from "@/services/supplyOrder.service";
 
 import { Claim } from "@/types/claims";
+import { Delivery } from "@/types/delivery";
 import { SupplyItem } from "@/types/supplyOrder";
 import { Ham, Snowflake } from "lucide-react";
 import Image from "next/image";
@@ -24,6 +28,8 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: {
     setActiveForm: (i: string) => void;
     selectedItems: SupplyItem[];
 }) {
+    const { data: delivery, loading, error } = useFetchOne<Delivery>(DeliveryService.getDeliveryFeeByBranch, [], [claims.branch.branchId]);
+
     const router = useRouter()
     const [tab, setTab] = useState('Meat Order');
     const [open, setOpen] = useState(false);
@@ -54,7 +60,8 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: {
                 branchId: claims.branch.branchId,
                 remarks: "",
                 meatCategoryItemId: meatFinal.id,
-                snowfrostCategoryItemId: snowFinal.id
+                snowfrostCategoryItemId: snowFinal.id,
+                deliveryFee: delivery!.deliveryFee,
             }
 
             const data = await SupplyOrderService.createSupplyOrder(orderSupply);
@@ -69,8 +76,9 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: {
         }
     }
 
+    if (loading) return <PapiverseLoading />
     return(
-        <section className="flex flex-col gap-2">
+        <section className="stack-md animate-fade-in-up">
             <AppHeader label="Supply Order Receipt" />
             <div className="w-fit flex-center bg-slate-50 shadow-sm rounded-full">
                 {tabs.map((item, i) => (
@@ -84,22 +92,14 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: {
                 ))}
             </div>
 
-            {tab === 'Meat Order' ? 
-                <Orders
-                    tab={ tab }
-                    orders={ meatReceipt }
-                    meatTotal={ totalMeatAmount }
-                    snowTotal={ totalSnowFrostAmount }
-                />
-            :
-                <Orders
-                    tab={ tab }
-                    orders={ snowFrostReceipt }
-                    meatTotal={ totalMeatAmount }
-                    snowTotal={ totalSnowFrostAmount }
-                />
-            }
-
+            <Orders
+                tab={ tab }
+                orders={ tab === 'Meat Order' ? meatReceipt : snowFrostReceipt }
+                delivery={ delivery! }
+                meatTotal={ totalMeatAmount }
+                snowTotal={ totalSnowFrostAmount }
+            />
+        
             <div className="flex justify-end gap-2 mt-2">
                 <Button 
                     onClick={ () => setActiveForm("snow") } 
@@ -128,9 +128,10 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: {
     );
 }
 
-function Orders({ tab, orders, meatTotal, snowTotal }: {
+function Orders({ tab, orders, delivery, meatTotal, snowTotal }: {
     tab: string;
     orders: SupplyItem[];
+    delivery: Delivery;
     meatTotal: number;
     snowTotal: number;
 }) {
@@ -144,7 +145,7 @@ function Orders({ tab, orders, meatTotal, snowTotal }: {
     ]
     
     return (
-        <div className="p-4 bg-white rounded-md shadow-sm relative">
+        <div className="p-4 bg-white rounded-md shadow-sm relative animate-fade-in-up" key={tab}>
             <Image src="/images/kp_logo.png" alt="KP Logo" width={60} height={60} className="top-2 right-2 absolute" />
             <div className="flex justify-center items-center gap-2">
                 { tab === 'Meat Order' ? <Ham /> : <Snowflake /> }
@@ -188,15 +189,18 @@ function Orders({ tab, orders, meatTotal, snowTotal }: {
                 : (
                     <div className="text-sm text-gray font-semibold text-center py-2">You have no items for { tab }.</div>
                 )}
-                <div className="text-gray text-sm text-end mx-4 mt-4">
+                <div className="text-gray text-sm text-end mx-4 mt-2">
                     Meat Order <span className="font-semibold text-dark">+ { formatToPeso(meatTotal) }</span>
                 </div>
-                <div className="text-gray text-sm text-end mx-4 mt-4">
+                <div className="text-gray text-sm text-end mx-4 mt-2">
                     Snow Order <span className="font-semibold text-dark">+ { formatToPeso(snowTotal) }</span>
+                </div>
+                <div className="text-gray text-sm text-end mx-4 mt-2">
+                    Delivery Fee <span className="font-semibold text-dark">+ { formatToPeso(delivery.deliveryFee) }</span>
                 </div>
                 <Separator className="my-4 bg-gray" />
                 <div className="text-gray text-end mx-4">
-                    Complete Order Total:  <span className="ml-2 font-semibold text-darkbrown inline-block scale-x-120">{ formatToPeso(meatTotal + snowTotal) }</span>
+                    Complete Order Total:  <span className="ml-2 font-semibold text-darkbrown inline-block scale-x-120">{ formatToPeso(meatTotal + snowTotal + delivery.deliveryFee) }</span>
                 </div>
             </div>
         </div>

@@ -1,6 +1,7 @@
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { DeleteButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
+import { ProductService } from "@/services/product.service";
 import { UserService } from "@/services/user.service";
 import { Product } from "@/types/products";
 import { useState } from "react";
@@ -18,7 +19,7 @@ export function DeleteProduct({ toDelete, setDelete, setReload }: Props) {
     async function handleDelete() {
         try {
             setProcess(true);
-            await UserService.deleteUser(toDelete.id!);
+            await ProductService.deleteProduct(toDelete.id!);
             toast.success(`Employee ${toDelete.name} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { 

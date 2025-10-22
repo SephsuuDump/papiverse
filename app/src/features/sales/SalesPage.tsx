@@ -43,7 +43,7 @@ export function SalesPage() {
     }, {} as Record<string, typeof summary>);
 
     return (
-        <section className="flex flex-col gap-2 w-full py-4 px-2 overflow-x-hidden">
+        <section className="stack-md animate-fade-in-up">
             <div className="flex items-stretch gap-2">
                 {Object.entries(grouped).map(([key, value]) => (
                     <div 
@@ -134,29 +134,31 @@ export function SalesPage() {
             </div>
 
             <div className="grid grid-cols-10 gap-2">
-                <div className="col-span-7 border-1 bg-white shadow-sm rounded-md px-2">
+                <div className="col-span-7 border-1 bg-white shadow-sm rounded-md px-2 overflow-hidden">
                     <div className="text-lg scale-x-110 font-semibold origin-left p-2">Top Selling Products</div>
-                    <div className="thead flex">
-                        <div className="border-r-1 border-r-white w-15 flex-center">#</div>
-                        <div className="grid grid-cols-3 w-full">
-                            {columns.map((item, _) => (
-                                <div key={_} className={`th ${item.style}`}>{ item.title }</div>
-                            ))}
-                        </div>
-                    </div>
-                    {data.topProducts.map((item: any, index: number) => (
-                        <div className="tdata flex">
-                            <div className="w-15 flex-center font-bold">{ index + 1 }</div>
-                            <div 
-                                key={ index }
-                                className={`w-full grid grid-cols-3`}
-                            >
-                                <div className="td">{ item.productName }</div>
-                                <div className="td">{ formatToPeso(item.amount) }</div>
-                                <div className="td">{ item.quantity }</div>
+                    <div className="shadow-[0_3px_8px_rgba(0,0,0,0.25)]">
+                        <div className="thead flex">
+                            <div className="border-r-1 border-r-white w-15 flex-center">#</div>
+                            <div className="grid grid-cols-3 w-full">
+                                {columns.map((item, _) => (
+                                    <div key={_} className={`th ${item.style}`}>{ item.title }</div>
+                                ))}
                             </div>
                         </div>
-                    ))}
+                        {data.topProducts.map((item: any, index: number) => (
+                            <div className="tdata flex">
+                                <div className="w-15 flex-center font-bold">{ index + 1 }</div>
+                                <div 
+                                    key={ index }
+                                    className={`w-full grid grid-cols-3`}
+                                >
+                                    <div className="td">{ item.productName }</div>
+                                    <div className="td">{ formatToPeso(item.amount) }</div>
+                                    <div className="td">{ item.quantity }</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
                 <div className="col-span-7 border-1 bg-white shadow-sm rounded-md px-2">
                     <div className="text-lg scale-x-110 font-semibold origin-left p-2">Top Selling Products</div>

@@ -22,7 +22,7 @@ export function DeleteSupply({ toDelete, setDelete, setReload }: Props) {
         try {
             setProcess(true);
             await SupplyService.deleteSupply(toDelete.code!);
-            toast.success(`Employee ${toDelete.name} deleted successfully.`)
+            toast.success(`Supply ${toDelete.name} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { 
             setProcess(false); 

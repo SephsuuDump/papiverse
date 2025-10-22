@@ -9,6 +9,7 @@ import { SectionLoading } from "@/components/ui/loader";
 import { Dispatch, SetStateAction, useState } from "react";
 import { AddRemarks } from "./AddRemarks";
 import Link from "next/link";
+import { Claim } from "@/types/claims";
 
 const columns = [
     { title: 'Branch Name' , style: '' },
@@ -18,7 +19,8 @@ const columns = [
     { title: 'Total Amount' , style: '' },
 ]
 
-export function PendingOrders({ paginated, setReload }: {
+export function PendingOrders({ claims, paginated, setReload }: {
+    claims: Claim;
     paginated: SupplyOrder[];
     setReload: Dispatch<SetStateAction<boolean>>;
 }) {
@@ -73,6 +75,7 @@ export function PendingOrders({ paginated, setReload }: {
 
             {order && (
                 <AddRemarks 
+                    claims={ claims }
                     order={ order }
                     setOrder={ setOrder }
                     setReload={ setReload }

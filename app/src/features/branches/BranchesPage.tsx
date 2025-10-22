@@ -14,6 +14,8 @@ import { BranchService } from "@/services/branch.service";
 import { CreateBranch } from "./CreateBranch";
 import { UpdateBranch } from "./UpdateBranch";
 import { DeleteBranch } from "./DeleteBranch";
+import { OrderStatusBadge } from "@/components/ui/badge";
+import { useCrudState } from "@/hooks/use-crud-state";
 
 const columns = [
     { title: "Branch Name", style: "" },
@@ -22,22 +24,27 @@ const columns = [
     { title: "Actions", style: "" },
 ]
 
+const filters = ['All', 'Internal Branch', 'External Branch'];
+
 export function BranchesPage() {
     const [reload, setReload] = useState(false);
+    const [filter, setFilter] = useState(filters[0]);
 
     const { data, loading } = useFetchData<Branch>(BranchService.getAllBranches, [reload]);
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['branchName']);
-    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
 
-    const [open, setOpen] = useState(false);
-    const [toUpdate, setUpdate] = useState<Branch | undefined>();
-    const [toDelete, setDelete] = useState<Branch | undefined>();
-    console.log(data);
-    
+    const filteredData = filteredItems.filter(i => {
+        if (filter === 'Internal Branch') return i.isInternal;
+        if (filter === 'External Branch') return !i.isInternal;
+        return true;
+    });
+
+    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20);
+    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Branch>();
 
     if (loading) return <PapiverseLoading />
     return (
-        <section className="flex flex-col gap-2">
+        <section className="stack-md animate-fade-in-up">
             <AppHeader label="All Branches" />
 
             <TableFilter
@@ -47,6 +54,9 @@ export function BranchesPage() {
                 buttonLabel="Add a branch"
                 size={ size }
                 setSize={ setSize }
+                filters={ filters }
+                filter={ filter }
+                setFilter={ setFilter }
             />
 
             <div>
@@ -56,30 +66,35 @@ export function BranchesPage() {
                     ))}
                 </div>
 
-                {paginated.length > 0 ? (
-                    paginated.map((item, index) => (
-                        <div className="tdata grid grid-cols-5" key={index}>
-                            <div className="td">{ item.branchName }</div>
-                            <div className="td col-span-2 break-words">
-                                {`${item.streetAddress}, ${item.barangay}, ${item.city}, ${item.province}`}
+                <div className="animate-fade-in-up" key={`${page}-${filter}`}>
+                    {paginated.length > 0 ? (
+                        paginated.map((item, index) => (
+                            <div className="tdata grid grid-cols-5" key={index}>
+                                <div className="td">{ item.branchName }</div>
+                                <div className="td col-span-2 break-words">
+                                    {`${item.streetAddress}, ${item.barangay}, ${item.city}, ${item.province}`}
+                                </div>
+                                <div className="td">
+                                    <OrderStatusBadge 
+                                        className={`!text-dark !text-xs ${item.isInternal ? "bg-[#e9e0c1]" : "bg-slate-200"}`} 
+                                        status={item.isInternal ? "Internal Branch" : "External Branch"} 
+                                    />
+                                </div>
+                                <div className="td flex-center-y gap-2">
+                                    <button onClick={() => setUpdate(item)}><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                                    <button><Info className="w-4 h-4" /></button>
+                                    <button onClick={() => setDelete(item)}><Trash2 className="w-4 h-4 text-darkred" /></button>
+                                </div>
                             </div>
-                            <div className="td">
-                                {item.isInternal ? "Internal Branch" : "External Branch"}
-                            </div>
-                            <div className="td flex-center-y gap-2">
-                                <button onClick={() => setUpdate(item)}><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                <button><Info className="w-4 h-4" /></button>
-                                <button onClick={() => setDelete(item)}><Trash2 className="w-4 h-4 text-darkred" /></button>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="my-2 text-sm text-center col-span-6">There are no existing branches yet.</div>
-                )}
+                        ))
+                    ) : (
+                        <div className="my-2 text-sm text-center col-span-6">There are no existing branches yet.</div>
+                    )}
+                </div>
             </div>
 
             <TablePagination
-                data={ data }
+                data={ filteredData }
                 paginated={ paginated }
                 page={ page }
                 size={ size }

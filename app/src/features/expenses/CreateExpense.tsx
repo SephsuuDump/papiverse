@@ -1,4 +1,4 @@
-import { AddButton, Button } from "@/components/ui/button";
+import { AddButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { FormLoader } from "@/components/ui/loader";
@@ -42,21 +42,26 @@ export function CreateExpense({ claims, setOpen, setReload }: Props) {
     async function handleSubmit() {
         try {
             setProcess(true);
+            let invalid = false;
             for (const field of expenseFields) {
-                    if (expense[field] === "" || expense[field] === undefined || expense[field] === 0) {
-                        toast.info("Please fill up all fields!");
-                        return; 
-                    }
+                if (!expense[field]) {
+                    invalid = true;
                 }
+            }
+            if (invalid) {
+                toast.info("Please fill up all fields!");
+                setProcess(false);
+                return
+            }
             const data = await ExpenseService.createExpense(expense);
-            if (data) toast.success(`Expenditure for ${expense.purpose} added successfully.`)
+            if (data) {
+                toast.success(`Expenditure for ${expense.purpose} added successfully.`);
+                setReload(prev => !prev);
+                setOpen(!open);
+                setExpense(expenseInit);
+            }
         } catch (error) { toast.error(`${error}`) }
-        finally { 
-            setReload(prev => !prev);
-            setProcess(false); 
-            setOpen(!open);
-            setExpense(expenseInit);
-        }
+        finally { setProcess(false) }
     }
     return(
         <Dialog open onOpenChange={ setOpen }>
@@ -143,7 +148,13 @@ export function CreateExpense({ claims, setOpen, setReload }: Props) {
                         />
                     </div>
                 </div>
-                <div className="flex justify-end gap-4">
+                <form 
+                    className="flex justify-end gap-4"
+                    onSubmit={ e => {
+                        e.preventDefault();
+                        handleSubmit();
+                    }}
+                >
                     <DialogClose className="text-sm">Close</DialogClose>
                     <AddButton 
                         type="submit"
@@ -151,7 +162,7 @@ export function CreateExpense({ claims, setOpen, setReload }: Props) {
                         label="Add Expenditure"
                         loadingLabel="Adding Expenditure"
                     />
-                </div>
+                </form>
             </DialogContent>
         </Dialog>
     );

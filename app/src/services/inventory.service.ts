@@ -28,6 +28,15 @@ export class InventoryService {
     );
   }
 
+  static async updateInventory(inventory: Inventory) {
+    return await requestData(
+        `${url}/update`,
+        "POST",
+        undefined,
+        inventory
+    );
+  }
+
   static async deleteInventory(id: number) {
     return await requestData(
         `${url}/delete?id=${id}`,
@@ -35,12 +44,19 @@ export class InventoryService {
     );
   }
 
-  static async createInventoryInput(inventory: Inventory, branchId: number) {
+  static async createInventoryInput(inventory: Inventory) {
     return await requestData(
         `${url}/process-transaction-input`,
         "POST",
         undefined,
-        inventory
+        {
+          rawMaterialCode: inventory.code,
+          branchId: inventory.branchId,
+          changedQuantity: inventory.changedQuantity,
+          type: inventory.type,
+          unitType: inventory.unitType,
+          source: 'INPUT'
+        }
     );
   }
 

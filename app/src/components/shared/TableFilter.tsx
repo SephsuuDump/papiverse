@@ -6,7 +6,7 @@ import { addBusinessDays } from "date-fns";
 
 const pages = [10, 20, 30, 40, 50, 100]
 
-export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel, size, setSize, removeAdd }: {
+export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel, size, setSize, removeAdd, filters, filter,  setFilter }: {
     setSearch: (i: string) => void;
     searchPlaceholder: string;
     size: number;
@@ -14,6 +14,9 @@ export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel
     removeAdd?: false | boolean;
     setOpen?: Dispatch<SetStateAction<boolean>>;
     buttonLabel?: string;
+    filters?: string[];
+    filter?: string;
+    setFilter?: (i: string) => void;
 }) {
     return (
         <div className="flex items-center">
@@ -39,11 +42,19 @@ export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel
                         </SelectContent>
                     </Select>
                 </div>
-                <Select>
+                <Select
+                    value={ filter }
+                    onValueChange={ (value) => setFilter?.(value) }
+                >
                     <SelectTrigger className="bg-light shadow-xs">
                         <Funnel className="text-dark" />
                         <SelectValue placeholder="Filter" />
                     </SelectTrigger>
+                    <SelectContent>
+                        {filters?.map((item, i) => (
+                            <SelectItem value={ item } key={i}>{ item }</SelectItem>
+                        ))}
+                    </SelectContent>
                 </Select>
                 <Button 
                     variant="secondary"

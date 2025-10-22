@@ -200,3 +200,10 @@ export function displayCurrentDate() {
 
     return `${weekday}, ${month} ${day}, ${year}`;
 }
+
+export function getPhilippineTimeISO() {
+    const now = new Date();
+    const tzOffset = now.getTimezoneOffset() * 60000; // e.g. -480 minutes = -8h
+    const localISOTime = new Date(now.getTime() - tzOffset).toISOString().slice(0, -1);
+    return localISOTime;
+}

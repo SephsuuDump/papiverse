@@ -1,4 +1,5 @@
 export type Supply = {
+    id?: number;
     code?: string;
     name?: string;
     isDeliverables?: boolean;
@@ -6,6 +7,8 @@ export type Supply = {
     unitMeasurement?: string;
     unitPriceInternal?: number;
     unitPriceExternal?: number;
+    convertedQuantity?: number;
+    convertedMeasurement?: string;
     category?: string;
 
     unitPrice?: number; 
@@ -17,6 +20,8 @@ export const supplyInit: Supply = {
     isDeliverables: true,
     unitQuantity: 0,
     unitMeasurement: "",
+    convertedQuantity: 0,
+    convertedMeasurement: "",
     unitPriceInternal: 0,
     unitPriceExternal: 0,
     category: "",

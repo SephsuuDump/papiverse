@@ -4,6 +4,7 @@ import { flattenGroupedLogsWithOrders, formatDateToWords, getWeekday } from "@/l
 import { InventoryLog } from "@/types/inventory-log";
 import { Fragment } from "react";
 import dayjs from "dayjs"
+import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 
 
 interface Props {
@@ -39,10 +40,9 @@ export function InputLogs({ logs }: Props) {
                         {item.orders.map((subItem, index) => (
                             <AccordionItem value={ String(subItem.orderId) } key={ index }>
                                 <AccordionTrigger className="rounded-none bg-light px-4 shadow-xs">
-                                    <div className="w-full grid grid-cols-4">
+                                    <div className="w-full grid grid-cols-3">
                                         <div>Order ID: <span className="font-semibold">{ subItem.orderId || "None" }</span></div>
                                         <div>Source: <span className="font-semibold">{ subItem.logs[0].source }</span></div>
-                                        <div>Type: <span className="font-semibold">{ subItem.logs[0].type === "IN" ? "INGOING" : "OUTGOING" }</span></div>
                                         <div className="font-semibold">{ subItem.logs[0].branchName }</div>
                                     </div>
                                 </AccordionTrigger> 
@@ -50,13 +50,22 @@ export function InputLogs({ logs }: Props) {
                                     
                                         {subItem.logs.map((subSubItem, index) => (
                                             <Fragment key={ index }>
-                                                <div className="grid grid-cols-4 py-2">
-                                                    <div>{ subSubItem.rawMaterialCode }</div>
-                                                    <div>Qty: { subSubItem.quantityChanged }</div>
-                                                    <div>{ subSubItem.rawMaterialName }</div>
-                                                    <div>
-                                                        {dayjs(subSubItem.dateTime).format("dddd, MMMM D, YYYY h:mm A")}
-                                                    </div>
+                                                <div className="grid grid-cols-5 py-2">
+                                                    <div className="my-auto">{ subSubItem.rawMaterialCode }</div>
+                                                    <div className="flex-center-y my-auto">
+                                                        { subSubItem.type === 'IN' ? 
+                                                            <ArrowBigUp 
+                                                                className="w-4 h-4 text-darkgreen" fill="#014421"
+                                                            />
+                                                            :
+                                                            <ArrowBigDown 
+                                                                className="w-4 h-4 text-darkred" fill="#731c13"
+                                                            />
+                                                        }
+                                                        { subSubItem.quantityChanged } { subSubItem.unitMeasurement }</div>
+                                                    <div className="my-auto">{ subSubItem.type === "IN" ? "INGOING" : "OUTGOING" }</div>
+                                                    <div className="my-auto">{ subSubItem.rawMaterialName }</div>
+                                                    <div className="my-auto">{dayjs(subSubItem.dateTime).format("ddd, MMM D, YYYY h:mm A")}</div>
                                                 </div>
                                                 <Separator />
                                             </Fragment>

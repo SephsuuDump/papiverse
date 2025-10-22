@@ -15,6 +15,7 @@ import { useState } from "react";
 import { CreateProduct } from "./components/CreateProduct";
 import { UpdateProduct } from "./components/UpdateProduct";
 import { DeleteProduct } from "./components/DeleteProduct";
+import { PapiverseLoading } from "@/components/ui/loader";
 
 const columns = [
     { title: 'Product Name', style: '' },
@@ -34,8 +35,9 @@ export function ProductsPage() {
     const [toUpdate, setUpdate] = useState<Product | undefined>();
     const [toDelete, setDelete]  = useState<Product | undefined>();
 
+    if (loading) return <PapiverseLoading />
     return (
-        <section className="flex flex-col gap-2">
+        <section className="stack-md animate-fade-in-up">
             <AppHeader label="All Products" />
             <TableFilter
                 setSearch={ setSearch }
@@ -52,41 +54,43 @@ export function ProductsPage() {
                         <div key={_} className={`th ${item.style}`}>{ item.title }</div>
                     ))}
                 </div>
-                {paginated.length > 0 ?
-                    paginated.map((item, i) => (
-                        <div className="tdata grid grid-cols-5" key={i}>
-                            <div className="td">{ item.name }</div>
-                            <div className="td">{ formatToPeso(item.price) }</div>
-                            <div className="td">{ item.category }</div>
-                            <Select>
-                                <SelectTrigger className="w-full font-semibold underline text-dark data-[state=open]:text-dark">
-                                    Supplies Needed
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>Supplies needed for { item.name }</SelectLabel>
-                                        {item.itemsNeeded.map((subItem, index) => (
-                                            <SelectItem 
-                                                key={ index } 
-                                                value={ subItem.code! }
-                                                className="flex"
-                                            >
-                                                <div className="text-sm">{ subItem.name }</div>
-                                                <div className="text-sm flex items-center ms-auto"><X /><div>{ `${subItem.quantity} ${subItem.unitMeasurement}` }</div></div>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            <div className="td flex-center-y gap-2">
-                                <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                <button><Info className="w-4 h-4" /></button>
-                                <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
+                <div className="animate-fade-in-up" key={page}>
+                    {paginated.length > 0 ?
+                        paginated.map((item, i) => (
+                            <div className="tdata grid grid-cols-5" key={i}>
+                                <div className="td">{ item.name }</div>
+                                <div className="td">{ formatToPeso(item.price) }</div>
+                                <div className="td">{ item.category }</div>
+                                <Select>
+                                    <SelectTrigger className="td font-semibold underline text-dark data-[state=open]:text-dark">
+                                        Supplies Needed
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectLabel>Supplies needed for { item.name }</SelectLabel>
+                                            {item.itemsNeeded.map((subItem, index) => (
+                                                <SelectItem 
+                                                    key={ index } 
+                                                    value={ subItem.code! }
+                                                    className="flex"
+                                                >
+                                                    <div className="text-sm">{ subItem.name }</div>
+                                                    <div className="text-sm flex items-center ms-auto"><X /><div>{ `${subItem.quantity} ${subItem.unitMeasurement}` }</div></div>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                                <div className="td flex-center-y gap-2">
+                                    <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                                    <button><Info className="w-4 h-4" /></button>
+                                    <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
+                                </div>
                             </div>
-                        </div>
-                    ))
-                    : (<div className="my-2 text-sm text-center col-span-6">There are no existing products yet.</div>)
-                }
+                        ))
+                        : (<div className="my-2 text-sm text-center col-span-6">There are no existing products yet.</div>)
+                    }
+                </div>
             </div>
 
             <TablePagination 
@@ -107,7 +111,7 @@ export function ProductsPage() {
             {toUpdate && 
                 <UpdateProduct
                     setUpdate={ setUpdate }
-                    toUpdate={ toDelete! }
+                    toUpdate={ toUpdate! }
                     setReload={ setReload }
                 />
             }

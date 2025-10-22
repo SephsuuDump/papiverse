@@ -15,6 +15,7 @@ import { EmployeeService } from "@/services/employee.service";
 import { CreateEmployee } from "./CreateEmployee";
 import { UpdateEmployee } from "./UpdateEmployee";
 import { DeleteEmployee } from "./DeleteEmployee";
+import { AppAvatar } from "@/components/shared/AppAvatar";
 
 const columns = [
     { title: "Full Name & Position", style: "col-span-2" },
@@ -40,7 +41,7 @@ export function EmployeesPage() {
     if (loading || authLoading) return <PapiverseLoading />;
 
     return (
-        <section className="flex flex-col gap-2">
+        <section className="stack-md animate-fade-in-up">
             <AppHeader label='All Employees' />
 
             <TableFilter
@@ -61,42 +62,42 @@ export function EmployeesPage() {
                     ))}
                 </div>
 
-                {paginated.length > 0 ? (
-                    paginated.map((item, index) => (
-                        <div className="tdata grid grid-cols-4" key={index}>
-                            <div className="td col-span-2 flex items-center gap-2">
-                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brown text-light font-semibold">
-                                    {`${item.firstName[0]}${item.lastName[0]}`}
-                                </div>
-                                <div>
-                                    <div className="font-semibold">
-                                        {`${item.lastName}, ${item.firstName} ${item.middleName}`}
+                <div className="animate-fade-in-up" key={page}>
+                    {paginated.length > 0 ? (
+                        paginated.map((item, index) => (
+                            <div className="tdata grid grid-cols-4" key={index}>
+                                <div className="td col-span-2 flex items-center gap-2">
+                                    <AppAvatar fallback={ `${item.firstName[0]}${item.lastName[0]}` } />
+                                    <div>
+                                        <div className="font-semibold">
+                                            {`${item.lastName}, ${item.firstName} ${item.middleName}`}
+                                        </div>
+                                        <div className="text-gray">{item.position}</div>
                                     </div>
-                                    <div className="text-gray">{item.position}</div>
+                                </div>
+                                <div className="td flex items-center gap-1">
+                                    <Mail className="w-4 h-4" />
+                                    <span className="text-sm">{item.email}</span>
+                                </div>
+                                <div className="td flex-center-y gap-2">
+                                    <button onClick={() => setUpdate(item)}>
+                                        <SquarePen className="w-4 h-4 text-darkgreen" />
+                                    </button>
+                                    <button>
+                                        <Info className="w-4 h-4" />
+                                    </button>
+                                    <button onClick={() => setDelete(item)}>
+                                        <Trash2 className="w-4 h-4 text-darkred" />
+                                    </button>
                                 </div>
                             </div>
-                            <div className="td flex items-center gap-1">
-                                <Mail className="w-4 h-4" />
-                                <span className="text-sm">{item.email}</span>
-                            </div>
-                            <div className="td flex-center-y gap-2">
-                                <button onClick={() => setUpdate(item)}>
-                                    <SquarePen className="w-4 h-4 text-darkgreen" />
-                                </button>
-                                <button>
-                                    <Info className="w-4 h-4" />
-                                </button>
-                                <button onClick={() => setDelete(item)}>
-                                    <Trash2 className="w-4 h-4 text-darkred" />
-                                </button>
-                            </div>
+                        ))
+                    ) : (
+                        <div className="my-2 text-sm text-center col-span-6">
+                            There are no existing employees yet.
                         </div>
-                    ))
-                ) : (
-                    <div className="my-2 text-sm text-center col-span-6">
-                        There are no existing employees yet.
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
 
             <TablePagination

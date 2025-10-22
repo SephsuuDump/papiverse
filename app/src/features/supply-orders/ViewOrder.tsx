@@ -1,13 +1,12 @@
 import { AppHeader } from "@/components/shared/AppHeader";
 import { ModalTitle } from "@/components/shared/ModalTitle";
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { OrderStatusBadge, OrderStatusLabel } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent } from "@/components/ui/alert-dialog";
+import { OrderStatusBadge } from "@/components/ui/badge";
 import { Button, UpdateButton } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormLoader, PapiverseLoading, SectionLoading } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
-import { useFetchData } from "@/hooks/use-fetch-data"
 import { useFetchOne } from "@/hooks/use-fetch-one";
 import { useSupplyOrderApproval } from "@/hooks/use-supply-order-approval";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
@@ -16,7 +15,6 @@ import { SupplyOrder } from "@/types/supplyOrder"
 import { Ham, MoveRight, Snowflake } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation"
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 const tabs = ['Meat Order', 'Snow Order']
@@ -50,7 +48,7 @@ export function ViewOrderPage({ id }: { id: number }) {
 
     if (loading || authLoading) return <PapiverseLoading /> 
     return (
-        <section className="flex flex-col gap-2">
+        <section className="stack-md animate-fade-in-up">
             <AppHeader label={ `${data!.meatCategory?.meatOrderId} | ${data!.snowfrostCategory?.snowFrostOrderId}`  } />
             <div className="flex justify-between items-center">
                 <div className="flex-center bg-slate-50 shadow-sm rounded-full">
@@ -79,7 +77,7 @@ export function ViewOrderPage({ id }: { id: number }) {
                 </div>
             </div>
 
-            <div className="relative p-4 bg-white rounded-md shadow-sm">
+            <div className="relative p-4 bg-white rounded-md shadow-sm animate-fade-in-up" key={tab}>
                 {claims.roles[0] === 'FRANCHISOR' && (
                     <div className="top-2 left-2 flex items-center gap-1">
                         <Checkbox id="meat" 
@@ -127,16 +125,19 @@ export function ViewOrderPage({ id }: { id: number }) {
                             <div key={_} className={`th ${item.style}`}>{ item.title }</div>
                         ))}
                     </div>
-                    { tab === 'Snow Order' ? 
+                    { tab === 'Meat Order' ? 
                         <Orders orders={ data!.meatCategory!.meatItems } /> 
                         : <Orders orders={ data!.snowfrostCategory!.snowFrostItems } /> 
                     }
                 </div>
-                <div className="text-gray text-sm text-end mx-4 mt-4">
+                <div className="text-gray text-sm text-end mx-4 mt-2">
                     Meat Order <span className="font-semibold text-dark">+ { formatToPeso(data!.meatCategory!.categoryTotal) }</span>
                 </div>
-                <div className="text-gray text-sm text-end mx-4">
+                <div className="text-gray text-sm text-end mx-4 mt-2">
                     Snow Order <span className="font-semibold text-dark">+ { formatToPeso(data!.snowfrostCategory!.categoryTotal) }</span>
+                </div>
+                <div className="text-gray text-sm text-end mx-4 mt-2">
+                    Delivery Fee <span className="font-semibold text-dark">+ { formatToPeso(data!.deliveryFee) }</span>
                 </div>
                 <Separator className="my-4 bg-gray" />
                 <div className="text-gray text-end mx-4">

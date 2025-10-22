@@ -48,9 +48,10 @@ export class SupplyService {
     const payload = {
         ...supply,
         name: capitalizeWords(supply.name!),
+        category: supply.isDeliverables ? supply.category : 'NONDELIVERABLES',
         unitQuantity: Number(supply.unitQuantity),
-        unitPriceInternal: Number(supply.unitPriceInternal),
-        unitPriceExternal: Number(supply.unitPriceExternal),
+        unitPriceInternal: supply.isDeliverables ? Number(supply.unitPriceInternal) : 0,
+        unitPriceExternal: supply.isDeliverables ? Number(supply.unitPriceExternal) : 0,
     };
 
     return await requestData(

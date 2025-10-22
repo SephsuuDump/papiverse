@@ -11,9 +11,11 @@ interface AuthContextType {
 
 const claimsInit = {
     branch: {
-        branchId: 0,          // default numeric id, adjust as needed
+        branchId: 0,   
+        branchName: '',       // default numeric id, adjust as needed
         isInternal: false,    // default boolean value
     },
+    username: '',
     exp: 0,                 // default expiration timestamp (e.g., Unix epoch start)
     iat: 0,                 // default issued-at timestamp
     roles: [],              // empty array, no roles assigned yet

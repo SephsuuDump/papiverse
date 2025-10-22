@@ -17,7 +17,7 @@ export function FormLoader({ onProcess, label, loadingLabel }: LoaderProps) {
 
 export function PapiverseLoading({ className }: { className?: string }) {
     return(
-        <section className={ `flex-center w-full h-screen ${className}` }>
+        <section className={ `flex-center w-full h-full ${className}` }>
             <div className="animate-bounce">
                 <Image
                     src="/images/papiverse_logo.png"
@@ -52,15 +52,7 @@ export function ModalLoader() {
         <Dialog open>
             <DialogContent>
                 <DialogTitle></DialogTitle>
-                <div className="h-100 animate-bounce">
-                    <Image
-                        src="/images/papiverse_logo.png"
-                        alt="Papiverse Logo"
-                        width={200}
-                        height={200}
-                    />
-                    <div className="text-lg text-center">LOADING</div>
-                </div>
+                <SectionLoading />
             </DialogContent>
         </Dialog>
     )

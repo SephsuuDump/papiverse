@@ -39,7 +39,7 @@ export function MeatOrder({ supplies, selectedItems, setActiveForm, onSelect, on
     };
 
     return(
-        <section className="flex flex-col gap-2">
+        <section className="stack-md animate-fade-in-up">
             <AppHeader label="Meat Order Form" />
 
             <div>

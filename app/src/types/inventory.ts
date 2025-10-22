@@ -5,6 +5,8 @@ export interface Inventory {
     name?: string;
     unitPrice?: number;
     unitMeasurement?: string;
+    convertedQuantity?: number;
+    convertedMeasurement?: string;
     category?: string;
     quantity?: number;
     branchId?: number;
@@ -13,6 +15,7 @@ export interface Inventory {
     rawMaterialCode?: string;
     type?: string;
     source?: string;
+    unitType?: string;
 }
 
 export const inventoryInit: Inventory = {
@@ -33,7 +36,6 @@ export const inventoryUpdate : Inventory = {
 }
 
 export const inventoryFields: (keyof Inventory)[] = [
-    "rawMaterialCode",
     "changedQuantity",
     "branchId",
 ];

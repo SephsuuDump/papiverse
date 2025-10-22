@@ -1,4 +1,5 @@
-import { AddButton, UpdateButton } from "@/components/ui/button";
+import { ModalTitle } from "@/components/shared/ModalTitle";
+import { UpdateButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,14 +7,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { handleChange } from "@/lib/form-handle";
 import { SupplyService } from "@/services/supply.service";
-import { Branch, branchFields, branchInit } from "@/types/branch";
-import { Supply, supplyFields, supplyInit } from "@/types/supply";
+import { Supply, supplyFields } from "@/types/supply";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const categories = ["MEAT", "SNOWFROST"];
-const units = ["kg", "grams", "milligrams", "piece", "oz", "packs", "boxes"]
+const categories = ["MEAT", "SNOWFROST", "NONDELIVERABLES"];
+const units = ["bar","block","bottle","box","bundle","can","gallon","grams","kilograms","liter","milligrams","milliliters","oz","pack","piece","roll","serving","set","tray"]
 
 interface Props {
     toUpdate: Supply;
@@ -30,16 +30,22 @@ export function UpdateSupply({ toUpdate, setUpdate, setReload }: Props) {
     async function handleSubmit() {
         try{         
             setProcess(true);
+            let invalid = false;
             for (const field of supplyFields) {
-                if (
-                    supply[field] === "" ||
-                    supply[field] === null ||
-                    supply[field] === undefined ||
-                    supply[field] === 0
-                ) {
-                    toast.info("Please fill up all fields!");
-                return; 
+            const value = supply[field];
+            if (value === "" || value === undefined || value === null) {
+                invalid = true;
+            }
+            if (typeof value === "number" && value === 0) {
+                if (supply.isDeliverables) {
+                    invalid = true;
                 }
+            }
+            }
+            if (invalid) {
+                toast.info("Please fill up all fields!");
+                setProcess(false);
+                return;
             }
             const data = await SupplyService.updateSupply(supply);
             if (data) toast.success(`Supply ${supply.name} updated successfully!`);    
@@ -52,18 +58,13 @@ export function UpdateSupply({ toUpdate, setUpdate, setReload }: Props) {
         }
     }
 
+    useEffect(() => {
+        console.log(supply);
+    }, [supply])
     return(
         <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined) } }>
-            <DialogContent className="overflow-y-auto">
-                <DialogTitle className="flex items-center gap-2">  
-                    <Image
-                        src="/images/kp_logo.png"
-                        alt="KP Logo"
-                        width={40}
-                        height={40}
-                    />
-                    <div className="font-semibold text-xl">Create Supply</div>      
-                </DialogTitle>
+            <DialogContent className="h-9/10 overflow-y-auto">
+                <ModalTitle label="Update" spanLabel={ toUpdate.name }/>
                 <form 
                     className="flex flex-col gap-4"
                     onSubmit={ e => {
@@ -128,7 +129,35 @@ export function UpdateSupply({ toUpdate, setUpdate, setReload }: Props) {
                                     })) }
                                 >
                                     <SelectTrigger className="w-full border-0">
-                                        <SelectValue placeholder={ supply.unitMeasurement } />
+                                        <SelectValue placeholder="Select Unit" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {units.map((item, index) => (
+                                            <SelectItem value={ item } key={ index }>{ item }</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-1 col-span-2">
+                            <div>Converted Measurement</div>
+                            <div className="flex border-1 border-gray rounded-md max-md:w-full">
+                                <Input    
+                                    className="w-full border-0" 
+                                    type="number"
+                                    name ="convertedQuantity"  
+                                    value={supply.convertedQuantity ?? 0}
+                                    onChange={ e => handleChange(e, setSupply)}
+                                />  
+                                <Select
+                                    value={ supply.convertedMeasurement }
+                                    onValueChange={ (value) => setSupply(prev => ({
+                                        ...prev,
+                                        convertedMeasurement: value
+                                    })) }
+                                >
+                                    <SelectTrigger className="w-full border-0">
+                                        <SelectValue placeholder="Select Unit" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {units.map((item, index) => (
@@ -141,29 +170,55 @@ export function UpdateSupply({ toUpdate, setUpdate, setReload }: Props) {
                         <div className="flex flex-col gap-1">
                             <div>Internal Price</div>
                             <div className="flex border-1 border-gray rounded-md">
-                                <input disabled value="₱" className="w-10 text-center" /> 
+                                <input disabled value="₱" className={`${!supply.isDeliverables && "text-gray"} w-10 text-center`} />
                                 <Input 
                                     type="number"
                                     className="w-full max-md:w-full" 
                                     name ="unitPriceInternal"  
-                                    value={supply.unitPriceInternal}
+                                    value={ supply.isDeliverables ? supply.unitPriceInternal : 0 }
                                     onChange={ e => handleChange(e, setSupply) }
+                                    disabled={ !supply.isDeliverables }
                                 />
                             </div>
                         </div>
                         <div className="flex flex-col gap-1">
                             <div>External Price</div>
                             <div className="flex border-1 border-gray rounded-md">
-                                <input disabled value="₱" className="w-10 text-center" /> 
+                                <input disabled value="₱" className={`${!supply.isDeliverables && "text-gray"} w-10 text-center`} />
                                 <Input 
                                     type="number"
                                     className="w-full max-md:w-full" 
                                     name ="unitPriceExternal"  
-                                    value={supply.unitPriceExternal}
+                                    value={ supply.isDeliverables ? supply.unitPriceExternal : 0 }
                                     onChange={ e => handleChange(e, setSupply) }
+                                    disabled={ !supply.isDeliverables }
                                 />
                             </div>
                         </div>
+                    </div>
+                    <div className="flex flex-col gap-1 col-span-2">
+                        <div className="mt-2">Select Delivery Type</div>
+                        <RadioGroup
+                            className="mt-2 flex"
+                            value={supply.isDeliverables ? "true" : "false"}
+                            name="isDeliverables"
+                            onValueChange={(value: string) => {
+                            setSupply((prev) => ({
+                                    ...prev,
+                                    isDeliverables: value === "true",
+                                }));
+                            }}
+                        >
+                            <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="true" className="border border-gray-300" id="deliverable" />
+                            <Label htmlFor="deliverable">Deliverable</Label>
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="false" className="border border-gray-300" id="non-deliverable" />
+                            <Label htmlFor="non-deliverable">Non-Deliverable</Label>
+                            </div>
+                        </RadioGroup>
                     </div>
                     <div className="flex justify-end gap-4">
                         <DialogClose className="text-sm">Close</DialogClose>

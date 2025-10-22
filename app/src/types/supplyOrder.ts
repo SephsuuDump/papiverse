@@ -4,6 +4,7 @@ export interface SupplyOrder {
     orderDate: string;
     status: string;
     remarks: string;
+    deliveryFee: number;
     completeOrderTotalAmount: number;
 
     meatCategory?: {
@@ -34,11 +35,13 @@ export interface SupplyOrder {
 }
 
 export interface SupplyItem {
+    id?: number;
     category?: string;        
     code?: string;          
     name?: string;           
     quantity?: number;        
     unitMeasurement?: string; 
+    convertedMeasurement?: string;
     unitPrice?: number;
     unitQuantity?: number;
 }
@@ -48,6 +51,7 @@ export interface CompleteOrder {
     remarks: string;
     meatCategoryItemId: string;
     snowfrostCategoryItemId: string;
+    deliveryFee: number;
 }
 
 interface OrderItem {

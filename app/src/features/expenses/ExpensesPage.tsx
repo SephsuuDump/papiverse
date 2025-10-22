@@ -41,7 +41,7 @@ export default function ExpensesPage() {
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
-        <section className="stack-md">
+        <section className="stack-md animate-fade-in-up">
             <AppHeader label="All Expenses" />
             <div className="w-fit flex-center bg-slate-50 shadow-sm rounded-full">
                 {tabs.map((item, i) => (
@@ -60,9 +60,9 @@ export default function ExpensesPage() {
                 setSize={ setSize }
                 size={ size }
                 buttonLabel="Add an expense"
+                setOpen={ setOpen }
             />
 
-            
             {tab === 'Weekly' && (
                 <WeeklyExpenses
                     setUpdate={ setUpdate }

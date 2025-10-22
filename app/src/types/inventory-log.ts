@@ -3,6 +3,7 @@ export interface InventoryLog {
     inventoryId: number;
     rawMaterialCode: string;
     rawMaterialName: string;
+    unitMeasurement: string;
     branchId: string;
     branchName?: string;
     quantityChanged: number;

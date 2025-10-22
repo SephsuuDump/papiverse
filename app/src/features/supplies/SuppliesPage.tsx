@@ -3,7 +3,7 @@
 import { PapiverseLoading } from "@/components/ui/loader";
 import { formatToPeso } from "@/lib/formatter";
 import { Supply } from "@/types/supply";
-import { Ham, Info, Snowflake, SquarePen, Trash2, Truck } from "lucide-react";
+import { Ham, Info, PackageX, Snowflake, SquarePen, Trash2, Truck } from "lucide-react";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSearchFilter } from "@/hooks/use-search-filter";
@@ -16,32 +16,41 @@ import { usePagination } from "@/hooks/use-pagination";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { UpdateSupply } from "./UpdateSupply";
 import { DeleteSupply } from "./DeleteSupply";
+import { OrderStatusBadge } from "@/components/ui/badge";
+import { useCrudState } from "@/hooks/use-crud-state";
 
 const columns = [
     { title: "SKU ID", style: "" },
     { title: "Supply Name", style: "" },
-    { title: "Unit", style: "" },
+    { title: "Base Measurement", style: "" },
+    { title: "Converted Measurement", style: "" },
     { title: "Internal Price", style: "" },
     { title: "External Price", style: "" },
     { title: 'Action', style: '' }
 ]
 
+const filters = ['All', 'Meat', 'Snow Frost', 'Non Deliverables'];
+
 export function SuppliesPage() {
     const [reload, setReload] = useState(false);
+    const [filter, setFilter] = useState(filters[0]);
 
     const { data, loading, error } = useFetchData<Supply>(SupplyService.getAllSupplies, [reload]);
-    console.log(data);
-    
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['code', 'name']); 
-    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);    
 
-    const [open, setOpen] = useState(false);
-    const [toUpdate, setUpdate] = useState<Supply>()
-    const [toDelete, setDelete] = useState<Supply>();
+    const filteredData = filteredItems.filter(i => {
+        if (filter === 'Meat') return i.category === 'MEAT';
+        if (filter === 'Snow Frost') return i.category === 'SNOWFROST';
+        if (filter === 'Non Deliverables') return i.category === 'NONDELIVERABLES';
+        return true;
+    });
+
+    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20);    
+    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Supply>();
 
     if (loading) return <PapiverseLoading />
     return(
-        <section className="flex flex-col gap-2">
+        <section className="stack-md animate-fade-in-up">
             <AppHeader label="All Supplies" />
             <TableFilter 
                 setSearch={ setSearch }
@@ -50,42 +59,43 @@ export function SuppliesPage() {
                 buttonLabel="Add a supply"
                 size={ size }
                 setSize={ setSize }
+                filters={ filters }
+                filter={ filter }
+                setFilter={ setFilter }
             />
 
             <div>
-                <div className="thead grid grid-cols-6">
+                <div className="thead grid grid-cols-7">
                     {columns.map((item, _) => (
                         <div key={_} className={`th ${item.style}`}>{ item.title }</div>
                     ))}
                 </div>
                 
-                <div className="animate-fade-in-up" key={page}>
+                <div className="animate-fade-in-up" key={`${page}-${filter}`}>
                     {paginated.length > 0 ?
                         paginated.map((item, index) => (
-                            <div className="tdata grid grid-cols-6" key={ index }>
+                            <div className="tdata grid grid-cols-7" key={ index }>
                                 <div className="td">{ item.code }</div>
                                 <div className="td flex gap-2">
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            {item.category === 'MEAT' ? <Ham className="w-4 h-4 text-darkbrown"/> : <Snowflake className="w-4 h-4 text-blue" />}
+                                            {item.category === 'MEAT' ? <Ham className="w-4 h-4 text-darkbrown"/> 
+                                            : item.category === 'SNOWFROST' ? <Snowflake className="w-4 h-4 text-blue" />
+                                            : <PackageX className="w-4 h-4 text-slate-400" />
+                                            }
                                         </TooltipTrigger>
-                                        <TooltipContent>{ item.category === 'MEAT' ? "MEAT Category" : "SNOW FROST Category"}</TooltipContent>
+                                        <TooltipContent>{ item.category === 'MEAT' ? "MEAT Category" : item.category === 'SNOWFROST' ? "SNOW FROST Category" : "NON DELIVERABLES"}</TooltipContent>
                                     </Tooltip>
                                     <div>{ item.name }</div>
                                 </div>
-                                <div className="td flex gap-2">
-                                    {item.isDeliverables && (
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <Truck className="w-4 h-4 text-darkorange" />
-                                            </TooltipTrigger>
-                                            <TooltipContent>Deliverable</TooltipContent>
-                                        </Tooltip>
-                                    )}
-                                    <div>{ `${item.unitQuantity} ${item.unitMeasurement}` }</div>
+                                <div className="td flex gap-2">{ `${item.unitQuantity} ${item.unitMeasurement}` }</div>
+                                <div className="td flex gap-2">{ `${item.convertedQuantity} ${item.convertedMeasurement}` }</div>
+                                <div className="td">
+                                    { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceInternal!) }
                                 </div>
-                                <div className="td">{ formatToPeso(item.unitPriceInternal!) }</div>
-                                <div className="td">{ formatToPeso(item.unitPriceExternal!) }</div>
+                                <div className="td">
+                                    { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceExternal!) }
+                                </div>
                                 <div className="td flex-center-y gap-2">
                                     <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
                                     <button><Info className="w-4 h-4" /></button>
@@ -103,7 +113,7 @@ export function SuppliesPage() {
             </div>
           
             <TablePagination
-                data={ data }
+                data={ filteredData }
                 paginated={ paginated }
                 page={ page }
                 size={ size }

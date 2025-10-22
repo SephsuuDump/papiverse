@@ -1,14 +1,14 @@
 "use client"
 
-import { usePathname } from "next/navigation";
-import React from "react";
+import { usePathname } from "next/navigation"
 
 export function AppCanvas({ children }: { children: React.ReactNode }) {
-    const pathName = usePathname();
-    if (pathName !== '/auth') { return (
-            <main className="w-full py-4 pl-2 pr-4">
-                {children}
-            </main>
-        )
-    } else return <main className="w-full">{children}</main>
+    const pathName = usePathname()
+    const isAuth = pathName === "/auth" || pathName === "/unauthorized"
+
+    return (
+        <main className={`w-full bg-slate-100 ${!isAuth ? "py-4 pl-2 pr-4" : ""}`}>
+            {children}
+        </main>
+    )
 }

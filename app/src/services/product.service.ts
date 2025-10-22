@@ -21,17 +21,11 @@ export class ProductService {
     }
 
     static async addProduct(product: Product) {
-        const payload = {
-            ...product,
-            name: product.name.toUpperCase(),
-            category: product.category.toUpperCase()
-        };
-
         return await requestData(
             `${url}/create`,
             'POST',
             undefined,
-            payload
+            product
         );
     }
 
