@@ -10,12 +10,13 @@ import { useSearchFilter } from "@/hooks/use-search-filter";
 import { formatToPeso } from "@/lib/formatter";
 import { ProductService } from "@/services/product.service";
 import { Product } from "@/types/products";
-import { Info, SquarePen, Trash2, X } from "lucide-react";
+import { Info, Salad, SquarePen, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { CreateProduct } from "./components/CreateProduct";
 import { UpdateProduct } from "./components/UpdateProduct";
 import { DeleteProduct } from "./components/DeleteProduct";
 import { PapiverseLoading } from "@/components/ui/loader";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const columns = [
     { title: 'Product Name', style: '' },
@@ -74,8 +75,18 @@ export function ProductsPage() {
                                                     value={ subItem.code! }
                                                     className="flex"
                                                 >
-                                                    <div className="text-sm">{ subItem.name }</div>
-                                                    <div className="text-sm flex items-center ms-auto"><X /><div>{ `${subItem.quantity} ${subItem.unitMeasurement}` }</div></div>
+                                                    <div className="text-sm">
+                                                        { subItem.type === 'PRODUCT' &&
+                                                            <Tooltip>
+                                                                <TooltipTrigger><Salad className="w-4 h-4 text-darkbrown inline-block -mt-1 mr-1" /></TooltipTrigger>
+                                                                <TooltipContent>Product Item</TooltipContent>
+                                                            </Tooltip> 
+                                                        }
+                                                        { subItem.name }
+                                                    </div>
+                                                    <div className="text-sm flex items-center ms-auto">
+                                                        <X /> <div>{ subItem.quantity } { subItem.unitMeasurement ?? '' }</div>
+                                                    </div>
                                                 </SelectItem>
                                             ))}
                                         </SelectGroup>

@@ -10,11 +10,12 @@ import { ProductService } from "@/services/product.service";
 import { SupplyService } from "@/services/supply.service";
 import { Product, productFields, productInit } from "@/types/products";
 import { SupplyItem } from "@/types/supplyOrder";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Salad, Trash2, X } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ModalLoader } from "../../../components/ui/loader";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const categories = ["A'LA CARTE", "AFFORDABLE RICE MEALS", "BIG EVENT? WE GOT YOU", "BILAO BLOW OUT", "BINALOT NI PAPI", "BURGERS", "CHEF'S PASTA", "CHEF'S PASTA 4-5 PAX", "COMBO A", "COMBO B", "COMBO C", "COMBO D", "COMBO E", "CRUNCHY BAGNET", "EXTRAS", "GRILLED SIZZLING BBQ DEALS", "KRISPY DELIGHTS", "KRISPY SISIG", "OVERLOAD SARAP", "PREMIUM BUNDLE DEALS", "QUENCHERS", "SALO SALO SPECIAL", "SIGNATURE PLATES", "SIZZLING MEALS", "SNOWFROST HALO MIX", "UNLI DEALS"];
 
@@ -32,6 +33,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
     const { data: supplies, loading, error } = useFetchData(SupplyService.getAllSupplies, [], [], 0, 1000);
     const { data: products, loading: productLoading, error: productsError } = useFetchData(ProductService.getAllProducts, [], [], 0, 1000);
     const { search, setSearch, filteredItems } = useSearchFilter(supplies, ['name', 'code']);
+    const { search: searchProduct, setSearch: setSearchProduct, filteredItems: filteredProducts } = useSearchFilter(products, ['name']);
     
     const handleSelect = async (code: string) => {
         if (!selectedItems.find((item: SupplyItem) => item.code === code)) {
@@ -39,10 +41,24 @@ export function CreateProduct({ setOpen, setReload }: Props) {
             if (selectedItem) {
             setSelectedItems([
                 ...selectedItems,
-                { code, name: selectedItem.name, quantity: 1, unitMeasurement: selectedItem.convertedMeasurement, unitPrice: selectedItem.unitPrice, category: selectedItem.category }
+                { id: selectedItem.id, code: selectedItem.code, name: selectedItem.name, quantity: 1, unitMeasurement: selectedItem.convertedMeasurement, unitPrice: selectedItem.unitPrice, category: selectedItem.category, type: "RAW" }
             ]);
             } else {
                 console.warn(`Item with code ${code} not found.`);
+            }
+        }
+    };
+
+    const handleProductSelect = async (id: number) => {
+        if (!selectedItems.find((item: SupplyItem) => item.id === id)) {
+            const selectedItem = products.find(item => item.id === id);
+            if (selectedItem) {
+            setSelectedItems([
+                ...selectedItems,
+                { id: selectedItem.id, code: "", name: selectedItem.name, quantity: 1, type: "PRODUCT" }
+            ]);
+            } else {
+                console.warn(`Item with code ${id} not found.`);
             }
         }
     };
@@ -55,8 +71,8 @@ export function CreateProduct({ setOpen, setReload }: Props) {
         ));
     };
 
-    const handleRemove = async (code: string) => {
-        setSelectedItems(selectedItems.filter((item: SupplyItem) => item.code !== code));
+    const handleRemove = async (id: number) => {
+        setSelectedItems(selectedItems.filter((item: SupplyItem) => item.id !== id));
     };
 
     async function handleSubmit() {
@@ -85,6 +101,11 @@ export function CreateProduct({ setOpen, setReload }: Props) {
         } catch(error) { toast.error(`${error}`) }
         finally { setProcess(false) }
     }
+
+    useEffect(() => {
+        console.log(selectedItems);
+        
+    }, [selectedItems]);
 
     if (loading || productLoading) return <ModalLoader />
     return(
@@ -141,30 +162,54 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                             </div>  
                         </div>
 
-                        <div className="relative col-span-2 border-1 rounded-md shadow-xs mt-4 p-2 h-50 overflow-y-auto">
-                            <Select onValueChange={ handleSelect }>
-                                <SelectTrigger 
-                                    hideIcon={ true }
-                                    className="absolute top-0 left-0 flex items-center justify-center border-0 w-full"
-                                >
-                                    <Plus strokeWidth={ 2 } className="w-5 h-5 text-dark" />
-                                    <div className="text-dark">Add the supplies needed</div>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <Input 
-                                            placeholder="Search for a supply"
-                                            onChange={ e => setSearch(e.target.value) }
-                                            onKeyDown={ e => e.stopPropagation() } 
-                                        />
-                                        <SelectLabel>All Supplies</SelectLabel>
-                                        {filteredItems.map((item) => (
-                                            <SelectItem key={item.code} value={item.code!}>{item.code} - {item.name}</SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            <div className="mt-6">
+                        <div className="relative col-span-2 border-1 rounded-md shadow-xs mt-4 px-2 pb-2 h-50 overflow-y-auto">
+                            <div className="flex-center-y sticky top-0 bg-white">
+                                <Select onValueChange={ handleSelect }>
+                                    <SelectTrigger 
+                                        hideIcon={ true }
+                                        className="flex items-center justify-center border-0 w-full hover:underline"
+                                    >
+                                        <Plus strokeWidth={ 2 } className="w-5 h-5 text-dark" />
+                                        <div className="text-dark">Select Supplies</div>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <Input 
+                                                placeholder="Search for a supply"
+                                                onChange={ e => setSearch(e.target.value) }
+                                                onKeyDown={ e => e.stopPropagation() } 
+                                            />
+                                            <SelectLabel>All Supplies</SelectLabel>
+                                            {filteredItems.map((item) => (
+                                                <SelectItem key={item.code} value={item.code!}>{item.code} - {item.name}</SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                                <Select onValueChange={(value) => handleProductSelect(Number(value))}>
+                                    <SelectTrigger 
+                                        hideIcon={ true }
+                                        className="flex items-center justify-center border-0 w-full hover:underline"
+                                    >
+                                        <Plus strokeWidth={ 2 } className="w-5 h-5 text-dark" />
+                                        <div className="text-dark">Select Products</div>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <Input 
+                                                placeholder="Search for a product"
+                                                onChange={ e => setSearch(e.target.value) }
+                                                onKeyDown={ e => e.stopPropagation() } 
+                                            />
+                                            <SelectLabel>All Products</SelectLabel>
+                                            {filteredProducts.map((item) => (
+                                                <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
                                 {selectedItems.map((item, index) => (
                                     <div className="flex tdata" key={index}>
                                         <div className="w-full grid grid-cols-2" key={ index }>
@@ -186,11 +231,19 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                                     }}
                                                     className="text-sm w-20 pl-2 py-1 bg-white h-8"
                                                 />
-                                                <div>{ item.unitMeasurement }</div>
+                                                <div>
+                                                    { item.type === 'PRODUCT' ?
+                                                        <Tooltip>
+                                                            <TooltipTrigger><Salad className="w-4 h-4 text-darkbrown inline-block -mt-1 mr-1" /></TooltipTrigger>
+                                                            <TooltipContent>Product Item</TooltipContent>
+                                                        </Tooltip>
+                                                        : item.unitMeasurement ?? 'N/A'
+                                                    }
+                                                </div>
                                             </div>       
                                         </div>
                                         <button 
-                                            onClick={ () => handleRemove(item.code!) }
+                                            onClick={ () => handleRemove(item.id!) }
                                             className="w-10 flex-center td underline text-darkred !text-[12px]"
                                         >
                                             <Trash2 className="w-4 h-4" />

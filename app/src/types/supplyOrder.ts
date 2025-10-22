@@ -44,6 +44,7 @@ export interface SupplyItem {
     convertedMeasurement?: string;
     unitPrice?: number;
     unitQuantity?: number;
+    type?: string;
 }
 
 export interface CompleteOrder {
