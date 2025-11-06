@@ -57,8 +57,8 @@ export function CompletedOrders({ claims, paginated, setReload }: {
 
     if (!paginated) return <SectionLoading />
     return (
-        <section>
-            <div className="flex-center-y thead">
+        <section className="table-wrapper animate-fade-in-up">
+            <div className="flex-center-y thead max-md:!w-250">
                 <div className="th"><SquareMinus className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
                 <div className="th"><FileSpreadsheet className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
                 <div className="th"><Truck className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
@@ -70,7 +70,7 @@ export function CompletedOrders({ claims, paginated, setReload }: {
             </div>
 
             {paginated.map((item, i) => (
-                <div className="flex-center-y tdata" key={i}>
+                <div className="flex-center-y tdata max-md:!w-250" key={i}>
                     <Link href={`/inventory/supply-orders/${item.orderId}`}>
                         <TableDataTooltip
                             element={<TableOfContents className="w-4 h-4 text-gray mx-auto" strokeWidth={3} />}

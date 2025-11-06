@@ -33,3 +33,17 @@
     word-break: break-all;
     margin-block: auto;
 }
+
+
+@media (max-width: 768px) {
+    .table-wrapper {
+      overflow-x: auto;
+    }
+}
+
+@media (max-width: 640px) {
+  .thead, .tdata {
+    width: 800px !important;
+  }
+}
+

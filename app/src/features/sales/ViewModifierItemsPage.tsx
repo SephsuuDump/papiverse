@@ -10,46 +10,77 @@ import { useSearchFilter } from "@/hooks/use-search-filter";
 import { formatToPeso } from "@/lib/formatter";
 import { ProductService } from "@/services/product.service";
 import { Product } from "@/types/products";
-import { Info, Salad, SquarePen, Trash2, X } from "lucide-react";
+import { ArrowLeft, Info, Salad, SquarePen, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { CreateProduct } from "./components/CreateProduct";
 import { UpdateProduct } from "./components/UpdateProduct";
 import { DeleteProduct } from "./components/DeleteProduct";
 import { PapiverseLoading, SectionLoading } from "@/components/ui/loader";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Modifier, ModifierItem } from "@/types/modifier";
+import { ModifierGroupService, ModifierItemService } from "@/services/modifier.service";
+import { CreateModifierGroup } from "./components/CreateModifierGroup";
+import { CreateModifierItem } from "./components/CreateModifierItem";
+import { useParams } from "next/navigation";
+import { useFetchOne } from "@/hooks/use-fetch-one";
+import Link from "next/link";
+
+type ModifierGroupItems = {
+    group: {
+        groupId: number,
+        groupName: string;
+    },
+    modifierItems: ModifierItem[]
+}
 
 const columns = [
-    { title: 'Product Name', style: '' },
-    { title: 'Price', style: '' },
-    { title: 'Category', style: '' },
+    { title: 'Name', style: '' },
+    { title: 'Description', style: '' },
     { title: 'Items Needed', style: '' },
-    { title: 'Action', style: '' },
+    { title: 'Actions', style: '' },
 ]
 
-export function ProductsPage() {
+export function  ViewModifierItemsPage() {
+    const { id } = useParams();
     const [reload, setReload] = useState(false);
-    const { data, loading, error } = useFetchData<Product>(ProductService.getAllProducts, [reload]);
-    const { search, setSearch, filteredItems } = useSearchFilter(data, ['name']);
+    const { data, loading, error } = useFetchOne<ModifierGroupItems>(
+        ModifierItemService.getByModifierGroup, 
+        [reload, id],
+        [id]
+    );    
+    console.log(data);
+    
+    const { search, setSearch, filteredItems } = useSearchFilter(data?.modifierItems, ['name']);
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
 
     const [open, setOpen] = useState(false);
-    const [toUpdate, setUpdate] = useState<Product | undefined>();
-    const [toDelete, setDelete]  = useState<Product | undefined>();
+    const [toUpdate, setUpdate] = useState<Modifier | undefined>();
+    const [toDelete, setDelete]  = useState<Modifier | undefined>();
 
-    if (loading) return <SectionLoading />
+    if (loading || !data) return <PapiverseLoading />
     return (
-        <section className="stack-md animate-fade-in-up">
+        <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
+            <div className="flex-center-y gap-4 w-full">
+                <Link href='/sales/products?tab=Modifier Groups'>
+                    <ArrowLeft className="w-7 h-7" />
+                </Link>
+                <AppHeader 
+                    label={`Modifier Items for ${data!.group.groupName}`} 
+                    className="w-full"
+                    hidePapiverseLogo={true}
+                />
+            </div>
             <TableFilter
                 setSearch={ setSearch }
-                searchPlaceholder="Search for a product"
+                searchPlaceholder="Search for a modifier item"
                 size={ size }
                 setSize={ setSize }
-                buttonLabel="Add a product"
+                buttonLabel="Add item"
                 setOpen={ setOpen }
             />
 
             <div className="table-wrapper">
-                <div className="thead grid grid-cols-5">
+                <div className="thead grid grid-cols-4">
                     {columns.map((item, _) => (
                         <div key={_} className={`th ${item.style}`}>{ item.title }</div>
                     ))}
@@ -57,10 +88,9 @@ export function ProductsPage() {
                 <div className="animate-fade-in-up" key={page}>
                     {paginated.length > 0 ?
                         paginated.map((item, i) => (
-                            <div className="tdata grid grid-cols-5" key={i}>
+                            <div className="tdata grid grid-cols-4" key={i}>
                                 <div className="td">{ item.name }</div>
-                                <div className="td">{ formatToPeso(item.price) }</div>
-                                <div className="td">{ item.category }</div>
+                                <div className="td">{ item.description }</div>
                                 <Select>
                                     <SelectTrigger className="td font-semibold underline text-dark data-[state=open]:text-dark">
                                         Supplies Needed
@@ -98,42 +128,26 @@ export function ProductsPage() {
                                 </div>
                             </div>
                         ))
-                        : (<div className="my-2 text-sm text-center col-span-6">There are no existing products yet.</div>)
+                        : (<div className="my-2 text-sm text-center col-span-6">There are no existing modifier items yet.</div>)
                     }
                 </div>
             </div>
 
-            <TablePagination 
+            {/* <TablePagination 
                 data={ data }
                 paginated={ paginated }
                 page={ page }
                 size={ size }
                 setPage={ setPage }
-            />
+            /> */}
 
             {open && 
-                <CreateProduct
+                <CreateModifierItem
+                    group={ data.group }
                     setOpen={ setOpen }
                     setReload={ setReload }
                 />
             }
-
-            {toUpdate && 
-                <UpdateProduct
-                    setUpdate={ setUpdate }
-                    toUpdate={ toUpdate! }
-                    setReload={ setReload }
-                />
-            }
-
-            {toDelete && 
-                <DeleteProduct
-                    toDelete={ toDelete! }
-                    setDelete={ setDelete }
-                    setReload={ setReload }
-                />
-            }
-
 
         </section>
     )

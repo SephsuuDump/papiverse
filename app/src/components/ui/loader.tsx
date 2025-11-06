@@ -33,7 +33,7 @@ export function PapiverseLoading({ className }: { className?: string }) {
 
 export function SectionLoading() {
     return (
-        <section className="w-full py-12">
+        <section className="w-full py-24">
             <div className="mx-auto flex-center flex-col animate-bounce">
                 <Image
                     src="/images/papiverse_logo.png"

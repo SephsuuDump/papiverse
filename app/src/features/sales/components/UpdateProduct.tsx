@@ -14,10 +14,10 @@ import { SupplyService } from "@/services/supply.service";
 import { Product, productFields } from "@/types/products";
 import { SupplyItem } from "@/types/supplyOrder";
 import { Plus, Salad, Trash2, X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const categories = ["A'LA CARTE", "AFFORDABLE RICE MEALS", "BIG EVENT? WE GOT YOU", "BILAO BLOW OUT", "BINALOT NI PAPI", "BURGERS", "CHEF'S PASTA", "CHEF'S PASTA 4-5 PAX", "COMBO A", "COMBO B", "COMBO C", "COMBO D", "COMBO E", "CRUNCHY BAGNET", "EXTRAS", "GRILLED SIZZLING BBQ DEALS", "KRISPY DELIGHTS", "KRISPY SISIG", "OVERLOAD SARAP", "PREMIUM BUNDLE DEALS", "QUENCHERS", "SALO SALO SPECIAL", "SIGNATURE PLATES", "SIZZLING MEALS", "SNOWFROST HALO MIX", "UNLI DEALS"];
+const categories = ["A'LA CARTE", "AFFORDABLE RICE MEALS", "ALL IN RICE BOWL", "BIG EVENT? WE GOT YOU", "BILAO BLOW OUT", "BINALOT NI PAPI", "BITES", "BURGERS", "CHEF'S PASTA", "CHEF'S PASTA 4-5 PAX", "COMBO A", "COMBO B", "COMBO C", "COMBO D", "COMBO E", "CRUNCHICKEN", "CRUNCHY BAGNET", "DINNER NIGHT TIME", "EXTRAS", "GRILLED SIZZLING BBQ DEALS", "KOPI NI PAPI", "KRISPY DELIGHTS", "KRISPY SISIG", "OVERLOAD SARAP", "PAPI FRIES", "PAPI'S FRUIT SODA", "PREMIUM BUNDLE DEALS", "QUENCHERS", "SALAD BLENDS", "SALO SALO SPECIAL", "SIGNATURE PLATES", "SIZZLING MEALS", "SNOWFROST HALO MIX", "SULIT RICE MIX", "UNLI BUNDLE DEALS", "UNLI DEALS"];
 
 interface Props {
     toUpdate: Product;
@@ -41,7 +41,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
             if (selectedItem) {
             setSelectedItems([
                 ...selectedItems,
-                { id: selectedItem.id, code: selectedItem.code, name: selectedItem.name, quantity: 1, unitMeasurement: selectedItem.convertedMeasurement, unitPrice: selectedItem.unitPrice, category: selectedItem.category, type: "RAW" }
+                { id: selectedItem.id, code: selectedItem.code, name: selectedItem.name, quantity: 1, unitMeasurement: selectedItem.convertedMeasurement, unitPrice: selectedItem.unitPrice, category: selectedItem.category, type: "RAW", forTakeOut: false }
             ]);
             } else {
                 console.warn(`Item with code ${code} not found.`);
@@ -99,7 +99,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                     return; 
                 }
             }
-            if (selectedItems.length <= 0) return toast.info("Please fill up all fields!");
+            // if (selectedItems.length <= 0) return toast.info("Please fill up all fields!");
             const updatedData = {
                 ...product,
                 itemsNeeded: selectedItems
@@ -111,6 +111,10 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
         } catch(error) { toast.error(`${error}`) }
         finally { setProcess(false) }
     }
+
+    useEffect(() => {
+        console.log(selectedItems);
+    }, [product, selectedItems])
 
     if (loading || productLoading) return <ModalLoader />
     return(
@@ -223,12 +227,12 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div>
+                            <div className="overflow-x-auto">
                                 {selectedItems.map((item, index) => (
-                                    <div className="flex tdata" key={index}>
+                                    <div className="w-130 flex tdata" key={index}>
                                         <div className="w-full grid grid-cols-3" key={ index }>
                                             <div className="td">{ item.name }</div>
-                                            <div className="td flex-center-y gap-2">
+                                            <div className="w-50 td flex-center-y gap-2">
                                                 <X className="w-3 h-3" />
                                                 <Input 
                                                     min={0.00001} 
@@ -243,7 +247,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                                             }
                                                         }
                                                     }}
-                                                    className="text-sm w-20 pl-2 py-1 bg-white h-8"
+                                                    className="basis-1/2 text-sm pl-2 py-1 bg-white h-8 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                                 />
                                                 <div>
                                                     { item.type === 'PRODUCT' ?
@@ -255,7 +259,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                                     }
                                                 </div>
                                             </div>  
-                                            <div className="text-xs flex-center">
+                                            <div className="td text-xs flex-center">
                                                 <Checkbox
                                                     className="mr-1 bg-white shadow-sm"
                                                     checked={ item.forTakeOut! }
@@ -267,6 +271,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                             </div>          
                                         </div>
                                         <button 
+                                            type="button"
                                             onClick={ () => handleRemove(item.id!) }
                                             className="w-10 flex-center td underline text-darkred !text-[12px]"
                                         >
@@ -283,8 +288,8 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                         <UpdateButton 
                             type="submit"
                             onProcess={ onProcess }
-                            label="Add Product"
-                            loadingLabel="Adding Product"
+                            label="Update Product"
+                            loadingLabel="Updating Product"
                         />
                     </div>
                 </form>

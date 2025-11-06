@@ -46,7 +46,7 @@ export function UsersPage() {
 
     if (loading) return <PapiverseLoading />
     return(
-        <section className="stack-md animate-fade-in-up">
+        <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label="All Users" />
 
             <TableFilter
@@ -61,7 +61,7 @@ export function UsersPage() {
                 setFilter={ setFilter }
             />
 
-            <div>
+            <div className="table-wrapper">
                 <div className="thead grid grid-cols-5">
                     {columns.map((item, _) => (
                         <div key={_} className={`th ${item.style}`}>{ item.title }</div>

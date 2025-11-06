@@ -1,9 +1,25 @@
+
+
 {
-    "name": "Sisig With Blue Lagoon ",
-    "itemsNeeded": [
-        { "id" : 192, "code": "RM-36567", "quantity": 380, "type" : "RAW"},  
-        {  "id" : 1, "code": "", "quantity": 1.0, "type" : "PRODUCT"}   
-    ],
-    "price": 85.0,
-    "category": "DRINK"
+    group: {
+        groupId: 1,
+        groupName: 'TEST'
+    },
+    modifierItems: [
+        {
+            id: 1,
+            name: 'TEST',
+            quantity: 0,
+            description: 'N/A',
+            itemsNeeded: [
+                id: 1,
+                code: 'RM',
+                name: 'TEST',
+                quantity: 1,
+                unitMeasurement: 'TEST',
+                type: 'TEST',
+                forTakeOut: false
+            ]
+        }
+    ]
 }

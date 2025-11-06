@@ -17,23 +17,32 @@ import { toast } from "sonner";
 import { ModalLoader } from "../../../components/ui/loader";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
-
-const categories = ["A'LA CARTE", "AFFORDABLE RICE MEALS", "ALL IN RICE BOWL", "BIG EVENT? WE GOT YOU", "BILAO BLOW OUT", "BINALOT NI PAPI", "BITES", "BURGERS", "CHEF'S PASTA", "CHEF'S PASTA 4-5 PAX", "COMBO A", "COMBO B", "COMBO C", "COMBO D", "COMBO E", "CRUNCHICKEN", "CRUNCHY BAGNET", "DINNER NIGHT TIME", "EXTRAS", "GRILLED SIZZLING BBQ DEALS", "KOPI NI PAPI", "KRISPY DELIGHTS", "KRISPY SISIG", "OVERLOAD SARAP", "PAPI FRIES", "PAPI'S FRUIT SODA", "PREMIUM BUNDLE DEALS", "QUENCHERS", "SALAD BLENDS", "SALO SALO SPECIAL", "SIGNATURE PLATES", "SIZZLING MEALS", "SNOWFROST HALO MIX", "SULIT RICE MIX", "UNLI BUNDLE DEALS", "UNLI DEALS"];
+import { Modifier, ModifierItem, modifierItemInit } from "@/types/modifier";
+import { ModifierGroupService, ModifierItemService } from "@/services/modifier.service";
+import { hasEmptyField } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Props {
+    group: {
+        groupId: number;
+        groupName: string;
+    };
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function CreateProduct({ setOpen, setReload }: Props) {
+export function CreateModifierItem({ group, setOpen, setReload }: Props) {
     const [onProcess, setProcess] = useState(false);
-    const [product, setProduct] = useState<Product>(productInit);
+    const [modifierItem, setModifierItem] = useState<Partial<ModifierItem>>(modifierItemInit);
     const [selectedItems, setSelectedItems] = useState<SupplyItem[]>([]);
 
     const { data: supplies, loading, error } = useFetchData(SupplyService.getAllSupplies, [], [], 0, 1000);
     const { data: products, loading: productLoading, error: productsError } = useFetchData(ProductService.getAllProducts, [], [], 0, 1000);
     const { search, setSearch, filteredItems } = useSearchFilter(supplies, ['name', 'code']);
     const { search: searchProduct, setSearch: setSearchProduct, filteredItems: filteredProducts } = useSearchFilter(products, ['name']);
+
+    console.log(group);
+    
     
     const handleSelect = async (code: string) => {
         if (!selectedItems.find((item: SupplyItem) => item.code === code)) {
@@ -89,24 +98,15 @@ export function CreateProduct({ setOpen, setReload }: Props) {
     async function handleSubmit() {
         try {
             setProcess(true);
-            setProduct(prev => ({
-                ...prev,
-                itemsNeeded: selectedItems
-            }))
-            for (const field of productFields) {
-                if (product[field] === "" || product[field] === undefined || product[field] === 0) {
-                    toast.info("Please fill up all fields!");
-                    return; 
-                }
-            }
-            // if (selectedItems.length <= 0) return toast.info("Please fill up all fields!");
             const updatedData = {
-                ...product,
-                itemsNeeded: selectedItems
-            }
-            console.log(updatedData);
-            const data = await ProductService.addProduct(updatedData);
-            if (data) toast.success(`Product ${product.name} created successfully.`)
+                ...modifierItem,
+                groupId: group.groupId,
+                requiredMaterials: selectedItems
+            };
+            if (hasEmptyField(updatedData, ["requiredMaterials"])) return toast.error('Please full up all the fields.');
+            if (selectedItems.length <= 0) return toast.info("Please fill up all fields!");
+            const data = await ModifierItemService.createModifierItem(updatedData);
+            if (data) toast.success(`Modifier ${modifierItem.name} created successfully.`)
             setOpen(!open);
             setReload(prev => !prev);
         } catch(error) { toast.error(`${error}`) }
@@ -114,14 +114,14 @@ export function CreateProduct({ setOpen, setReload }: Props) {
     }
 
     useEffect(() => {
-        console.log(selectedItems);
-    }, [selectedItems]);
+        console.log(modifierItem);
+    }, [modifierItem]);
 
     if (loading || productLoading) return <ModalLoader />
     return(
         <Dialog open onOpenChange={ setOpen }>
-            <DialogContent className="overflow-y-auto">
-                <ModalTitle label="Add a Product" />
+            <DialogContent className="overflow-y-auto h-10/11">
+                <ModalTitle label={`Add Item for ${group.groupName}`} />
                 <form 
                     className="flex flex-col gap-4"
                     onSubmit={ e => {
@@ -131,48 +131,34 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                 >
                     <div className="grid grid-cols-2 gap-2">
                         <div className="flex flex-col gap-1 col-span-2">
-                            <div>Product Name</div>
+                            <div>Modifier Item Name</div>
                             <Input    
                                 className="w-full border-1 border-gray rounded-md max-md:w-full" 
                                 name ="name"  
-                                value={product.name}
-                                onChange={ e => handleChange(e, setProduct)}
+                                value={modifierItem.name}
+                                onChange={ e => handleChange(e, setModifierItem)}
                             />  
                         </div>
-                        <div className="flex flex-col gap-1">
-                            <div>Category</div>
-                            <Select
-                                value={ product.category }
-                                onValueChange={ (value) => setProduct(prev => ({
-                                    ...prev,
-                                    category: value
-                                })) }
-                            >
-                                <SelectTrigger className="w-full border-1 border-gray">
+                        <div className="flex flex-col gap-1 col-span-2">
+                            <div>Modifier Group</div>
+                            <Select value={ String(group.groupId) }>
+                                <SelectTrigger className="w-full border-1 border-gray" disabled>
                                     <SelectValue placeholder="Select Category" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {categories.map((item, index) => (
-                                        <SelectItem value={ item } key={ index }>{ item }</SelectItem>
-                                    ))}
+                                    <SelectItem value={ String(group.groupId) }>{ group.groupName }</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
-
-                        <div className="flex flex-col gap-1">
-                            <div>Price</div>
-                            <div className="flex border-1 border-gray rounded-md max-md:w-full">
-                                <input disabled value="₱" className="text-center w-10" />
-                                <Input    
-                                    className="w-full border-0" 
-                                    type="number"
-                                    name ="price"  
-                                    value={product.price}
-                                    onChange={ e => handleChange(e, setProduct)}
-                                /> 
-                            </div>  
+                        <div className="flex flex-col gap-1 col-span-2">
+                            <div>Description</div>
+                            <Textarea    
+                                className="w-full border-1 border-gray rounded-md max-md:w-full" 
+                                name ="description"  
+                                value={modifierItem.description}
+                                onChange={ e => handleChange(e, setModifierItem)}
+                            />  
                         </div>
-
                         <div className="relative col-span-2 border-1 rounded-md shadow-xs mt-4 px-2 pb-2 h-50 overflow-y-auto">
                             <div className="flex-center-y sticky top-0 bg-white">
                                 <Select onValueChange={ handleSelect }>
@@ -286,8 +272,8 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                         <AddButton 
                             type="submit"
                             onProcess={ onProcess }
-                            label="Add Product"
-                            loadingLabel="Adding Product"
+                            label="Add Item"
+                            loadingLabel="Adding Item"
                         />
                     </div>
                 </form>

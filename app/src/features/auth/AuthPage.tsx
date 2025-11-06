@@ -36,7 +36,7 @@ export function AuthPage() {
 
     return(
         <section
-            className="w-full h-screen flex justify-center items-center bg-cover bg-center"
+            className="w-full h-screen flex-center bg-cover bg-center"
             style={{ backgroundImage: "url('/images/kp_login.jpg')" }}
         >
             <Toaster position="top-center" closeButton />

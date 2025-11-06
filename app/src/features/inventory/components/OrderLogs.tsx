@@ -38,18 +38,18 @@ export function OrderLogs({ logs }: Props) {
                         {item.orders.map((subItem, index) => (
                             <AccordionItem value={ String(subItem.orderId) } key={ index }>
                                 <AccordionTrigger className="rounded-none bg-light px-4 shadow-xs">
-                                    <div className="w-full grid grid-cols-4">
+                                    <div className="w-full grid grid-cols-2">
                                         <div>Order ID: <span className="font-semibold">{ subItem.orderId || "None" }</span></div>
-                                        <div>Source: <span className="font-semibold">{ subItem.logs[0].source }</span></div>
+                                        {/* <div>Source: <span className="font-semibold">{ subItem.logs[0].source }</span></div> */}
                                         <div>Type: <span className="font-semibold">{ subItem.logs[0].type === "IN" ? "INGOING" : "OUTGOING" }</span></div>
-                                        <div className="font-semibold">{ subItem.logs[0].branchName }</div>
+                                        {/* <div className="font-semibold">{ subItem.logs[0].branchName }</div> */}
                                     </div>
                                 </AccordionTrigger> 
-                                <AccordionContent className="px-4 bg-light border-b-darkred border-1">
+                                <AccordionContent className="table-wrapper px-4 bg-light border-b-darkred border-1">
                                     
                                         {subItem.logs.map((subSubItem, index) => (
                                             <Fragment key={ index }>
-                                                <div className="grid grid-cols-4 py-2">
+                                                <div className="tdata grid grid-cols-4 py-2">
                                                     <div>{ subSubItem.rawMaterialCode }</div>
                                                     <div>Qty: { subSubItem.quantityChanged }</div>
                                                     <div>{ subSubItem.rawMaterialName }</div>

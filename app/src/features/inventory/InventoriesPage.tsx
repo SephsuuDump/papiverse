@@ -56,7 +56,7 @@ export function InventoriesPage() {
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
-        <section className="stack-md animate-fade-in-up">
+        <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label="All Inventories" />
 
             <TableFilter 
@@ -70,8 +70,8 @@ export function InventoriesPage() {
                 setFilter={ setFilter }
             />
 
-            <div>
-                <div className="thead grid grid-cols-6">
+            <div className="table-wrapper">
+                <div className="thead grid grid-cols-6 max-md:!w-250">
                     {columns.map((item, _) => (
                         <div key={_} className={`th ${item.style}`}>{ item.title }</div>
                     ))}
@@ -80,7 +80,7 @@ export function InventoriesPage() {
                 <div className="animate-fade-in-up" key={`${page}-${filter}`}>
                     {paginated.length > 0 ?
                         paginated.map((item, index) => (
-                            <div className="tdata grid grid-cols-6" key={ index }>
+                            <div className="tdata grid grid-cols-6 max-md:!w-250" key={ index }>
                                 <div className="td">{ item.code }</div>
                                 <div className="td flex gap-2">
                                     <Tooltip>

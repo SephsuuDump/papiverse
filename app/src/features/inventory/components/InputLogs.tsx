@@ -40,17 +40,17 @@ export function InputLogs({ logs }: Props) {
                         {item.orders.map((subItem, index) => (
                             <AccordionItem value={ String(subItem.orderId) } key={ index }>
                                 <AccordionTrigger className="rounded-none bg-light px-4 shadow-xs">
-                                    <div className="w-full grid grid-cols-3">
+                                    <div className="w-full grid grid-cols-2">
                                         <div>Order ID: <span className="font-semibold">{ subItem.orderId || "None" }</span></div>
                                         <div>Source: <span className="font-semibold">{ subItem.logs[0].source }</span></div>
-                                        <div className="font-semibold">{ subItem.logs[0].branchName }</div>
+                                        {/* <div className="font-semibold">{ subItem.logs[0].branchName }</div> */}
                                     </div>
                                 </AccordionTrigger> 
-                                <AccordionContent className="px-4 bg-light border-b-darkred border-1">
+                                <AccordionContent className="table-wrapper px-4 bg-light border-b-darkred border-1">
                                     
                                         {subItem.logs.map((subSubItem, index) => (
                                             <Fragment key={ index }>
-                                                <div className="grid grid-cols-5 py-2">
+                                                <div className="tdata grid grid-cols-5 py-2">
                                                     <div className="my-auto">{ subSubItem.rawMaterialCode }</div>
                                                     <div className="flex-center-y my-auto">
                                                         { subSubItem.type === 'IN' ? 

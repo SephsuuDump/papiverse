@@ -16,7 +16,7 @@ export const adminRoute = [
     { 
         title: 'Messages', 
         icon: MessageCircleMore,
-        href: '/admin/messages',
+        href: '/messages',
         children: []
     },
     { 

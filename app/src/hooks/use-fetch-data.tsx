@@ -31,7 +31,7 @@ export function useFetchData<T>(
                     setItems(result as T);
                 }
             } catch (err: any) {
-                const message = err?.message || "Failed to fetch data";
+                const message = err?.message || err?.error || "Failed to fetch data";
                 setError(message);
                 toast.error(message);
             } finally {

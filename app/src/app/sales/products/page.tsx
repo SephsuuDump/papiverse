@@ -1,7 +1,7 @@
-import { ProductsPage } from "@/features/sales/ProductsPage";
+import { ProductEntitiesPage } from "@/features/sales/ProductEntitiesPage";
 
 export default function Products() {
     return (
-        <ProductsPage />
+        <ProductEntitiesPage />
     )
 }

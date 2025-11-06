@@ -6,7 +6,7 @@ export interface Product {
     itemsNeeded: MaterialItem[];
 }
 
-interface MaterialItem {
+export interface MaterialItem {
     id?: number;
     code?: string;
     name?: string,

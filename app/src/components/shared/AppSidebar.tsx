@@ -7,7 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { adminRoute, franchiseeRoute } from "@/lib/routes";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
-import { ChevronDown, ChevronsUpDown, CircleUserRound, LogOut } from "lucide-react";
+import { ChevronDown, ChevronsUpDown, CircleUserRound, LogOut, Menu } from "lucide-react";
 import { AuthPage } from "@/features/auth/AuthPage";
 import { AppAvatar } from "./AppAvatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
@@ -15,9 +15,12 @@ import { Claim } from "@/types/claims";
 import { Dispatch, SetStateAction, useState } from "react";
 import { AuthService } from "@/services/auth.service";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 
 export function AppSidebar() {
     const pathName = usePathname();
+    const isMobile = useIsMobile();
     if (pathName === '/auth' || pathName === '/unauthorized') return null;
 
     const { claims, loading } = useAuth();
@@ -36,6 +39,95 @@ export function AppSidebar() {
     if (!claims) return <AuthPage />;
     if (claims.roles[0] === 'FRANCHISOR') route = adminRoute
     if (claims.roles[0] === 'FRANCHISEE') route = franchiseeRoute
+    console.log(isMobile);
+    
+
+    if (isMobile) {
+        return (
+            <Sheet>
+                <SheetTitle 
+                    className="fixed top-0 z-50 bg-white rounded-md shadow w-full px-4 h-14 bg-cover bg-center"
+                    style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
+                >
+                    <div className="relative flex justify-end my-auto py-4">
+                        <Link 
+                            href="/"
+                            className="mx-auto absolute top-0 left-1/2 -translate-x-1/2"
+                        >
+                            <Image
+                                src="/images/papiverse_logo.png"
+                                alt="Papiverse Logo"
+                                width={120}
+                                height={120}
+                                className="mx-auto mt-4"
+                            />
+                        </Link>
+                        <SheetTrigger className="h-full">
+                            <Menu />
+                        </SheetTrigger>
+                    </div>
+                </SheetTitle>
+
+                <SheetContent 
+                    side="left" 
+                    className="p-0"
+                >
+                    <Sidebar collapsible="none">
+                        <SidebarContent
+                            className="bg-center bg-cover"
+                            style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
+                        >
+                            <Link href="/">
+                                <Image
+                                    src="/images/papiverse_logo.png"
+                                    alt="Papiverse Logo"
+                                    width={150}
+                                    height={150}
+                                    className="mx-auto mt-4"
+                                />
+                            </Link>
+
+                            <SidebarMenu className="mt-4">
+                            {route?.map((item, i) => (
+                                item.children.length > 0 ? (
+                                <Collapsible key={i}>
+                                    <CollapsibleTrigger asChild>
+                                    <SidebarMenuButton className="flex gap-2 pl-4">
+                                        <item.icon className="w-4 h-4" />
+                                        {item.title}
+                                        <ChevronDown className="ml-auto" />
+                                    </SidebarMenuButton>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                    <SidebarMenuSub>
+                                        {item.children.map((sub, index) => (
+                                        <SidebarMenuButton key={index}>
+                                            <Link href={sub.href} className="w-full h-full">
+                                            {sub.title}
+                                            </Link>
+                                        </SidebarMenuButton>
+                                        ))}
+                                    </SidebarMenuSub>
+                                    </CollapsibleContent>
+                                </Collapsible>
+                                ) : (
+                                <SidebarMenuItem key={i}>
+                                    <Link href={item.href!} className="w-full">
+                                    <SidebarMenuButton className="flex gap-2 pl-4">
+                                        <item.icon className="w-4 h-4" />
+                                        {item.title}
+                                    </SidebarMenuButton>
+                                    </Link>
+                                </SidebarMenuItem>
+                                )
+                            ))}
+                            </SidebarMenu>
+                        </SidebarContent>
+                    </Sidebar>
+                </SheetContent>
+            </Sheet>
+        )
+    }
 
     return (
         <>
@@ -47,10 +139,10 @@ export function AppSidebar() {
                     className="rounded-full shadow-6xl bg-white absolute z-50 right-[-20px] top-[47%] -translate-x-1/2 -translate-y-1/2"
                 />
                 <SidebarContent 
-                    className={`rounded-md bg-cover overflow-x-hidden`}
+                    className={`h-screen rounded-md bg-cover overflow-x-hidden`}
                     style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
                 >
-                    <Link href="/auth/login">
+                    <Link href="/">
                         <Image
                             src="/images/papiverse_logo.png"
                             alt="Papiverse Logo"

@@ -32,7 +32,7 @@ export function LogsPage() {
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
-        <section className="stack-md animate-fade-in-up">
+        <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label="Inventory Logs" />
 
             <TableFilter 
