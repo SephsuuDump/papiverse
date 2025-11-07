@@ -41,7 +41,7 @@ export function EmployeesPage() {
     if (loading || authLoading) return <PapiverseLoading />;
 
     return (
-        <section className="stack-md animate-fade-in-up">
+        <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label='All Employees' />
 
             <TableFilter
@@ -53,7 +53,7 @@ export function EmployeesPage() {
                 setSize={setSize}
             />
 
-            <div>
+            <div className="table-wrapper">
                 <div className="thead grid grid-cols-4">
                     {columns.map((item, i) => (
                         <div key={i} className={`th ${item.style}`}>

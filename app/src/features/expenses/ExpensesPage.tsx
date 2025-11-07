@@ -2,14 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import {  PapiverseLoading } from "@/components/ui/loader";
-import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { Expense } from "@/types/expense";
-import { Download, Funnel, Plus } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";;
 import { ExpenseService } from "@/services/expense.service";
 import { WeeklyExpenses } from "./WeeklyExpenses";
 import { CreateExpense } from "./CreateExpense";
@@ -41,7 +36,7 @@ export default function ExpensesPage() {
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
-        <section className="stack-md animate-fade-in-up">
+        <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label="All Expenses" />
             <div className="w-fit flex-center bg-slate-50 shadow-sm rounded-full">
                 {tabs.map((item, i) => (

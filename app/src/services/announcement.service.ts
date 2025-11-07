@@ -29,7 +29,7 @@ export class AnnouncementService {
         return await requestData(`${url}/update-announcement`, "POST", undefined, announcement);
     }
 
-    static async deleteAnnouncement(id: number | string) {
-        return await requestData(`${url}/delete-announcement?id=${id}`, "POST");
+    static async deleteAnnouncement(id: number) {
+        return await requestData(`${url}/delete?id=${id}`, "POST");
     }
 }

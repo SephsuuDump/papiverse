@@ -12,7 +12,7 @@ export function FranchiseeDashboard() {
     const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
 
     return (
-        <section className="stack-md">
+        <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label="Welcome Back, User!" />
             <div className="row-md">
                 {tabs.map((item, i) => (

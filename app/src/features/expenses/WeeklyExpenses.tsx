@@ -68,14 +68,12 @@ export function WeeklyExpenses({ branchId, search, reload, setReload, setUpdate,
 
     if (loading) return <PapiverseLoading className="!h-fit mt-36" />
     return(
-        <section className="w-full">
-            <Toaster closeButton position="top-center" />
-            
+        <section className="w-full">            
             {sortedDates.map((date) => {
                 const totalForDate = groupedExpenses[date].reduce((sum, expense) => sum + expense.expense, 0);
                 return(
-                    <div key={ date }>
-                        <div className="grid bg-slate-200 p-2 rounded-sm shadow-sm">
+                    <div key={ date } className="table-wrapper">
+                        <div className="thead grid bg-slate-200 p-2 rounded-sm shadow-sm">
                             <div className="flex justify-between mx-2">
                                 <div className="flex gap-1 items-center">
                                     <div className="font-bold text-md">{formatDateToWords(date)}</div>
@@ -85,12 +83,12 @@ export function WeeklyExpenses({ branchId, search, reload, setReload, setUpdate,
                             </div>
 
                             {groupedExpenses[date].map((expense, index) => (
-                                <div key={index} className="grid grid-cols-7 px-4 py-2 bg-gray-100 rounded-sm my-0.5 shadown-sm">
-                                    <div className="flex gap-2 items-center col-span-2">
+                                <div key={index} className="grid grid-cols-7 px-4 py-2 bg-gray-100 rounded-sm my-0.5 shadown-sm max-md:grid-cols-4">
+                                    <div className="flex gap-2 items-center col-span-2 max-md:col-span-1">
                                         <div className="w-8 h-8 bg-brown text-light flex items-center justify-center rounded-full font-semibold">{ expense.firstName![0] }{ expense.lastName![0] }</div>
                                         <div className="font-semibold text-sm">{ expense.firstName } { expense.lastName }</div>
                                     </div>
-                                    <div className="col-span-3">
+                                    <div className="col-span-3 max-md:col-span-1">
                                         <div className="text-md text-sm font-semibold">{expense.purpose}</div>
                                         <div className="text-xs text-gray font-semibold">{expense.paymentMode}</div>
                                     </div>

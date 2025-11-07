@@ -16,13 +16,14 @@ import { useState } from "react";
 import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { ViewAnnouncement } from "./components/ViewAnnouncement";
 import { Ellipsis } from "lucide-react";
+import { DeleteAnnouncement } from "./components/DeleteAnnouncement";
 
 export function AnnouncementPage() {
     const [reload, setReload] = useState(false);
 
     const { claims, loading: authLoading } = useAuth();
     const { data: announcements, loading, error } = useFetchData<Announcement>(AnnouncementService.getAllAnnouncements, [reload], []);
-    const { toView, setView, open, setOpen } = useCrudState<Announcement>();
+    const { toView, setView, open, setOpen, toDelete, setDelete } = useCrudState<Announcement>();
     
     if (loading || authLoading) return <PapiverseLoading />
     return (
@@ -56,6 +57,7 @@ export function AnnouncementPage() {
                                 <AppRUDSelection
                                     item={ item }
                                     icon={Ellipsis}
+                                    setDelete={ setDelete }
                                 />
                             )}
                         </div>
@@ -84,6 +86,14 @@ export function AnnouncementPage() {
                 <ViewAnnouncement 
                     toView={ toView! } 
                     setView={ setView }
+                />
+            )}
+
+            {toDelete && (
+                <DeleteAnnouncement
+                    toDelete={ toDelete }
+                    setDelete={ setDelete }
+                    setReload={ setReload }
                 />
             )}
         </section>

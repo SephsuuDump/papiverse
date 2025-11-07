@@ -46,7 +46,7 @@ export function AuthPage() {
                     handleSubmit();
                 } }
                 method='post'
-                className='flex flex-col gap-4 bg-light w-[400px] shadow-lg rounded-xl max-md:shadow-none max-md:border-0 px-8 py-12 max-sm:mx-2'
+                className='flex flex-col gap-4 bg-light w-[400px] shadow-lg rounded-xl max-md:shadow-none max-md:border-0 max-md:-mt-24 px-8 py-12 max-sm:mx-2'
             >
                 <div>
                     <Image
