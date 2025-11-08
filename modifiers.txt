@@ -115,3 +115,16 @@ Drinks
 - Blue Lagoon
 - Island Iced Tea
 - Golden Cove
+
+
+
+modifierGroups: [
+    {
+        id: 1,
+        name: 'SET A'
+    },
+    {
+        id: 2,
+        name: 'SET B'
+    },
+]

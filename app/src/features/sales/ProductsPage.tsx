@@ -11,7 +11,7 @@ import { formatToPeso } from "@/lib/formatter";
 import { ProductService } from "@/services/product.service";
 import { Product } from "@/types/products";
 import { Info, Salad, SquarePen, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateProduct } from "./components/CreateProduct";
 import { UpdateProduct } from "./components/UpdateProduct";
 import { DeleteProduct } from "./components/DeleteProduct";

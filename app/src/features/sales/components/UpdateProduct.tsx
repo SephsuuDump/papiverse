@@ -63,9 +63,9 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
         }
     };
 
-    const handleQuantityChange = async (code: string, quantity: number) => {
+    const handleQuantityChange = async (id: number, quantity: number) => {
         setSelectedItems(selectedItems.map((item: SupplyItem) => 
-            item.code === code 
+            item.id === id 
                 ? { ...item, quantity: quantity || 0 } 
                 : item
         ));
@@ -243,7 +243,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                                         const value = e.target.value;
                                                         if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
                                                             if (value !== "" && !isNaN(Number(value))) {
-                                                                handleQuantityChange(item.code!, Number(value));
+                                                                handleQuantityChange(item.id!, Number(value));
                                                             }
                                                         }
                                                     }}

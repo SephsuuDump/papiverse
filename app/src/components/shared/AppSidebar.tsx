@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/hooks/use-auth"
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarTrigger, useSidebar } from "../ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,11 +12,12 @@ import { AuthPage } from "@/features/auth/AuthPage";
 import { AppAvatar } from "./AppAvatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Claim } from "@/types/claims";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AuthService } from "@/services/auth.service";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
+import { PapiverseLoading } from "../ui/loader";
 
 export function AppSidebar() {
     const pathName = usePathname();
@@ -25,7 +26,6 @@ export function AppSidebar() {
 
     const { claims, loading } = useAuth();
     const { open } = useSidebar();
-
     const [show, setShow] = useState(false);
 
     async function handleLogout() {
@@ -35,12 +35,16 @@ export function AppSidebar() {
         window.location.href = '/auth'
     }
     
-    let route;
-    if (!claims) return <AuthPage />;
-    if (claims.roles[0] === 'FRANCHISOR') route = adminRoute
-    if (claims.roles[0] === 'FRANCHISEE') route = franchiseeRoute
-    console.log(isMobile);
+    if (loading) return <PapiverseLoading />
+    if (!claims || !claims.roles || claims.roles.length === 0) redirect('/auth')
     
+        
+    const role = claims.roles[0];
+    let route;
+
+    if (role === "FRANCHISOR") route = adminRoute;
+    else if (role === "FRANCHISEE") route = franchiseeRoute;
+    else redirect("/unauthorized");
 
     if (isMobile) {
         return (

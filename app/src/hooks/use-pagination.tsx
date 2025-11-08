@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 export function usePagination<T>(items: T[] = [], defaultSize: number = 20) {
     const [page, setPage] = useState(0); // 0-based index
     const [size, setSize] = useState(defaultSize); // items per page
+
+    useEffect(() => {
+        setPage(0);
+    }, [size, items]);
 
     const paginated = useMemo(() => {
         if (!items) return [];
