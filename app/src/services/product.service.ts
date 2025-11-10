@@ -2,6 +2,7 @@ import { BASE_URL } from "@/lib/urls";
 import { requestData } from "./_config";
 import { Product } from "@/types/products";
 import { Supply } from "@/types/supply";
+import { Modifier } from "@/types/modifier";
 
 const url = `${BASE_URL}/products`;
 
@@ -20,6 +21,13 @@ export class ProductService {
         );
     }
 
+    static async getProductGroups(id: number) {
+        return await requestData(
+            `${url}/get-groups?product_id=${id}`,
+            'GET'
+        );
+    }
+
     static async addProduct(product: Product) {
         return await requestData(
             `${url}/create`,
@@ -27,6 +35,15 @@ export class ProductService {
             undefined,
             product
         );
+    }
+
+    static async linkProductGroup(productModifier: Modifier[]) {
+        return await requestData(
+            `${BASE_URL}/product-link/create`,
+            'POST',
+            undefined,
+            productModifier
+        )
     }
 
     static async updateProduct(supply: Supply) {

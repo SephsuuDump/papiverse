@@ -1,9 +1,12 @@
+import { Modifier } from "./modifier";
+
 export interface Product {
     id?: number;
     name: string;
     price: number;
     category: string;
     itemsNeeded: MaterialItem[];
+    groups?: Modifier[];
 }
 
 export interface MaterialItem {

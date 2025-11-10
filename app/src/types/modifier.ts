@@ -6,8 +6,8 @@ import { QuantityBadge } from "@/components/ui/badge";
 
 export interface Modifier {
     id?: number;
-    name: string;
-    description: string;
+    name?: string;
+    description?: string;
 }
 
 export interface ModifierItem {

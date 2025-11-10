@@ -7,10 +7,13 @@ import { ModalLoader } from "@/components/ui/loader";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useFetchData } from "@/hooks/use-fetch-data";
+import { useFetchOne } from "@/hooks/use-fetch-one";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { handleChange } from "@/lib/form-handle";
+import { ModifierGroupService } from "@/services/modifier.service";
 import { ProductService } from "@/services/product.service";
 import { SupplyService } from "@/services/supply.service";
+import { Modifier } from "@/types/modifier";
 import { Product, productFields } from "@/types/products";
 import { SupplyItem } from "@/types/supplyOrder";
 import { Plus, Salad, Trash2, X } from "lucide-react";
@@ -29,11 +32,19 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
     const [onProcess, setProcess] = useState(false);
     const [product, setProduct] = useState<Product>(toUpdate);
     const [selectedItems, setSelectedItems] = useState<SupplyItem[]>(toUpdate.itemsNeeded);
-    
-    const { data: supplies, loading, error } = useFetchData(SupplyService.getAllSupplies, [], []);
-    const { data: products, loading: productLoading, error: productsError } = useFetchData(ProductService.getAllProducts, [], [], 0, 1000);
+    const [selectedGroups, setSelectedGroups] = useState<Modifier[]>(toUpdate.groups!);
+        
+    const { data: supplies, loading, error } = useFetchData(SupplyService.getAllSupplies);
+    const { data: products, loading: productsLoading, error: productsError } = useFetchData(ProductService.getAllProducts);
+    const { data: modifiers, loading: modifierLoading, error: modifierError } = useFetchData<Modifier>(ModifierGroupService.getAllModifierGroups);
+
     const { search, setSearch, filteredItems } = useSearchFilter(supplies, ['name', 'code']);
     const { search: searchProduct, setSearch: setSearchProduct, filteredItems: filteredProducts } = useSearchFilter(products, ['name']);
+    const { search: searchGroup, setSearch: setSearchGroup, filteredItems: filteredGroups } = useSearchFilter(modifiers, ['name']);    
+
+    const availableGroups = filteredGroups.filter(
+        (group) => !selectedGroups.some((selected) => selected.id === group.id)
+    );
 
     const handleSelect = async (code: string) => {
         if (!selectedItems.find((item: SupplyItem) => item.code === code)) {
@@ -59,6 +70,21 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
             ]);
             } else {
                 console.warn(`Item with code ${id} not found.`);
+            }
+        }
+    };
+
+    const handleGroupSelect = (id: number) => {
+        const isAlreadySelected = selectedGroups.some(group => group.id === id);
+        if (isAlreadySelected) {
+            setSelectedGroups(selectedGroups.filter(group => group.id !== id));
+        } else {
+            const selectedGroup = modifiers.find(group => group.id === id);
+            if (selectedGroup) {
+                setSelectedGroups([
+                    ...selectedGroups,
+                    { id: selectedGroup.id, name: selectedGroup.name }
+                ]);
             }
         }
     };
@@ -104,8 +130,14 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                 ...product,
                 itemsNeeded: selectedItems
             }
+            const updatedGroups = selectedGroups.map(({ name, id: groupId, ...rest }) => ({
+                ...rest,
+                groupId,
+                productId: toUpdate.id
+            }));
             const data = await ProductService.updateProduct(updatedData);
-            if (data) toast.success(`Product ${product.name} created successfully.`)
+            const linkData = await ProductService.linkProductGroup(updatedGroups);
+            if (data && linkData) toast.success(`Product ${product.name} created successfully.`)
             setUpdate(undefined);
             setReload(prev => !prev);
         } catch(error) { toast.error(`${error}`) }
@@ -113,10 +145,10 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
     }
 
     useEffect(() => {
-        console.log(selectedItems);
-    }, [product, selectedItems])
+        console.log(selectedGroups);
+    }, [selectedGroups])
 
-    if (loading || productLoading) return <ModalLoader />
+    if (loading || productsLoading || modifierLoading) return <ModalLoader />
     return(
         <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined)} }>
             <DialogContent className="overflow-y-auto">
@@ -182,7 +214,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                         className="flex items-center justify-center border-0 w-full hover:underline"
                                     >
                                         <Plus strokeWidth={ 2 } className="w-5 h-5 text-dark" />
-                                        <div className="text-dark">Select Supplies</div>
+                                        <div className="text-dark">Supplies</div>
                                     </SelectTrigger>
                                     <SelectContent className="relative">
                                         <SelectGroup>
@@ -207,7 +239,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                         className="flex items-center justify-center border-0 w-full hover:underline"
                                     >
                                         <Plus strokeWidth={ 2 } className="w-5 h-5 text-dark" />
-                                        <div className="text-dark">Select Products</div>
+                                        <div className="text-dark">Products</div>
                                     </SelectTrigger>
                                     <SelectContent className="relative">
                                         <SelectGroup>
@@ -226,11 +258,36 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
+                                <Select onValueChange={(value) => handleGroupSelect(Number(value))}>
+                                    <SelectTrigger 
+                                        hideIcon={ true }
+                                        className="flex items-center justify-center border-0 w-full hover:underline"
+                                    >
+                                        <Plus strokeWidth={ 2 } className="w-5 h-5 text-dark" />
+                                        <div className="text-dark">Modifiers</div>
+                                    </SelectTrigger>
+                                    <SelectContent className="relative">
+                                        <SelectGroup>
+                                            <div className="sticky top-0 z-10 bg-white">
+                                                <Input
+                                                    placeholder="Search for a product"
+                                                    className="!bg-white !text-black shadow-sm"
+                                                    onChange={(e) => setSearchGroup(e.target.value)}
+                                                    onKeyDown={(e) => e.stopPropagation()}
+                                                />
+                                            </div>
+                                            <SelectLabel>All Groups</SelectLabel>
+                                            {availableGroups.map((item) => (
+                                                <SelectItem key={item.id} value={String(item.id)}>{item.name}</SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div className="overflow-x-auto">
                                 {selectedItems.map((item, index) => (
                                     <div className="w-130 flex tdata" key={index}>
-                                        <div className="w-full grid grid-cols-3" key={ index }>
+                                        <div className="w-full grid grid-cols-3">
                                             <div className="td">{ item.name }</div>
                                             <div className="w-50 td flex-center-y gap-2">
                                                 <X className="w-3 h-3" />
@@ -279,7 +336,22 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                         </button>
                                     </div>
                                 ))}
-                                
+                                {selectedGroups.length > 0 && (
+                                    <div className="text-xs my-4">Modifier Groups</div>
+                                )}
+                                {selectedGroups.map((item) => (
+                                    <div className="w-130 flex tdata" key={item.id}>
+                                        <div className="w-full grid grid-cols-2">
+                                            <div className="td">{ item.name }</div>
+                                            <div className="td">
+                                                <Trash2 
+                                                    className="w-4 h-4 cursor-pointer text-darkred"
+                                                    onClick={() => setSelectedGroups(selectedGroups.filter(g => g.id !== item.id))}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
