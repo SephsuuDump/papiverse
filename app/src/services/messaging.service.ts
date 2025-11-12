@@ -38,3 +38,62 @@ export class MessagingService {
         );
     }
 }
+
+
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
+
+const SOCKET_URL = "http://localhost:8080/ws"; // same as your Spring Boot endpoint
+
+let stompClient: Client;
+
+export const connectWebSocket = (
+  userId: number,
+  conversationId: number,
+  onMessageReceived?: (message: any) => void
+) => {
+  stompClient = new Client({
+    webSocketFactory: () => new SockJS(SOCKET_URL),
+    reconnectDelay: 5000,
+    onConnect: () => {
+      console.log("✅ Connected to WebSocket");
+
+      // Subscribe to conversation messages
+      stompClient.subscribe(`/topic/conversation/${conversationId}`, (msg) => {
+        const body = JSON.parse(msg.body);
+        console.log("💬 New message:", body);
+        if (onMessageReceived) onMessageReceived(body);
+      });
+
+      // Typing indicators
+      stompClient.subscribe(`/topic/conversation/${conversationId}/typing`, (msg) => {
+        console.log("✍️ Typing:", JSON.parse(msg.body));
+      });
+
+      stompClient.subscribe(`/topic/conversation/${conversationId}/stopTyping`, (msg) => {
+        console.log("🛑 Stopped typing:", JSON.parse(msg.body));
+      });
+    },
+  });
+
+  stompClient.activate();
+};
+
+
+export const sendMessage = (message: any) => {
+  if (stompClient && stompClient.connected) {
+    stompClient.publish({ destination: "/app/sendMessage", body: JSON.stringify(message) });
+  }
+};
+
+export const sendTyping = (dto: any) => {
+  if (stompClient && stompClient.connected) {
+    stompClient.publish({ destination: "/app/typing", body: JSON.stringify(dto) });
+  }
+};
+
+export const sendStopTyping = (dto: any) => {
+  if (stompClient && stompClient.connected) {
+    stompClient.publish({ destination: "/app/stopTyping", body: JSON.stringify(dto) });
+  }
+};

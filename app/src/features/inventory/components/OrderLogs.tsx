@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { flattenGroupedLogsWithOrders, formatDateToWords, getWeekday } from "@/lib/formatter";
 import { InventoryLog } from "@/types/inventory-log";
 import dayjs from "dayjs"
+import { Truck } from "lucide-react";
 import { Fragment } from "react";
 
 interface Props {
@@ -26,6 +27,8 @@ export function OrderLogs({ logs }: Props) {
         return acc;
     }, {});
 
+    console.log(groupedByDateAndOrder);
+    
     return(
         <section>
             {flattenGroupedLogsWithOrders(groupedByDateAndOrder).map((item, index) => (
@@ -36,13 +39,16 @@ export function OrderLogs({ logs }: Props) {
                             <div className="bg-dark h-fit rounded-sm text-light px-2 font-semibold text-[10px]">{getWeekday(item.date)}</div>
                         </div>
                         {item.orders.map((subItem, index) => (
-                            <AccordionItem value={ String(subItem.orderId) } key={ index }>
+                            <AccordionItem value={ String(subItem.order.id) } key={ index }>
                                 <AccordionTrigger className="rounded-none bg-light px-4 shadow-xs">
-                                    <div className="w-full grid grid-cols-2">
-                                        <div>Order ID: <span className="font-semibold">{ subItem.orderId || "None" }</span></div>
+                                    <div className="w-full grid grid-cols-3">
+                                        <div>Order ID: <span className="font-semibold">{ subItem.order.id || "None" }</span></div>
                                         {/* <div>Source: <span className="font-semibold">{ subItem.logs[0].source }</span></div> */}
                                         <div>Type: <span className="font-semibold">{ subItem.logs[0].type === "IN" ? "INGOING" : "OUTGOING" }</span></div>
-                                        {/* <div className="font-semibold">{ subItem.logs[0].branchName }</div> */}
+                                        <div className="flex-center-y gap-2">
+                                            <Truck className="w-4 h-4 text-darkbrown" />
+                                            <div className="text-sm">{ subItem.order.orderDestination }</div>
+                                        </div>
                                     </div>
                                 </AccordionTrigger> 
                                 <AccordionContent className="table-wrapper px-4 bg-light border-b-darkred border-1">

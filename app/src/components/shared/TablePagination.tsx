@@ -6,14 +6,16 @@ import {
     PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
-export function TablePagination({ data, page, size, setPage, paginated }: {
+export function TablePagination({ data, page, size, setPage, paginated, search, filter }: {
     data: any[];
     paginated: any[];
     page: number;
     size: number;
     setPage: Dispatch<SetStateAction<number>>;
+    search?: string;
+    filter?:  string;
 }) {
     const totalPages = Math.ceil((data?.length ?? 0) / size);
 
@@ -43,10 +45,18 @@ export function TablePagination({ data, page, size, setPage, paginated }: {
 
     const pageNumbers = createPageNumbers();
 
+    useEffect(() => {
+        setPage(0);
+    }, [filter, search, data.length]);
+
     return (
         <div className="flex-center-y justify-between max-md:flex-col max-sm:gap-2">
             <div className="text-sm text-gray">
-                Showing {paginated.length} of {data.length} items
+                {(() => {
+                    const start = page * size + 1;
+                    const end = page * size + paginated.length;
+                    return `Showing ${start}-${end} of ${data.length} items`;
+                })()}
             </div>
 
             <Pagination className="justify-end">

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessagesSkeleton } from "@/components/ui/skeleton";
 import { getMessagesSocket } from "@/lib/socket";
+import { connectWebSocket, sendMessage, sendStopTyping, sendTyping } from "@/services/messaging.service";
 import { Claim } from "@/types/claims";
 import { Conversation, Message } from "@/types/messaging";
 import { EllipsisIcon, Info, Link, Mic, Send, SmilePlus } from "lucide-react";
@@ -27,74 +28,57 @@ export function MessagesCanvas({ claims, selected }: Props) {
     const readTimeoutRef = useRef<NodeJS.Timeout>(null);
 
     useEffect(() => {
-        const socket = getMessagesSocket(claims.userId, selected.id);
-        socket.emit("joinConversation", { conversationId: selected.id, userId: claims.userId });
-        socket.on('messages', (data: Message[]) => {
-            setMessages(data);
-            setLoading(false);
-        })
+        if (!selected) return;
+        setLoading(true);
 
-        socket.on("typing", ({ userId }) => {
-            if (userId !== claims.userId) {
-                const user = selected.participants.find(p => p.id === userId);
-                if (user) {
-                setTypingUsers(prev => {
-                    // avoid duplicates
-                    if (prev.some(u => u.userId === userId)) return prev;
-                    return [...prev, { userId, name: `${user.firstName} ${user.lastName}` }];
-                });
-                } else {
-                setTypingUsers(prev => {
-                    if (prev.some(u => u.userId === userId)) return prev;
-                    return [...prev, { userId, name: "Someone" }];
-                });
-                }
-            }
-        });
-
-        socket.on("stopTyping", ({ userId }) => {
-            setTypingUsers(prev => prev.filter(u => u.userId !== userId));
+        connectWebSocket(claims.userId, selected.id, (newMessage) => {
+            setMessages((prev) => [...prev, newMessage]);
         });
 
 
-        return () => {
-            socket.off('messages');
-            socket.off("typing");
-            socket.off("stopTyping");
-        }
-    }, [selected]);    
+        // Listen for messages via stompClient.subscribe in websocket.ts
+        // You could also move subscriptions here if needed
 
+        setTimeout(() => setLoading(false), 500); // Simulate small delay for smoother UX
+    }, [selected]);
+
+    // Scroll to bottom when messages or typing updates
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
-    }, [messages, typingUsers]); 
+    }, [messages, typingUsers]);
 
+    // Handle typing indicator (STOMP equivalent)
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setMessageInput(e.target.value);
+        sendTyping({ conversationId: selected.id, userId: claims.userId });
 
-        const socket = getMessagesSocket(claims.userId, selected.id);
-
-        socket.emit("typing", { conversationId: selected.id, userId: claims.userId });
-
-        if (typingTimeoutRef.current) {
-            clearTimeout(typingTimeoutRef.current);
-        }
-
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
         typingTimeoutRef.current = setTimeout(() => {
-            socket.emit("stopTyping", { conversationId: selected.id, userId: claims.userId });
+            sendStopTyping({ conversationId: selected.id, userId: claims.userId });
         }, 2000);
     };
 
-    const sendMessage = (content: string) => {
-        const socket = getMessagesSocket(selected.id, claims.userId);
-        socket.emit("sendMessage", {
-            conversationId: selected.id,
+    // Send a message through STOMP
+    const handleSendMessage = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!messageInput.trim()) return;
+
+        const msg: Message = {
+            id: Date.now(),
             senderId: claims.userId,
-            content: content,
-            messageType: "text"   // you can also allow "image", "file", etc.
-        });
-    }
+            content: messageInput.trim(),
+            messageType: "text",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            conversationId: selected.id,
+        } as any;
+
+        sendMessage(msg);
+        setMessageInput("");
+    };
+
 
     if (loading) return <MessagesSkeleton />
     return(
@@ -177,11 +161,7 @@ export function MessagesCanvas({ claims, selected }: Props) {
 
                     <form 
                         className="absolute w-full bottom-0 px-4 border-t-1" 
-                        onSubmit={(e: FormEvent<HTMLFormElement>) => {
-                            e.preventDefault();            
-                            sendMessage(messageInput);  
-                            setMessageInput("");
-                        }}
+                        onSubmit={handleSendMessage}
                     >
                         <div className="flex items-center w-full bg-white">
                             <button className="mx-2">

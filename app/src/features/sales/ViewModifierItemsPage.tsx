@@ -30,7 +30,8 @@ type ModifierGroupItems = {
         groupId: number,
         groupName: string;
     },
-    modifierItems: ModifierItem[]
+    modifierItems: ModifierItem[],
+    products: Product[],
 }
 
 const columns = [
@@ -38,6 +39,11 @@ const columns = [
     { title: 'Description', style: '' },
     { title: 'Items Needed', style: '' },
     { title: 'Actions', style: '' },
+]
+
+const productColumns = [
+    { title: 'Product Name', style: '' },
+    { title: 'Category', style: '' },
 ]
 
 export function  ViewModifierItemsPage() {
@@ -48,7 +54,6 @@ export function  ViewModifierItemsPage() {
         [reload, id],
         [id]
     );    
-    console.log(data);
     
     const { search, setSearch, filteredItems } = useSearchFilter(data?.modifierItems, ['name']);
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
@@ -133,13 +138,30 @@ export function  ViewModifierItemsPage() {
                 </div>
             </div>
 
-            {/* <TablePagination 
-                data={ data }
-                paginated={ paginated }
-                page={ page }
-                size={ size }
-                setPage={ setPage }
-            /> */}
+            <AppHeader 
+                className="mt-4" 
+                label={`Products Linked to ${data!.group.groupName}`} 
+                hidePapiverseLogo={true}
+            />
+
+            <div className="table-wrapper">
+                <div className="thead grid grid-cols-2">
+                    {productColumns.map((item, _) => (
+                        <div key={_} className={`th ${item.style}`}>{ item.title }</div>
+                    ))}
+                </div>
+                <div className="animate-fade-in-up" key={page}>
+                    {data.products.length > 0 ?
+                        data.products.map((item, i) => (
+                            <div className="tdata grid grid-cols-2" key={i}>
+                                <div className="td">{ item.name }</div>
+                                <div className="td">{ item.category }</div>
+                            </div>
+                        ))
+                        : (<div className="my-2 text-sm text-center col-span-6">There are no existing products yet.</div>)
+                    }
+                </div>
+            </div>
 
             {open && 
                 <CreateModifierItem

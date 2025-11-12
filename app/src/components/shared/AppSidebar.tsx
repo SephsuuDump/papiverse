@@ -17,7 +17,7 @@ import { AuthService } from "@/services/auth.service";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
-import { PapiverseLoading } from "../ui/loader";
+import { PapiverseLoading, SidebarLoading } from "../ui/loader";
 
 export function AppSidebar() {
     const pathName = usePathname();
@@ -35,7 +35,7 @@ export function AppSidebar() {
         window.location.href = '/auth'
     }
     
-    if (loading) return <PapiverseLoading />
+    if (loading) return <SidebarLoading />
     if (!claims || !claims.roles || claims.roles.length === 0) redirect('/auth')
     
         

@@ -8,6 +8,9 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { fromatMessageDateTime } from "@/lib/formatter";
 import { getMessagesSocket } from "@/lib/socket";
 import { CreateConversation } from "./CreateConversation";
+import { MESSAGING_URL } from "@/lib/urls";
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
 
 const tabs = ['DIRECT', 'GROUPS', 'PUBLIC'];
 
@@ -33,14 +36,30 @@ export function MessagesSidebar({ claims, setReload, conversations, selected, se
     }, [activeTab]);
 
     useEffect(() => {
-        const socket = getMessagesSocket(claims.userId);
-        socket.emit("joinUser", { userId: claims.userId });
-        socket.on("conversations", (updatedConversations) => {
-            setSelectedConversations(updatedConversations);
-        })
+        // 🔌 Initialize SockJS + STOMP
+        const socket = new SockJS(MESSAGING_URL ?? "http://localhost:8080/ws");
+        const stompClient = new Client({
+            webSocketFactory: () => socket,
+            reconnectDelay: 5000,
+            onConnect: () => {
+                console.log("✅ Connected to Spring Boot WS");
+
+                // 📨 Subscribe to conversations for this user
+                stompClient.subscribe(`/topic/user.${claims.userId}.conversations`, (msg: any) => {
+                    const updated = JSON.parse(msg.body);
+                    setSelectedConversations(updated);
+                });
+            },
+            onDisconnect: () => {
+                console.log("❌ Disconnected from WebSocket");
+            },
+        });
+
+        stompClient.activate();
+
         return () => {
-            socket.off("conversations");
-        }
+            stompClient.deactivate();
+        };
     }, [claims.userId]);
 
     return(
@@ -104,7 +123,7 @@ export function MessagesSidebar({ claims, setReload, conversations, selected, se
                             </div>
                             <div className="w-6/10 text-start text-xs text-gray truncate">{ item.updated_message || "No existing message" }</div>
                         </div>
-                        <div className="absolute bottom-2 right-2 text-[10px]">{ fromatMessageDateTime(item.updated_at) }</div>
+                        <div className="absolute bottom-2 right-2 text-[10px]">{ fromatMessageDateTime(item.updatedAt) }</div>
                     </button>
                 ))}
             </div>

@@ -2,7 +2,7 @@ export interface Conversation {
     id: number;
     type: string;
     name: string;
-    updated_at: string,
+    updatedAt: string,
     updated_message: string,
     participants: {
         id: number;

@@ -32,6 +32,11 @@ export interface SupplyOrder {
             price: number;
         } []
     }
+
+    order?: {
+        id: number,
+        orderDestination: string;
+    }
 }
 
 export interface SupplyItem {

@@ -16,6 +16,7 @@ import { SupplyService } from "@/services/supply.service";
 import { Modifier } from "@/types/modifier";
 import { Product, productFields } from "@/types/products";
 import { SupplyItem } from "@/types/supplyOrder";
+import { link } from "fs";
 import { Plus, Salad, Trash2, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -29,18 +30,21 @@ interface Props {
 }
 
 export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
+    console.log(toUpdate);
+    
     const [onProcess, setProcess] = useState(false);
     const [product, setProduct] = useState<Product>(toUpdate);
     const [selectedItems, setSelectedItems] = useState<SupplyItem[]>(toUpdate.itemsNeeded);
     const [selectedGroups, setSelectedGroups] = useState<Modifier[]>(toUpdate.groups!);
+    const [removedGroups, setRemovedGroups] = useState<{productId: number, groupId: number}[]>([]);
         
-    const { data: supplies, loading, error } = useFetchData(SupplyService.getAllSupplies);
-    const { data: products, loading: productsLoading, error: productsError } = useFetchData(ProductService.getAllProducts);
-    const { data: modifiers, loading: modifierLoading, error: modifierError } = useFetchData<Modifier>(ModifierGroupService.getAllModifierGroups);
+    const { data: supplies, loading } = useFetchData(SupplyService.getAllSupplies);
+    const { data: products, loading: productsLoading } = useFetchData(ProductService.getAllProducts);
+    const { data: modifiers, loading: modifierLoading } = useFetchData<Modifier>(ModifierGroupService.getAllModifierGroups);
 
-    const { search, setSearch, filteredItems } = useSearchFilter(supplies, ['name', 'code']);
-    const { search: searchProduct, setSearch: setSearchProduct, filteredItems: filteredProducts } = useSearchFilter(products, ['name']);
-    const { search: searchGroup, setSearch: setSearchGroup, filteredItems: filteredGroups } = useSearchFilter(modifiers, ['name']);    
+    const { setSearch, filteredItems } = useSearchFilter(supplies, ['name', 'code']);
+    const { setSearch: setSearchProduct, filteredItems: filteredProducts } = useSearchFilter(products, ['name']);
+    const { setSearch: setSearchGroup, filteredItems: filteredGroups } = useSearchFilter(modifiers, ['name']);    
 
     const availableGroups = filteredGroups.filter(
         (group) => !selectedGroups.some((selected) => selected.id === group.id)
@@ -66,7 +70,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
             if (selectedItem) {
             setSelectedItems([
                 ...selectedItems,
-                { id: selectedItem.id, code: "", name: selectedItem.name, quantity: 1, type: "PRODUCT" }
+                { id: selectedItem.id, code: "", name: selectedItem.name, quantity: 1, type: "PRODUCT", forTakeOut: false }
             ]);
             } else {
                 console.warn(`Item with code ${id} not found.`);
@@ -77,15 +81,19 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
     const handleGroupSelect = (id: number) => {
         const isAlreadySelected = selectedGroups.some(group => group.id === id);
         if (isAlreadySelected) {
-            setSelectedGroups(selectedGroups.filter(group => group.id !== id));
+            setSelectedGroups(prev => prev.filter(group => group.id !== id));
+            setRemovedGroups(prev => [
+                ...prev,
+                { groupId: id, productId: toUpdate.id! }
+            ]);
         } else {
-            const selectedGroup = modifiers.find(group => group.id === id);
-            if (selectedGroup) {
-                setSelectedGroups([
-                    ...selectedGroups,
-                    { id: selectedGroup.id, name: selectedGroup.name }
-                ]);
-            }
+            setSelectedGroups(prev => [
+                ...prev,
+                modifiers.find(group => group.id === id)!
+            ]);
+            setRemovedGroups(prev =>
+                prev.filter(r => r.groupId !== id)
+            );
         }
     };
 
@@ -130,23 +138,63 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                 ...product,
                 itemsNeeded: selectedItems
             }
-            const updatedGroups = selectedGroups.map(({ name, id: groupId, ...rest }) => ({
-                ...rest,
+            
+            const originalGroupIds = (toUpdate.groups ?? [])
+                .map(g => g.id)
+                .filter((id): id is number => id !== undefined);
+
+            const selectedGroupIds = selectedGroups
+                .map(g => g.id)
+                .filter((id): id is number => id !== undefined);
+
+            const addedGroupIds = selectedGroupIds.filter(id => !originalGroupIds.includes(id));
+            const removedGroupIds = originalGroupIds.filter(id => !selectedGroupIds.includes(id));
+
+            const addedGroupsPayload = addedGroupIds.map(groupId => ({
                 groupId,
-                productId: toUpdate.id
+                productId: toUpdate.id!
             }));
-            const data = await ProductService.updateProduct(updatedData);
-            const linkData = await ProductService.linkProductGroup(updatedGroups);
-            if (data && linkData) toast.success(`Product ${product.name} created successfully.`)
+
+            const removedGroupsPayload = removedGroupIds.map(groupId => ({
+                groupId,
+                productId: toUpdate.id!
+            }));
+
+            if (addedGroupsPayload.length > 0) {
+                const linkData = await ProductService.linkProductGroup(addedGroupsPayload);
+                if (linkData) toast.success('Modifier group added sucessfully.');
+                if (!linkData) return toast.error('Cannot create link on products and modifier group.');
+            }
+
+            if (removedGroupsPayload.length > 0) {
+                const removedData = await ProductService.deleteProductLink(removedGroupsPayload);
+                if (removedData) toast.success('Modifier group removed sucessfully.');
+                if (!removedData) return toast.error('Cannot delete link on products and modifier group.');
+            }
+
+            const productChanged = JSON.stringify(updatedData) !== JSON.stringify(toUpdate);
+            const groupsChanged = addedGroupIds.length > 0 || removedGroupIds.length > 0;
+
+            if (productChanged) {
+                const data = await ProductService.updateProduct(updatedData);
+                if (data) return toast.error(`Product ${toUpdate.name} updated successfully.`);
+                if (!data) return toast.error('Cannot update product.');
+            }
+            
             setUpdate(undefined);
             setReload(prev => !prev);
-        } catch(error) { toast.error(`${error}`) }
+            if (!groupsChanged && !productChanged) return toast.info('No data has been changed.')
+        } catch (error) { toast.error(`${error}`) }
         finally { setProcess(false) }
     }
 
     useEffect(() => {
         console.log(selectedGroups);
     }, [selectedGroups])
+
+    useEffect(() => {
+        console.log(removedGroups);
+    }, [removedGroups])
 
     if (loading || productsLoading || modifierLoading) return <ModalLoader />
     return(
@@ -346,7 +394,17 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                             <div className="td">
                                                 <Trash2 
                                                     className="w-4 h-4 cursor-pointer text-darkred"
-                                                    onClick={() => setSelectedGroups(selectedGroups.filter(g => g.id !== item.id))}
+                                                    onClick={() => {
+                                                        setSelectedGroups(selectedGroups.filter(g => g.id !== item.id));
+                                                        setRemovedGroups(prev => [
+                                                            ...prev,
+                                                            {
+                                                                groupId: item.id!,
+                                                                productId: toUpdate.id!
+                                                            }
+                                                        ]);
+                                                    }}
+                                                        
                                                 />
                                             </div>
                                         </div>

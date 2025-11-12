@@ -21,11 +21,11 @@ export class ProductService {
         );
     }
 
-    static async getProductGroups(id: number) {
+    static async getGroupProduct(id: number)  {
         return await requestData(
-            `${url}/get-groups?product_id=${id}`,
-            'GET'
-        );
+            `${BASE_URL}/product-link/get-products?group_id=${id}`,
+            'GET',
+        )
     }
 
     static async addProduct(product: Product) {
@@ -37,7 +37,7 @@ export class ProductService {
         );
     }
 
-    static async linkProductGroup(productModifier: Modifier[]) {
+    static async linkProductGroup(productModifier: { groupId: number, productId: number }[]) {
         return await requestData(
             `${BASE_URL}/product-link/create`,
             'POST',
@@ -47,20 +47,21 @@ export class ProductService {
     }
 
     static async updateProduct(supply: Supply) {
-        const payload = {
-            ...supply,
-            name: supply.name?.toUpperCase(),
-            unitQuantity: Number(supply.unitQuantity),
-            unitPriceInternal: Number(supply.unitPriceInternal),
-            unitPriceExternal: Number(supply.unitPriceExternal)
-        };
-
         return await requestData(
             `${url}/update`,
             'POST',
             undefined,
-            payload
+            supply
         );
+    }
+
+    static async deleteProductLink(toDeleteModifier: { groupId: number, productId: number}[]) {
+        return await requestData(
+            `${BASE_URL}/product-link/delete-links`,
+            'POST',
+            undefined,
+            toDeleteModifier
+        )
     }
 
     static async deleteProduct(id: number) {

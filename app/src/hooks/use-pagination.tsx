@@ -8,7 +8,7 @@ export function usePagination<T>(items: T[] = [], defaultSize: number = 20) {
 
     useEffect(() => {
         setPage(0);
-    }, [size, items]);
+    }, [size]);
 
     const paginated = useMemo(() => {
         if (!items) return [];

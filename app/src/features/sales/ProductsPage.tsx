@@ -26,11 +26,20 @@ const columns = [
     { title: 'Action', style: '' },
 ]
 
+const filters = ["ALL PRODUCTS", "A'LA CARTE", "AFFORDABLE RICE MEALS", "ALL IN RICE BOWL", "BIG EVENT? WE GOT YOU", "BILAO BLOW OUT", "BINALOT NI PAPI", "BITES", "BURGERS", "CHEF'S PASTA", "CHEF'S PASTA 4-5 PAX", "COMBO A", "COMBO B", "COMBO C", "COMBO D", "COMBO E", "CRUNCHICKEN", "CRUNCHY BAGNET", "DINNER NIGHT TIME", "EXTRAS", "GRILLED SIZZLING BBQ DEALS", "KOPI NI PAPI", "KRISPY DELIGHTS", "KRISPY SISIG", "OVERLOAD SARAP", "PAPI FRIES", "PAPI'S FRUIT SODA", "PREMIUM BUNDLE DEALS", "QUENCHERS", "SALAD BLENDS", "SALO SALO SPECIAL", "SIGNATURE PLATES", "SIZZLING MEALS", "SNOWFROST HALO MIX", "SULIT RICE MIX", "UNLI BUNDLE DEALS", "UNLI DEALS"];
+
 export function ProductsPage() {
     const [reload, setReload] = useState(false);
+    const [filter, setFilter] = useState(filters[0]);
     const { data, loading, error } = useFetchData<Product>(ProductService.getAllProducts, [reload]);
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['name']);
-    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
+
+    const filteredData = filteredItems.filter(i => {
+        if (filter === 'ALL PRODUCTS') return true;
+        return i.category === filter;
+    });
+
+    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20);
 
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<Product | undefined>();
@@ -46,6 +55,9 @@ export function ProductsPage() {
                 setSize={ setSize }
                 buttonLabel="Add a product"
                 setOpen={ setOpen }
+                filter={ filter }
+                filters={ filters }
+                setFilter={ setFilter }
             />
 
             <div className="table-wrapper">
@@ -54,11 +66,11 @@ export function ProductsPage() {
                         <div key={_} className={`th ${item.style}`}>{ item.title }</div>
                     ))}
                 </div>
-                <div className="animate-fade-in-up" key={page}>
+                <div className="animate-fade-in-up" key={`${page}-${filter}`}>
                     {paginated.length > 0 ?
                         paginated.map((item, i) => (
                             <div className="tdata grid grid-cols-5" key={i}>
-                                <div className="td">{ item.name }</div>
+                                <div className="td">{ item.name.toUpperCase() }</div>
                                 <div className="td">{ formatToPeso(item.price) }</div>
                                 <div className="td">{ item.category }</div>
                                 <Select>
@@ -88,6 +100,10 @@ export function ProductsPage() {
                                                     </div>
                                                 </SelectItem>
                                             ))}
+                                            {item.groups!.length > 0 && <SelectLabel>Modifier Groups</SelectLabel>}
+                                            {item.groups!.length > 0 && item.groups!.map((subItem) => (
+                                                <SelectItem value={subItem.name!} key={subItem.name!}>{ subItem.name }</SelectItem>
+                                            ))}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
@@ -109,6 +125,8 @@ export function ProductsPage() {
                 page={ page }
                 size={ size }
                 setPage={ setPage }
+                search={ search }
+                filter={ filter }
             />
 
             {open && 

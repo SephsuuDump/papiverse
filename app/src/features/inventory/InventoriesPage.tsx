@@ -120,6 +120,8 @@ export function InventoriesPage() {
                 page={ page }
                 size={ size }
                 setPage={ setPage }
+                search={ search }
+                filter={ filter }
             />
 
             {toUpdate && (

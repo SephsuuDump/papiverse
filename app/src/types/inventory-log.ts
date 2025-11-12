@@ -11,4 +11,8 @@ export interface InventoryLog {
     source: string;
     orderId: number | null;
     dateTime: string;
+    order?: {
+        id: number;
+        orderDestination: string;
+    }
 }

@@ -18,22 +18,30 @@ export function MessagesPage() {
     const [reload, setReload] = useState(false);
 
     useEffect(() => {
-        if (!claims.userId) return;
-        const socket = getMessagesSocket(claims.userId);
-        socket.emit("joinUser", { userId: claims.userId });
-        socket.on("conversations", (data: Conversation[]) => {
-            setConversations(data);
-            if (data.length > 0) {
-                setSelected(data[0]);   
-            } else {
-                setSelected(undefined); 
+        const fetchConversations = async () => {
+            if (!claims.userId) return;
+
+            try {
+                const res = await fetch(
+                    `http://localhost:8080/api/v1/messaging/conversations/${claims.userId}?page=1&limit=20`
+                );
+                if (!res.ok) throw new Error("Failed to fetch conversations");
+
+                const data = await res.json();
+                setConversations(data);
+
+                if (data.length > 0) setSelected(data[0]);
+                else setSelected(undefined);
+
+            } catch (err) {
+                console.error("⚠️ Error loading conversations:", err);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
-        });
-        return () => {
-            socket.disconnect();
         };
-    }, [claims.userId]);
+
+        fetchConversations();
+    }, [claims.userId, reload]);
 
     if (loading || authLoading || selected === undefined) return <PapiverseLoading />
     return (

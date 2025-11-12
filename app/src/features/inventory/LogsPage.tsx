@@ -15,6 +15,7 @@ import { TablePagination } from "@/components/shared/TablePagination";
 import { TableFilter } from "@/components/shared/TableFilter";
 import { Button } from "@/components/ui/button";
 import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
+import { flattenGroupedLogsWithOrders } from "@/lib/formatter";
 
 const tabs = ['Input Logs', 'Order Logs'];
 
@@ -29,6 +30,25 @@ export function LogsPage() {
     );
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['dateTime', 'orderId']);
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 100);
+
+    const groupedByDateAndOrder = data.reduce<Record<string, Record<string, InventoryLog[]>>>((acc, log) => {
+            if (!log.dateTime) {
+                return acc; 
+            }
+            const dateOnly = log.dateTime.slice(0, 10);
+            if (!acc[dateOnly]) {
+                acc[dateOnly] = {};
+            }
+            const orderKey = String(log.orderId);
+            if (!acc[dateOnly][orderKey]) {
+                acc[dateOnly][orderKey] = [];
+            }
+            acc[dateOnly][orderKey].push(log);
+            return acc;
+        }, {});
+    
+    console.log(flattenGroupedLogsWithOrders(groupedByDateAndOrder));
+    
 
     if (loading || authLoading) return <PapiverseLoading />
     return(

@@ -16,6 +16,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
 import { CompletedOrders } from "./CompletedOrders";
+import { BranchService } from "@/services/branch.service";
+import { log } from "node:console";
 
 const tabs = ['Pending', 'Completed', 'Rejected']
 
@@ -33,7 +35,17 @@ export default function SupplyOrdersPage() {
     
     const { data, loading, error } = isCommisary ? fetchAll : fetchByBranch;
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['branchName', 'snowfrostCategory.snowFrostOrderId', 'meatCategory.meatOrderId']);
-    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 100);
+    const { data: branches, loading: branhesLoading } = useFetchData(BranchService.getAllBranches);
+    
+    const filters = ['All Branches', ...(branches?.map(b => b.branchName) ?? [])];
+    const [filter, setFilter] = useState<string>('All Branches');
+
+    const filteredData = filteredItems.filter(i => {
+        if (filter === 'All Branches') return true;
+        return i.branchName === filter;
+    });
+
+    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 100);
 
     useEffect(() => {
         if (open) {
@@ -41,7 +53,7 @@ export default function SupplyOrdersPage() {
         }
     }, [open, router]);
 
-    if (loading || authLoading) return <PapiverseLoading />
+    if (loading || authLoading || branhesLoading) return <PapiverseLoading />
     return(
         <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label='Supply Orders' />
@@ -56,9 +68,12 @@ export default function SupplyOrdersPage() {
                 searchPlaceholder="Search for a supply order"
                 size={ size }
                 setSize={ setSize }
-                removeAdd={claims.roles[0] === 'FRANCHISOR' ? true : false}
+                removeAdd={ claims.roles[0] === 'FRANCHISOR' ? true : false }
                 setOpen={ setOpen }
                 buttonLabel="Order supplies"
+                filter={ filter }
+                filters={ filters }
+                setFilter={ setFilter }
             />
 
             {tab === 'Pending' && (

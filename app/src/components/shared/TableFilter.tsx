@@ -16,11 +16,10 @@ export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel
     removeFilter?: false | boolean;
     setOpen?: Dispatch<SetStateAction<boolean>>;
     buttonLabel?: string;
-    filters?: string[];
+    filters?: (string | { label: string; value: string })[];
     filter?: string;
-    setFilter?: (i: string) => void;
+    setFilter?: (value: string) => void;
 }) {
-    const isMobile = useIsMobile();
     return (
         <div className={`flex items-center max-md:flex-col max-md:gap-2`}>
             <div className="flex-center-y gap-2 w-full">
@@ -62,17 +61,25 @@ export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel
                 </div>
                 {!removeFilter && (
                     <Select
-                        value={ filter }
-                        onValueChange={ (value) => setFilter?.(value) }
+                        value={filter}
+                        onValueChange={(value) => setFilter?.(value)}
                     >
                         <SelectTrigger className="bg-light shadow-xs">
                             <Funnel className="text-dark" />
                             <SelectValue placeholder="Filter" />
                         </SelectTrigger>
+
                         <SelectContent>
-                            {filters?.map((item, i) => (
-                                <SelectItem value={ item } key={i}>{ item }</SelectItem>
-                            ))}
+                            {filters?.map((item, i) => {
+                                const value = typeof item === "string" ? item : item.value;
+                                const label = typeof item === "string" ? item : item.label;
+
+                                return (
+                                <SelectItem key={i} value={value}>
+                                    {label}
+                                </SelectItem>
+                                );
+                            })}
                         </SelectContent>
                     </Select>
                 )}

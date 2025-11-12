@@ -1,1 +1,8 @@
 
+{
+    group: {
+        id, name
+    },
+    modifierItems: [],
+    products: []
+}
