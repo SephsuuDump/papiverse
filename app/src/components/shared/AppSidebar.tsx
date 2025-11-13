@@ -127,42 +127,12 @@ export function AppSidebar() {
                             ))}
                             </SidebarMenu>
                             <SidebarFooter className="mt-auto mb-1">
-                                <DropdownMenu open={show} onOpenChange={setShow}>
-                                    <DropdownMenuTrigger asChild>
-                                    <button 
-                                        className={`flex-center-y gap-2 hover:bg-slate-50 rounded-md ${open && "p-1.5"}`}
-                                    >
-                                        <AppAvatar fallback="KP"/>
-                                        <div>
-                                        <div className="font-semibold">Username</div>
-                                        <div className="text-xs -mt-0.5">{claims.roles[0]}</div>
-                                        </div>
-                                        <ChevronsUpDown className="ms-auto w-4 h-4" />
-                                    </button>
-                                    </DropdownMenuTrigger>
-
-                                    <DropdownMenuContent side="top" align="end" className="w-56">
-                                        <div className="flex items-center gap-2 p-2">
-                                            <AppAvatar fallback="KP"/>
-                                            <div>
-                                            <div className="font-semibold">Username</div>
-                                            <div className="text-xs text-muted-foreground">{claims.roles[0]}</div>
-                                            </div>
-                                        </div>
-                                        <DropdownMenuSeparator />
-                                        <button 
-                                            className="w-full flex-center-y gap-2 text-sm px-3 py-1.5 hover:bg-slate-50 hover:rounded-md hover:text-gray"
-                                        >
-                                            <CircleUserRound className="w-4 h-4"/>My Account
-                                        </button>
-                                        <button 
-                                            onClick={ () => handleLogout() }
-                                            className="w-full flex-center-y gap-2 text-sm px-3 py-1.5 hover:bg-slate-50 hover:rounded-md hover:text-darkred"
-                                        >
-                                            <LogOut className="w-4 h-4"/>Logout
-                                        </button>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                <DropdownFooter 
+                                    open={ show }
+                                    setShow={ setShow }
+                                    claims={ claims }
+                                    handleLogout={ handleLogout }
+                                />
                             </SidebarFooter>
                         </SidebarContent>
                     </Sidebar>
@@ -238,42 +208,12 @@ export function AppSidebar() {
                     </SidebarMenu>
 
                     <SidebarFooter className="mt-auto mb-1">
-                        <DropdownMenu open={show} onOpenChange={setShow}>
-                            <DropdownMenuTrigger asChild>
-                            <button 
-                                className={`flex-center-y gap-2 hover:bg-slate-50 rounded-md ${open && "p-1.5"}`}
-                            >
-                                <AppAvatar fallback="KP"/>
-                                <div>
-                                <div className="font-semibold">Username</div>
-                                <div className="text-xs -mt-0.5">{claims.roles[0]}</div>
-                                </div>
-                                <ChevronsUpDown className="ms-auto w-4 h-4" />
-                            </button>
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent side="right" align="end" className="w-56">
-                                <div className="flex items-center gap-2 p-2">
-                                    <AppAvatar fallback="KP"/>
-                                    <div>
-                                    <div className="font-semibold">Username</div>
-                                    <div className="text-xs text-muted-foreground">{claims.roles[0]}</div>
-                                    </div>
-                                </div>
-                                <DropdownMenuSeparator />
-                                <button 
-                                    className="w-full flex-center-y gap-2 text-sm px-3 py-1.5 hover:bg-slate-50 hover:rounded-md hover:text-gray"
-                                >
-                                    <CircleUserRound className="w-4 h-4"/>My Account
-                                </button>
-                                <button 
-                                    onClick={ () => handleLogout() }
-                                    className="w-full flex-center-y gap-2 text-sm px-3 py-1.5 hover:bg-slate-50 hover:rounded-md hover:text-darkred"
-                                >
-                                    <LogOut className="w-4 h-4"/>Logout
-                                </button>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <DropdownFooter 
+                            open={ show }
+                            setShow={ setShow }
+                            claims={ claims }
+                            handleLogout={ handleLogout }
+                        />
                     </SidebarFooter>
                 </SidebarContent>
             </Sidebar>
@@ -282,22 +222,49 @@ export function AppSidebar() {
     )
 }
 
-function DropdownFooter({ open, setShow, claims}: {
+function DropdownFooter({ open, setShow, claims, handleLogout }: {
     open: boolean
     setShow: Dispatch<SetStateAction<boolean>>
     claims: Claim
+    handleLogout: () => void;
 }) {
     return (
-        <DropdownMenu open onOpenChange={ setShow }>
-            <DropdownMenuContent>
-                <div className={`flex-center-y gap-2 hover:bg-slate-50 rounded-md ${open && "p-1.5"}`}>
+        <DropdownMenu open={open} onOpenChange={setShow}>
+            <DropdownMenuTrigger asChild>
+                <button 
+                    className={`flex-center-y gap-2 hover:bg-slate-50 rounded-md p-1.5`}
+                >
                     <AppAvatar fallback="KP"/>
-                    <div className="">
-                        <div className="font-semibold">Username</div>
-                        <div className="text-xs -mt-0.5">{ claims.roles[0] }</div>
+                    <div>
+                        <div className="font-semibold text-start">{ claims.username }</div>
+                        <div className="text-xs -mt-0.5">{claims.roles[0]}</div>
                     </div>
                     <ChevronsUpDown className="ms-auto w-4 h-4" />
+                </button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent side="right" align="end" className="w-56">
+                <div className="flex items-center gap-2 p-2">
+                    <AppAvatar fallback="KP"/>
+                    <div>
+                    <div className="font-semibold text-start">{ claims.username }</div>
+                    <div className="text-xs text-muted-foreground">{claims.roles[0]}</div>
+                    </div>
                 </div>
+                <DropdownMenuSeparator />
+                <Link href='/account'>
+                    <button 
+                        className="w-full flex-center-y gap-2 text-sm px-3 py-1.5 hover:bg-slate-50 hover:rounded-md hover:text-gray"
+                    >
+                        <CircleUserRound className="w-4 h-4"/>My Account
+                    </button>
+                </Link>
+                <button 
+                    onClick={ () => handleLogout() }
+                    className="w-full flex-center-y gap-2 text-sm px-3 py-1.5 hover:bg-slate-50 hover:rounded-md hover:text-darkred"
+                >
+                    <LogOut className="w-4 h-4"/>Logout
+                </button>
             </DropdownMenuContent>
         </DropdownMenu>
     )

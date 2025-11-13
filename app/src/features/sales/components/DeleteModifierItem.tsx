@@ -1,26 +1,27 @@
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { DeleteButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ModifierItemService } from "@/services/modifier.service";
 import { SupplyService } from "@/services/supply.service";
+import { ModifierItem } from "@/types/modifier";
 import { Supply } from "@/types/supply";
-import { User } from "@/types/user";
 import { useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
-    toDelete: Supply;
-    setDelete: React.Dispatch<React.SetStateAction<Supply | undefined>>;
+    toDelete: ModifierItem;
+    setDelete: React.Dispatch<React.SetStateAction<ModifierItem | undefined>>;
     setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function DeleteSupply({ toDelete, setDelete, setReload }: Props) {
+export function DeleteModifierItem({ toDelete, setDelete, setReload }: Props) {
     const [onProcess, setProcess] = useState(false);
-
+    
     async function handleDelete() {
         try {
             setProcess(true);
-            await SupplyService.deleteSupply(toDelete.code!);
-            toast.success(`Supply ${toDelete.name} deleted successfully.`)
+            await ModifierItemService.deleteModifierItem(toDelete.id);
+            toast.success(`Modifier item ${toDelete.name} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { 
             setProcess(false); 
@@ -48,8 +49,8 @@ export function DeleteSupply({ toDelete, setDelete, setReload }: Props) {
                         <DeleteButton 
                             type="submit"
                             onProcess={ onProcess }
-                            label="Delete Supply"
-                            loadingLabel="Deleting Supply"
+                            label="Delete Item"
+                            loadingLabel="Deleting Item"
                         />
                     </form>
             </DialogContent>

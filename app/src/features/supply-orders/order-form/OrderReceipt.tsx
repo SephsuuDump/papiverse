@@ -61,7 +61,7 @@ export function OrderReceipt({ claims, setActiveForm, selectedItems }: {
                 remarks: "",
                 meatCategoryItemId: meatFinal.id,
                 snowfrostCategoryItemId: snowFinal.id,
-                deliveryFee: delivery!.deliveryFee,
+                deliveryFee: delivery ? delivery.deliveryFee : 0,
             }
 
             const data = await SupplyOrderService.createSupplyOrder(orderSupply);
@@ -196,11 +196,11 @@ function Orders({ tab, orders, delivery, meatTotal, snowTotal }: {
                     Snow Order <span className="font-semibold text-dark">+ { formatToPeso(snowTotal) }</span>
                 </div>
                 <div className="text-gray text-sm text-end mx-4 mt-2">
-                    Delivery Fee <span className="font-semibold text-dark">+ { formatToPeso(delivery.deliveryFee) }</span>
-                </div>
+                    Delivery Fee <span className="font-semibold text-dark">+ { formatToPeso(delivery ? delivery.deliveryFee : 0) }</span>
+                </div> 
                 <Separator className="my-4 bg-gray" />
                 <div className="text-gray text-end mx-4">
-                    Complete Order Total:  <span className="ml-2 font-semibold text-darkbrown inline-block scale-x-120">{ formatToPeso(meatTotal + snowTotal + delivery.deliveryFee) }</span>
+                    Complete Order Total:  <span className="ml-2 font-semibold text-darkbrown inline-block scale-x-120">{ formatToPeso(meatTotal + snowTotal + (delivery ? delivery.deliveryFee : 0)) }</span>
                 </div>
             </div>
         </div>

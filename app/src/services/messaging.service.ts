@@ -1,8 +1,8 @@
 
-import { MESSAGING_URL } from "@/lib/urls";
+import { BASE_URL, MESSAGING_URL } from "@/lib/urls";
 import { requestData } from "./_config";
 
-const url = `${MESSAGING_URL}/messaging`;
+const url = `${BASE_URL}/messaging`;
 
 export class MessagingService {
     static async getConversations(id: number) {
@@ -39,61 +39,102 @@ export class MessagingService {
     }
 }
 
-
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 
-const SOCKET_URL = "http://localhost:8080/ws"; // same as your Spring Boot endpoint
+const SOCKET_URL = process.env.NEXT_PUBLIC_API_WEBSOCKET;
 
 let stompClient: Client;
+
+export const connectConversationUpdates = (
+    userId: number,
+    onConversationUpdate: (update: any) => void
+) => {
+    const client = new Client({
+        webSocketFactory: () => new SockJS(SOCKET_URL!),
+        reconnectDelay: 5000,
+        onConnect: () => {
+            client.subscribe(`/topic/user.${userId}.conversations`, (msg) => {
+                const update = JSON.parse(msg.body);
+                onConversationUpdate(update);
+            });
+        }
+    });
+
+    client.activate();
+    return client;
+};
 
 export const connectWebSocket = (
   userId: number,
   conversationId: number,
-  onMessageReceived?: (message: any) => void
+  onMessageReceived?: (message: any) => void,
+  onTyping?: (dto: any) => void,
+  onStopTyping?: (dto: any) => void
 ) => {
   stompClient = new Client({
-    webSocketFactory: () => new SockJS(SOCKET_URL),
+    webSocketFactory: () => new SockJS(SOCKET_URL!),
     reconnectDelay: 5000,
     onConnect: () => {
       console.log("✅ Connected to WebSocket");
 
-      // Subscribe to conversation messages
-      stompClient.subscribe(`/topic/conversation/${conversationId}`, (msg) => {
+      // ✅ Subscribe to conversation messages
+      stompClient.subscribe(`/topic/conversation.${conversationId}`, (msg) => {
         const body = JSON.parse(msg.body);
         console.log("💬 New message:", body);
-        if (onMessageReceived) onMessageReceived(body);
+        onMessageReceived?.(body);
       });
 
-      // Typing indicators
-      stompClient.subscribe(`/topic/conversation/${conversationId}/typing`, (msg) => {
-        console.log("✍️ Typing:", JSON.parse(msg.body));
+      // ✅ Typing indicators (use dots, not slashes)
+      stompClient.subscribe(`/topic/conversation.${conversationId}.typing`, (msg) => {
+        const body = JSON.parse(msg.body);
+        console.log("✍️ Typing:", body);
+        onTyping?.(body);
       });
 
-      stompClient.subscribe(`/topic/conversation/${conversationId}/stopTyping`, (msg) => {
-        console.log("🛑 Stopped typing:", JSON.parse(msg.body));
+      stompClient.subscribe(`/topic/conversation.${conversationId}.stopTyping`, (msg) => {
+        const body = JSON.parse(msg.body);
+        console.log("🛑 Stopped typing:", body);
+        onStopTyping?.(body);
       });
+    },
+    onStompError: (frame) => {
+      console.error("❌ STOMP error:", frame.headers["message"], frame.body);
     },
   });
 
   stompClient.activate();
 };
 
+export const disconnectWebSocket = () => {
+  if (stompClient && stompClient.active) {
+    stompClient.deactivate();
+  }
+};
 
 export const sendMessage = (message: any) => {
-  if (stompClient && stompClient.connected) {
-    stompClient.publish({ destination: "/app/sendMessage", body: JSON.stringify(message) });
+  if (stompClient?.connected) {
+    stompClient.publish({
+      destination: "/app/sendMessage",
+      body: JSON.stringify(message),
+    });
   }
 };
 
 export const sendTyping = (dto: any) => {
-  if (stompClient && stompClient.connected) {
-    stompClient.publish({ destination: "/app/typing", body: JSON.stringify(dto) });
+  if (stompClient?.connected) {
+    stompClient.publish({
+      destination: "/app/typing",
+      body: JSON.stringify(dto),
+    });
   }
 };
 
 export const sendStopTyping = (dto: any) => {
-  if (stompClient && stompClient.connected) {
-    stompClient.publish({ destination: "/app/stopTyping", body: JSON.stringify(dto) });
+  if (stompClient?.connected) {
+    stompClient.publish({
+      destination: "/app/stopTyping",
+      body: JSON.stringify(dto),
+    });
   }
 };

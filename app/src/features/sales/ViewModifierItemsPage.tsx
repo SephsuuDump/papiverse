@@ -24,6 +24,8 @@ import { CreateModifierItem } from "./components/CreateModifierItem";
 import { useParams } from "next/navigation";
 import { useFetchOne } from "@/hooks/use-fetch-one";
 import Link from "next/link";
+import { UpdateModifierItem } from "./components/UpdateModifierItem";
+import { DeleteModifierItem } from "./components/DeleteModifierItem";
 
 type ModifierGroupItems = {
     group: {
@@ -59,8 +61,8 @@ export function  ViewModifierItemsPage() {
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
 
     const [open, setOpen] = useState(false);
-    const [toUpdate, setUpdate] = useState<Modifier | undefined>();
-    const [toDelete, setDelete]  = useState<Modifier | undefined>();
+    const [toUpdate, setUpdate] = useState<ModifierItem | undefined>();
+    const [toDelete, setDelete]  = useState<ModifierItem | undefined>();
 
     if (loading || !data) return <PapiverseLoading />
     return (
@@ -170,6 +172,23 @@ export function  ViewModifierItemsPage() {
                     setReload={ setReload }
                 />
             }
+
+            {toUpdate && (
+                <UpdateModifierItem 
+                    toUpdate={ toUpdate }
+                    setUpdate={ setUpdate }
+                    group={ data.group }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toDelete && (
+                <DeleteModifierItem
+                    toDelete={ toDelete }
+                    setDelete={ setDelete }
+                    setReload={ setReload }
+                />
+            )}
 
         </section>
     )

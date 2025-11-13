@@ -39,7 +39,9 @@ export function PendingOrders({ claims, paginated, setReload }: {
                     ))}
                 </div>
             </div>
-
+            {paginated && paginated.length === 0 && (
+                <div className="w-full text-center my-2 text-sm">There are no pending supply orders as of now.</div>
+            )}
             {paginated.map((item, i) => (
                 <div className="flex-center-y tdata max-md:!w-250" key={i}>
                     <Link href={`/inventory/supply-orders/${item.orderId}`}>

@@ -11,6 +11,7 @@ export interface Modifier {
 }
 
 export interface ModifierItem {
+    id: number;
     groupId: number;
     name: string;
     quantity: number;

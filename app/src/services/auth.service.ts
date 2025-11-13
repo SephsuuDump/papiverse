@@ -48,7 +48,7 @@ export class AuthService {
         )
     }
 
-    async updateCredentials(credentials: object) {
+    static async updateCredentials(credentials: object) {
         return await requestData(
             `${url}/update-credentials`,
             'POST',

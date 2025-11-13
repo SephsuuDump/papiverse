@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessagesSkeleton } from "@/components/ui/skeleton";
 import { getMessagesSocket } from "@/lib/socket";
-import { connectWebSocket, sendMessage, sendStopTyping, sendTyping } from "@/services/messaging.service";
+import { connectWebSocket, disconnectWebSocket, MessagingService, sendMessage, sendStopTyping, sendTyping } from "@/services/messaging.service";
 import { Claim } from "@/types/claims";
 import { Conversation, Message } from "@/types/messaging";
 import { EllipsisIcon, Info, Link, Mic, Send, SmilePlus } from "lucide-react";
@@ -28,19 +28,52 @@ export function MessagesCanvas({ claims, selected }: Props) {
     const readTimeoutRef = useRef<NodeJS.Timeout>(null);
 
     useEffect(() => {
+        async function fetchData() {
+            const data = await MessagingService.getMessages(selected.id, claims.userId)
+            setMessages(data);
+        } fetchData();
+    }, [selected.id, claims.userId])
+
+    useEffect(() => {
         if (!selected) return;
         setLoading(true);
 
-        connectWebSocket(claims.userId, selected.id, (newMessage) => {
+        connectWebSocket(
+            claims.userId,
+            selected.id,
+            // When a new message is received
+            (newMessage) => {
             setMessages((prev) => [...prev, newMessage]);
-        });
+            },
+            // When someone starts typing
+            (typingUser) => {
+            if (typingUser.userId !== claims.userId) {
+                setTypingUsers((prev) => {
+                if (prev.some((u) => u.userId === typingUser.userId)) return prev;
+                const name =
+                    selected.participants.find((p) => p.id === typingUser.userId)?.firstName ||
+                    "Someone";
+                return [...prev, { userId: typingUser.userId, name }];
+                });
+            }
+            },
+            // When someone stops typing
+            (stoppedUser) => {
+            setTypingUsers((prev) =>
+                prev.filter((u) => u.userId !== stoppedUser.userId)
+            );
+            }
+        );
 
+        setTimeout(() => setLoading(false), 400);
 
-        // Listen for messages via stompClient.subscribe in websocket.ts
-        // You could also move subscriptions here if needed
-
-        setTimeout(() => setLoading(false), 500); // Simulate small delay for smoother UX
+        return () => {
+            // Cleanup when switching conversations
+            setTypingUsers([]);
+            disconnectWebSocket();
+        };
     }, [selected]);
+
 
     // Scroll to bottom when messages or typing updates
     useEffect(() => {
@@ -82,7 +115,7 @@ export function MessagesCanvas({ claims, selected }: Props) {
 
     if (loading) return <MessagesSkeleton />
     return(
-        <section className="relative flex flex-col col-span-2 border-1 h-[95vh]">
+        <section className="relative flex flex-col col-span-3 border-1 h-[95vh]">
             {selected && (
                 <>
                     {/* Header */}

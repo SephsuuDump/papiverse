@@ -21,6 +21,8 @@ import { Modifier } from "@/types/modifier";
 import { ModifierGroupService } from "@/services/modifier.service";
 import { CreateModifierGroup } from "./components/CreateModifierGroup";
 import Link from "next/link";
+import { UpdateModifierGroup } from "./components/UpdateModifierGroup";
+import { DeleteModifierGroup } from "./components/DeleteModifierGroup";
 
 const columns = [
     { title: 'Name', style: '' },
@@ -31,7 +33,7 @@ const columns = [
 export function ModifierGroupsPage() {
     const [reload, setReload] = useState(false);
     const { data, loading, error } = useFetchData<Modifier>(ModifierGroupService.getAllModifierGroups, [reload]);
-    const { search, setSearch, filteredItems } = useSearchFilter(data, ['name']);
+    const { setSearch, filteredItems } = useSearchFilter(data, ['name']);
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
 
     const [open, setOpen] = useState(false);
@@ -93,6 +95,22 @@ export function ModifierGroupsPage() {
                     setReload={ setReload }
                 />
             }
+
+            {toUpdate && (
+                <UpdateModifierGroup 
+                    toUpdate={ toUpdate }
+                    setUpdate={ setUpdate }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toDelete && (
+                <DeleteModifierGroup 
+                    toDelete={ toDelete }
+                    setDelete={ setDelete }
+                    setReload={ setReload }
+                />
+            )}
 
         </section>
     )

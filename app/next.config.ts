@@ -8,6 +8,19 @@ const nextConfig = {
         port: "",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8080",
+        pathname: "/uploads/**",
+      },
+      // Localhost HTTPS (if ever used)
+      {
+        protocol: "https",
+        hostname: "localhost",
+        port: "8080",
+        pathname: "/uploads/**",
+      },
     ],
   },
 };

@@ -1,26 +1,25 @@
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { DeleteButton } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { SupplyService } from "@/services/supply.service";
-import { Supply } from "@/types/supply";
-import { User } from "@/types/user";
+import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
+import { ModifierGroupService } from "@/services/modifier.service";
+import { Modifier } from "@/types/modifier";
 import { useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
-    toDelete: Supply;
-    setDelete: React.Dispatch<React.SetStateAction<Supply | undefined>>;
+    toDelete: Modifier;
+    setDelete: React.Dispatch<React.SetStateAction<Modifier | undefined>>;
     setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function DeleteSupply({ toDelete, setDelete, setReload }: Props) {
+export function DeleteModifierGroup({ toDelete, setDelete, setReload }: Props) {
     const [onProcess, setProcess] = useState(false);
-
+    
     async function handleDelete() {
         try {
             setProcess(true);
-            await SupplyService.deleteSupply(toDelete.code!);
-            toast.success(`Supply ${toDelete.name} deleted successfully.`)
+            await ModifierGroupService.deleteModifierGroup(toDelete.id!);
+            toast.success(`Modifier group ${toDelete.name} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { 
             setProcess(false); 
@@ -48,8 +47,8 @@ export function DeleteSupply({ toDelete, setDelete, setReload }: Props) {
                         <DeleteButton 
                             type="submit"
                             onProcess={ onProcess }
-                            label="Delete Supply"
-                            loadingLabel="Deleting Supply"
+                            label="Delete Group"
+                            loadingLabel="Deleting Group"
                         />
                     </form>
             </DialogContent>

@@ -8,9 +8,16 @@ import { MessagesSidebar } from "./components/MessagesSidebar";
 import { getMessagesSocket } from "@/lib/socket";
 import { MessagesCanvas } from "./components/MessagesCanvas";
 import MessagesSuggestions from "./components/MessagesSuggestions";
+import { CreateConversation } from "./components/CreateConversation";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { User } from "@/types/user";
+import { UserService } from "@/services/user.service";
+import { connectConversationUpdates } from "@/services/messaging.service";
 
 export function MessagesPage() {
     const { claims, loading: authLoading } = useAuth();
+    const { data: users, loading: usersLoading } = useFetchData<User>(UserService.getAllUsers);
+    const [open, setOpen] = useState(false);
 
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState<Conversation>();
@@ -23,7 +30,7 @@ export function MessagesPage() {
 
             try {
                 const res = await fetch(
-                    `http://localhost:8080/api/v1/messaging/conversations/${claims.userId}?page=1&limit=20`
+                    `${process.env.NEXT_PUBLIC_API_BASE}/messaging/conversations/${claims.userId}?page=1&limit=20`
                 );
                 if (!res.ok) throw new Error("Failed to fetch conversations");
 
@@ -43,27 +50,73 @@ export function MessagesPage() {
         fetchConversations();
     }, [claims.userId, reload]);
 
-    if (loading || authLoading || selected === undefined) return <PapiverseLoading />
+    useEffect(() => {
+        if (!claims?.userId) return;
+
+        let client = connectConversationUpdates(
+            claims.userId,
+            (update) => {
+                setConversations((prev) => {
+                    const found = prev.find(c => c.id === update.conversationId);
+                    if (!found) return prev;
+
+                    const updated = {
+                        ...found,
+                        updatedAt: update.updatedAt,
+                        updated_message: update.content,
+                    };
+
+                    return [
+                        updated,
+                        ...prev.filter(c => c.id !== update.conversationId)
+                    ];
+                });
+            }
+        );
+
+        return () => {
+            if (client) client.deactivate();
+        };
+    }, [claims?.userId]);
+
+
+    if (loading || authLoading || usersLoading) return <PapiverseLoading />;
+
     return (
         <section className="stack-md animate-fade-in-up">
             <div className="grid grid-cols-4 bg-light h-full rounded-md shadow-sm">
+
                 <MessagesSidebar 
                     claims={ claims }
+                    setOpen={ setOpen }
                     setReload={ setReload }
                     conversations={ conversations }
-                    selected={ selected! }
+                    selected={ selected }
                     setSelected={ setSelected }
                 />
-                <MessagesCanvas
-                    claims={ claims }
-                    selected={ selected! }
-                />
-                <MessagesSuggestions 
-                    userId={ claims.userId }
-                    conversations={ conversations }
-                    setRealod={ setReload }
-                />
+
+                {selected ? (
+                    <MessagesCanvas
+                        claims={ claims }
+                        selected={ selected }
+                    />
+                ) : (
+                    <div className="col-span-2 flex justify-center items-center text-gray-400">
+                        Select or create a conversation.
+                    </div>
+                )}
+
             </div> 
+
+            {open && (
+                <CreateConversation
+                    userData={ users }
+                    claims={ claims }
+                    setReload={ setReload }
+                    setOpen={ setOpen } 
+                />
+            )}
         </section>
-    )
+    );
+
 }

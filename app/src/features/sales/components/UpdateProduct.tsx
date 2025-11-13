@@ -21,7 +21,7 @@ import { Plus, Salad, Trash2, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const categories = ["A'LA CARTE", "AFFORDABLE RICE MEALS", "ALL IN RICE BOWL", "BIG EVENT? WE GOT YOU", "BILAO BLOW OUT", "BINALOT NI PAPI", "BITES", "BURGERS", "CHEF'S PASTA", "CHEF'S PASTA 4-5 PAX", "COMBO A", "COMBO B", "COMBO C", "COMBO D", "COMBO E", "CRUNCHICKEN", "CRUNCHY BAGNET", "DINNER NIGHT TIME", "EXTRAS", "GRILLED SIZZLING BBQ DEALS", "KOPI NI PAPI", "KRISPY DELIGHTS", "KRISPY SISIG", "OVERLOAD SARAP", "PAPI FRIES", "PAPI'S FRUIT SODA", "PREMIUM BUNDLE DEALS", "QUENCHERS", "SALAD BLENDS", "SALO SALO SPECIAL", "SIGNATURE PLATES", "SIZZLING MEALS", "SNOWFROST HALO MIX", "SULIT RICE MIX", "UNLI BUNDLE DEALS", "UNLI DEALS"];
+const categories = ["A'LA CARTE", "AFFORDABLE RICE MEALS", "ALL IN RICE BOWL", "BIG EVENT? WE GOT YOU", "BILAO BLOW OUT", "BINALOT NI PAPI", "BITES", "BURGERS", "CHEF'S PASTA", "CHEF'S PASTA 4-5 PAX", "COMBO A", "COMBO B", "COMBO C", "COMBO D", "COMBO E", "CRUNCHICKEN", "CRUNCHY BAGNET", "DINNER NIGHT TIME", "EXTRAS", "GRILLED SIZZLING BBQ DEALS", "KOPI NI PAPI", "KRISPY DELIGHTS", "KRISPY SISIG", "OVERLOAD SARAP", "PAPI FRIES", "PAPI'S FRUIT SODA", "PREMIUM BUNDLE DEALS", "QUENCHERS", "SALAD BLENDS", "SALO SALO SPECIAL", "SIGNATURE PLATES", "SIZZLING MEALS", "SNOWFROST HALO MIX", "SULIT RICE MIX", "ULTIMATE BUNDLE DEALS", "UNLI DEALS"];
 
 interface Props {
     toUpdate: Product;
@@ -175,15 +175,13 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
             const productChanged = JSON.stringify(updatedData) !== JSON.stringify(toUpdate);
             const groupsChanged = addedGroupIds.length > 0 || removedGroupIds.length > 0;
 
-            if (productChanged) {
+            if (productChanged || groupsChanged) {
                 const data = await ProductService.updateProduct(updatedData);
-                if (data) return toast.error(`Product ${toUpdate.name} updated successfully.`);
+                setUpdate(undefined);
+                setReload(prev => !prev);
+                if (data) return toast.success(`Product ${toUpdate.name} updated successfully.`);
                 if (!data) return toast.error('Cannot update product.');
-            }
-            
-            setUpdate(undefined);
-            setReload(prev => !prev);
-            if (!groupsChanged && !productChanged) return toast.info('No data has been changed.')
+            } else return toast.info('No data has been changed.')
         } catch (error) { toast.error(`${error}`) }
         finally { setProcess(false) }
     }

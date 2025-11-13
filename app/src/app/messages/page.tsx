@@ -1,7 +1,1 @@
-import { MessagesPage } from "@/features/messages/MessagesPage";
-
-export default function Messages() {
-    return (
-        <MessagesPage />
-    )
-}
+export { MessagesPage as default } from "@/features/messages/MessagesPage";
