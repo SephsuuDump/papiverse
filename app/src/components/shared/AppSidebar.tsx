@@ -36,7 +36,12 @@ export function AppSidebar() {
     }
     
     if (loading) return <SidebarLoading />
-    if (!claims || !claims.roles || claims.roles.length === 0) redirect('/auth')
+    if (!claims || !claims.roles || claims.roles.length === 0) {
+        if (typeof window !== 'undefined') {
+            window.location.href = '/auth';
+        }
+        return null; 
+    }
     
         
     const role = claims.roles[0];

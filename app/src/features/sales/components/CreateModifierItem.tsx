@@ -104,7 +104,7 @@ export function CreateModifierItem({ group, setOpen, setReload }: Props) {
                 requiredMaterials: selectedItems
             };
             if (hasEmptyField(updatedData, ["requiredMaterials"])) return toast.error('Please full up all the fields.');
-            if (selectedItems.length <= 0) return toast.info("Please fill up all fields!");
+            // if (selectedItems.length <= 0) return toast.info("Please fill up all fields!");
             const data = await ModifierItemService.createModifierItem(updatedData);
             if (data) toast.success(`Modifier ${modifierItem.name} created successfully.`)
             setOpen(!open);

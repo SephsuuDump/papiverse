@@ -89,7 +89,11 @@ export function SuppliesPage() {
                                     <div>{ item.name }</div>
                                 </div>
                                 <div className="td flex gap-2">{ `${item.unitQuantity} ${item.unitMeasurement}` }</div>
-                                <div className="td flex gap-2">{ `${item.convertedQuantity} ${item.convertedMeasurement}` }</div>
+                               <div className="td flex gap-2 ">
+                                    {item.convertedQuantity && item.convertedMeasurement
+                                        ? `${item.convertedQuantity} ${item.convertedMeasurement}`
+                                        : <div className="text-darkred font-semibold">N/A</div>}
+                                </div>
                                 <div className="td">
                                     { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceInternal!) }
                                 </div>

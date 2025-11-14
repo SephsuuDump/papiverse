@@ -5,19 +5,18 @@ import { useAuth } from "@/hooks/use-auth"
 import { Conversation } from "@/types/messaging";
 import { useEffect, useState } from "react";
 import { MessagesSidebar } from "./components/MessagesSidebar";
-import { getMessagesSocket } from "@/lib/socket";
 import { MessagesCanvas } from "./components/MessagesCanvas";
-import MessagesSuggestions from "./components/MessagesSuggestions";
 import { CreateConversation } from "./components/CreateConversation";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { User } from "@/types/user";
 import { UserService } from "@/services/user.service";
-import { connectConversationUpdates } from "@/services/messaging.service";
+import { CreateDirectConversation } from "./components/CreateDirectConversation";
 
 export function MessagesPage() {
     const { claims, loading: authLoading } = useAuth();
     const { data: users, loading: usersLoading } = useFetchData<User>(UserService.getAllUsers);
     const [open, setOpen] = useState(false);
+    const [direct, setDirect] = useState(false);
 
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState<Conversation>();
@@ -37,11 +36,11 @@ export function MessagesPage() {
                 const data = await res.json();
                 setConversations(data);
 
-                if (data.length > 0) setSelected(data[0]);
-                else setSelected(undefined);
-
-            } catch (err) {
-                console.error("⚠️ Error loading conversations:", err);
+                if (data.length > 0) {
+                    setSelected(data[0]);
+                }
+            } catch (error) {
+                console.error(error);
             } finally {
                 setLoading(false);
             }
@@ -49,36 +48,6 @@ export function MessagesPage() {
 
         fetchConversations();
     }, [claims.userId, reload]);
-
-    useEffect(() => {
-        if (!claims?.userId) return;
-
-        let client = connectConversationUpdates(
-            claims.userId,
-            (update) => {
-                setConversations((prev) => {
-                    const found = prev.find(c => c.id === update.conversationId);
-                    if (!found) return prev;
-
-                    const updated = {
-                        ...found,
-                        updatedAt: update.updatedAt,
-                        updated_message: update.content,
-                    };
-
-                    return [
-                        updated,
-                        ...prev.filter(c => c.id !== update.conversationId)
-                    ];
-                });
-            }
-        );
-
-        return () => {
-            if (client) client.deactivate();
-        };
-    }, [claims?.userId]);
-
 
     if (loading || authLoading || usersLoading) return <PapiverseLoading />;
 
@@ -89,7 +58,7 @@ export function MessagesPage() {
                 <MessagesSidebar 
                     claims={ claims }
                     setOpen={ setOpen }
-                    setReload={ setReload }
+                    setDirect={ setDirect }
                     conversations={ conversations }
                     selected={ selected }
                     setSelected={ setSelected }
@@ -114,6 +83,16 @@ export function MessagesPage() {
                     claims={ claims }
                     setReload={ setReload }
                     setOpen={ setOpen } 
+                />
+            )}
+
+            {direct && (
+                <CreateDirectConversation   
+                    setOpen={ setDirect }
+                    users={ users }
+                    claims={ claims }
+                    conversations={ conversations }
+                    setReload={ setReload }
                 />
             )}
         </section>

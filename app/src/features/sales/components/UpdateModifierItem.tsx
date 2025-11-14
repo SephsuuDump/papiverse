@@ -31,6 +31,8 @@ interface Props {
 }
 
 export function UpdateModifierItem({ group, toUpdate, setUpdate, setReload }: Props) {
+    console.log('To Update', toUpdate);
+    
     const [onProcess, setProcess] = useState(false);
     const [modifierItem, setModifierItem] = useState<Partial<ModifierItem>>(toUpdate);
     const [selectedItems, setSelectedItems] = useState<SupplyItem[]>(toUpdate.itemsNeeded);
@@ -215,7 +217,7 @@ export function UpdateModifierItem({ group, toUpdate, setUpdate, setReload }: Pr
                                                     min={0.00001} 
                                                     type="number"
                                                     step="any"
-                                                    defaultValue={1}
+                                                    defaultValue={item.quantity}
                                                     onChange={(e) => {
                                                         const value = e.target.value;
                                                         if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {

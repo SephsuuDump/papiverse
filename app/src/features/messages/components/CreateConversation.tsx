@@ -87,7 +87,6 @@ export function CreateConversation({
 
     return (
         <Dialog open onOpenChange={setOpen}>
-        
             <DialogContent>
                 <DialogTitle className="flex items-center gap-2">
                     <Image

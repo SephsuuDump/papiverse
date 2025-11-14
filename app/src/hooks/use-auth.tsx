@@ -35,7 +35,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const fetchClaims = async () => {
             try {
                 const response = await AuthService.getCookie();
-                setClaims(response);
+                if (!response || !response.userId) {
+                    setClaims(claimsInit);
+                } else {
+                    setClaims(response);
+                }
             } catch (error) {
                 setClaims(claimsInit);
             } finally {

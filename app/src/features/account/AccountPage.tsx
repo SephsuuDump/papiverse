@@ -131,7 +131,6 @@ export function AccountPage() {
 
       return (
             <SidebarProvider>
-                  <Toaster position="top-center" />
 
                   <div className="w-full p-3 sm:p-5">
 
@@ -317,10 +316,10 @@ function AccountInfo(props: any) {
                               </DialogHeader>
 
                               <div className="space-y-3">
-                                    <InputField label="Username" value={credentials.username} onChange={(e: any) => handleChange(e, setCredentials)} />
-                                    <InputField label="Email" value={credentials.email} onChange={(e: any) => handleChange(e, setCredentials)} />
-                                    <InputField label="New Password" type="password" value={newPass} onChange={(e: any) => handleChangeSolo(e, setNewPass)} />
-                                    <InputField label="Confirm Password" type="password" value={confirmPass} onChange={(e: any) => handleChangeSolo(e, setConfirmPass)} />
+                                    <InputField label="Username" value={credentials.username} onChange={(e: any) => handleChange(e, setCredentials)} name="username" />
+                                    <InputField label="Email" value={credentials.email} onChange={(e: any) => handleChange(e, setCredentials)} name="email" />
+                                    <InputField label="New Password" type="password" value={newPass} onChange={(e: any) => handleChangeSolo(e, setNewPass)} name="newPassword" />
+                                    <InputField label="Confirm Password" type="password" value={confirmPass} onChange={(e: any) => handleChangeSolo(e, setConfirmPass)} name="confirmPassword" />
 
                                     <Button className="w-full" onClick={() => setConfirmOpen(true)}>Save Changes</Button>
                               </div>
@@ -366,28 +365,33 @@ function AccountInfo(props: any) {
       );
 }
 
-function InputField({ label, ...props }: any) {
-      return (
-            <div>
-                  <label className="text-sm">{label}</label>
-                  <input {...props} className="border p-2 rounded w-full my-1 sm:my-2" />
-            </div>
-      );
+function InputField({ label, name, ...props }: any) {
+    return (
+        <div>
+            <label className="text-sm">{label}</label>
+            <input
+                name={name}           // <-- FIX
+                {...props}
+                className="border p-2 rounded w-full my-1 sm:my-2"
+            />
+        </div>
+    );
 }
+
 
 function EditProfileDialog({ open, setOpen, editData, setEditData, date, setDate, submitProfile }: any) {
       return (
             <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogContent className="max-w-[90%] sm:max-w-lg">
-                        <DialogHeader>
+                  <DialogContent className="h-10/11 overflow-y-auto max-w-[90%] sm:max-w-lg !pt-0">
+                        <DialogHeader className="sticky top-0 bg-white py-5">
                               <DialogTitle>Edit Personal Information</DialogTitle>
                         </DialogHeader>
 
                         <div className="space-y-3 sm:space-y-4">
-                              <InputField label="First Name" value={editData.firstName} onChange={(e: any) => handleChange(e, setEditData)} />
-                              <InputField label="Middle Name" value={editData.middleName} onChange={(e: any) => handleChange(e, setEditData)} />
-                              <InputField label="Last Name" value={editData.lastName} onChange={(e: any) => handleChange(e, setEditData)} />
-                              <InputField label="Phone" value={editData.contactNumber} onChange={(e: any) => handleChange(e, setEditData)} />
+                              <InputField label="First Name" value={editData.firstName} onChange={(e: any) => handleChange(e, setEditData)} name="firstName" />
+                              <InputField label="Middle Name" value={editData.middleName} onChange={(e: any) => handleChange(e, setEditData)} name="middleName" />
+                              <InputField label="Last Name" value={editData.lastName} onChange={(e: any) => handleChange(e, setEditData)} name="lastName" />
+                              <InputField label="Phone" value={editData.contactNumber} onChange={(e: any) => handleChange(e, setEditData)} name="contactNumber" />
 
                               {/* Gender */}
                               <label className="text-sm">Gender</label>
