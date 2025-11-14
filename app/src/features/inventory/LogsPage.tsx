@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
 import { flattenGroupedLogsWithOrders } from "@/lib/formatter";
 
-const tabs = ['Input Logs', 'Order Logs'];
+const tabs = ['Input Logs', 'Order Logs', 'Sales Logs'];
 
 export function LogsPage() {
     const [activeTab, setActiveTab] = useState('Input Logs');
@@ -74,6 +74,9 @@ export function LogsPage() {
             )}
             {activeTab === 'Input Logs' && (
                 <InputLogs logs={ paginated.filter(i => i.source === 'INPUT') } />
+            )}
+            {activeTab === 'Sales Logs' && (
+                <InputLogs logs={ paginated.filter(i => i.source === 'SALES') } />
             )}
 
             <TablePagination 

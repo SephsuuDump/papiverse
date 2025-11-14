@@ -17,7 +17,9 @@ import { AuthService } from "@/services/auth.service";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
-import { PapiverseLoading, SidebarLoading } from "../ui/loader";
+import { SidebarLoading } from "../ui/loader";
+import useNotifications from "@/hooks/use-notification";
+import { NotificationResponse } from "@/types/notification";
 
 export function AppSidebar() {
     const pathName = usePathname();
@@ -26,6 +28,14 @@ export function AppSidebar() {
 
     const { claims, loading } = useAuth();
     const { open } = useSidebar();
+    const { notifications, loading: notifLoading, refetch, unreadCount } = useNotifications({
+        claims, 
+        onNewNotification: (notification: NotificationResponse) => {
+            toast.info(notification.title, {
+                description: notification.message
+            });
+        }
+    })
     const [show, setShow] = useState(false);
 
     async function handleLogout() {
@@ -35,7 +45,7 @@ export function AppSidebar() {
         window.location.href = '/auth'
     }
     
-    if (loading) return <SidebarLoading />
+    if (loading || notifLoading) return <SidebarLoading />
     if (!claims || !claims.roles || claims.roles.length === 0) {
         if (typeof window !== 'undefined') {
             window.location.href = '/auth';
@@ -50,6 +60,8 @@ export function AppSidebar() {
     if (role === "FRANCHISOR") route = adminRoute;
     else if (role === "FRANCHISEE") route = franchiseeRoute;
     else redirect("/unauthorized");
+
+    // const supplyNotifCount = notifications.filter(n => n.type ===)
 
     if (isMobile) {
         return (
@@ -94,6 +106,7 @@ export function AppSidebar() {
                                     height={150}
                                     className="mx-auto mt-4"
                                 />
+                                <div>{ unreadCount ?? 90 }</div>
                             </Link>
 
                             <SidebarMenu className="mt-4">
