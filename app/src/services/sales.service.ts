@@ -15,7 +15,7 @@ export class SalesService {
 
     static async getSalesByBranch(branchId: number, start: string, end: string) {
         return await requestData(
-            `${salesUrl}/get-summary?branchId${branchId}&start=${start}&end=${end}`,
+            `${salesUrl}/get-summary?branchId=${branchId}&start=${start}&end=${end}`,
             'GET'
         )
     }

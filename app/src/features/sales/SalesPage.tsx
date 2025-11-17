@@ -1,6 +1,7 @@
 "use client"
 
-import { PapiverseLoading } from "@/components/ui/loader";
+import { PapiverseLoading, SectionLoading } from "@/components/ui/loader";
+import { useAuth } from "@/hooks/use-auth";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { useFetchOne } from "@/hooks/use-fetch-one";
 import { brownColors, sales, topSelling } from "@/lib/data-array";
@@ -9,28 +10,54 @@ import { SalesService } from "@/services/sales.service";
 import { NotepadText } from "lucide-react";
 import { Fragment, useState } from "react";
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { DateRangePicker } from "../dashboard/components/DataRangePicker";
+import { format } from "date-fns";
 
 const chartTabs = ['Daily', 'Weekly', 'Monthly']
 
-const columns = [
+const productColumns = [
     { title: 'Product Name', style: '' },
     { title: 'Total Sales', style: '' },
     { title: 'Total Orders', style: '' },
 ]
 
-export function SalesPage() {
-    const [chartTab, setChartTab] = useState('Daily');
+const branchesColumns = [
+    { title: 'Branch Name', style: '' },
+    { title: 'Total Sales', style: '' },
+]
 
-    const { data, loading, error } = useFetchOne(SalesService.getOverallSummary, [], ['2025-08-20', '2025-08-20']);
-    console.log(data);
-    if (loading) return <PapiverseLoading />
+const today = format(new Date(), "yyyy-MM-dd");
+
+export function SalesPage({ branchId }: {
+    branchId?: number;
+}) {
+    const { claims, loading: authLoading } = useAuth();
+    const [chartTab, setChartTab] = useState("Daily");
+    const [startDate, setStartDate] = useState<string>(today);
+    const [endDate, setEndDate] = useState<string>(today);
+
+    const params = branchId
+        ? [branchId, startDate, endDate]
+        : [startDate, endDate];
+
+    const service = branchId
+        ? SalesService.getSalesByBranch
+        : SalesService.getOverallSummary;
+
+    const { data, loading, error } = useFetchOne(
+        service,
+        params,
+        params
+    );
+
+    if (loading || authLoading) return <SectionLoading />
     
     const summary = [
         { title: 'Total Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: data.totalOrders  },
         { title: 'Payment Methods', date: formatCustomDate('2025-08-21 22:45:19'), count: formatToPeso(data.totalCash), type: "Cash"  },
         { title: 'Payment Methods', date: formatCustomDate('2025-08-21 22:45:19'), count: formatToPeso(data.totalGcash), type: "G-cash"  },
-        { title: 'Type of Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: 78, type: "Dine in"  },
-        { title: 'Type of Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: 78, type: "Take out"  },
+        { title: 'Type of Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: data.totalDineIn ?? 0, type: "Dine in"  },
+        { title: 'Type of Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: data.totalTakeAway ?? 0, type: "Take out"  },
         { title: 'Total Income', date: formatCustomDate('2025-08-21 22:45:19'), count: formatToPeso(data.totalIncome)  },
     ]
 
@@ -44,6 +71,13 @@ export function SalesPage() {
 
     return (
         <section className="stack-md animate-fade-in-up">
+            <DateRangePicker 
+                startDate={ startDate }
+                endDate={ endDate }
+                setStartDate={ setStartDate }
+                setEndDate={ setEndDate }
+            />
+
             <div className="flex items-stretch gap-2">
                 {Object.entries(grouped).map(([key, value]) => (
                     <div 
@@ -133,58 +167,79 @@ export function SalesPage() {
                 </ResponsiveContainer>
             </div>
 
-            <div className="grid grid-cols-10 gap-2">
-                <div className="col-span-7 border-1 bg-white shadow-sm rounded-md px-2 overflow-hidden">
-                    <div className="text-lg scale-x-110 font-semibold origin-left p-2">Top Selling Products</div>
-                    <div className="shadow-[0_3px_8px_rgba(0,0,0,0.25)]">
-                        <div className="thead flex">
-                            <div className="border-r-1 border-r-white w-15 flex-center">#</div>
-                            <div className="grid grid-cols-3 w-full">
-                                {columns.map((item, _) => (
-                                    <div key={_} className={`th ${item.style}`}>{ item.title }</div>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
+                <div className="bg-white shadow-sm rounded-lg overflow-hidden border">
+                    <div className="px-4 py-3 border-b flex items-center justify-between">
+                        <h3 className="text-lg font-semibold tracking-tight text-darkbrown">
+                            Top Selling Products
+                        </h3>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gray-50 text-darkbrown text-sm">
+                                <tr>
+                                    <th className="py-2 px-3 text-left w-10">#</th>
+                                    <th className="py-2 px-3 text-left">Product Name</th>
+                                    <th className="py-2 px-3 text-left">Total Sales</th>
+                                    <th className="py-2 px-3 text-left">Total Orders</th>
+                                </tr>
+                            </thead>
+
+                            <tbody className="text-sm">
+                                {data.topProducts.map((item: any, index: number) => (
+                                    <tr key={index} className="border-b hover:bg-gray-50 transition">
+                                        <td className="py-2 px-3 font-semibold">{index + 1}</td>
+                                        <td className="py-2 px-3">{item.productName}</td>
+                                        <td className="py-2 px-3 font-semibold text-darkbrown">
+                                            {formatToPeso(item.amount)}
+                                        </td>
+                                        <td className="py-2 px-3">{item.quantity}</td>
+                                    </tr>
                                 ))}
-                            </div>
-                        </div>
-                        {data.topProducts.map((item: any, index: number) => (
-                            <div className="tdata flex">
-                                <div className="w-15 flex-center font-bold">{ index + 1 }</div>
-                                <div 
-                                    key={ index }
-                                    className={`w-full grid grid-cols-3`}
-                                >
-                                    <div className="td">{ item.productName }</div>
-                                    <div className="td">{ formatToPeso(item.amount) }</div>
-                                    <div className="td">{ item.quantity }</div>
-                                </div>
-                            </div>
-                        ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div className="col-span-7 border-1 bg-white shadow-sm rounded-md px-2">
-                    <div className="text-lg scale-x-110 font-semibold origin-left p-2">Top Selling Products</div>
-                    <div className="thead flex">
-                        <div className="border-r-1 border-r-white w-15 flex-center">#</div>
-                        <div className="grid grid-cols-3 w-full">
-                            {columns.map((item, _) => (
-                                <div key={_} className={`th ${item.style}`}>{ item.title }</div>
-                            ))}
+
+                {/* ---------------------- */}
+                {/* TOP BRANCHES */}
+                {/* ---------------------- */}
+                {!branchId && (
+                    <div className="bg-white shadow-sm rounded-lg overflow-hidden border">
+                        <div className="px-4 py-3 border-b flex items-center justify-between">
+                            <h3 className="text-lg font-semibold tracking-tight text-darkbrown">
+                                Top Branches
+                            </h3>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50 text-darkbrown text-sm">
+                                    <tr>
+                                        <th className="py-2 px-3 text-left w-10">#</th>
+                                        <th className="py-2 px-3 text-left">Branch Name</th>
+                                        <th className="py-2 px-3 text-left">Total Sales</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody className="text-sm">
+                                    {data.topBranches.map((item: any, index: number) => (
+                                        <tr key={index} className="border-b hover:bg-gray-50 transition">
+                                            <td className="py-2 px-3 font-semibold">{index + 1}</td>
+                                            <td className="py-2 px-3">{item.branchName}</td>
+                                            <td className="py-2 px-3 font-semibold text-darkbrown">
+                                                {formatToPeso(item.totalSales)}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    {data.topProducts.map((item: any, index: number) => (
-                        <div className="tdata flex">
-                            <div className="w-15 flex-center font-bold">{ index + 1 }</div>
-                            <div 
-                                key={ index }
-                                className={`w-full grid grid-cols-3`}
-                            >
-                                <div className="td">{ item.productName }</div>
-                                <div className="td">{ formatToPeso(item.amount) }</div>
-                                <div className="td">{ item.quantity }</div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                )}
             </div>
+
         </section>
     )
 }

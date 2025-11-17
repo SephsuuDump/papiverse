@@ -22,8 +22,17 @@ const useNotifications = ({ claims, onNewNotification }: {
             setLoading(true);
             const res = await fetch(`${BASE_URL}/notifications/initial-feed/${claims.userId}/${claims.branch.branchId}`);
             const data = await res.json();
-            setNotifications(data);
-            setUnreadCount(data.filter((n: NotificationResponse) => !n.read).length);
+            
+            const list = Array.isArray(data)
+                ? data
+                : Array.isArray(data.notifications)
+                    ? data.notifications
+                    : Array.isArray(data.content)
+                        ? data.content
+                        : [];
+
+            setNotifications(list);
+            setUnreadCount(list.filter((n: NotificationResponse) => !n.read).length);
         } catch (err: any) {
             setError(err.message);
             console.error('Failed to fetch notifications:', err);
@@ -104,7 +113,7 @@ const useNotifications = ({ claims, onNewNotification }: {
         fetchNotifications();
 
         // Connect to WebSocket
-        const socket = new SockJS(`${process.env.NEXT_PUBLIC_API_WEBSOCKET}/ws`);
+        const socket = new SockJS(`${process.env.NEXT_PUBLIC_API_ASSETS}/ws`);
         const client = Stomp.over(socket);
 
         // Disable debug logging (optional)

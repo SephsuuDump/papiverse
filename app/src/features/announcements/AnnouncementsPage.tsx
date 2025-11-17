@@ -17,63 +17,89 @@ import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { ViewAnnouncement } from "./components/ViewAnnouncement";
 import { Ellipsis } from "lucide-react";
 import { DeleteAnnouncement } from "./components/DeleteAnnouncement";
+import NotificationSection from "./components/NotificationSection";
+import useNotifications from "@/hooks/use-notification";
+import { toast } from "sonner";
+import { NotificationToaster } from "@/components/ui/toaster";
+import { NotificationResponse } from "@/types/notification";
 
 export function AnnouncementPage() {
     const [reload, setReload] = useState(false);
 
     const { claims, loading: authLoading } = useAuth();
     const { data: announcements, loading, error } = useFetchData<Announcement>(AnnouncementService.getAllAnnouncements, [reload], []);
+    const { notifications, loading: notifLoading } = useNotifications({
+        claims, 
+        onNewNotification: (notification: NotificationResponse) => {
+            toast.custom((t) => (
+                <NotificationToaster
+                    id={notification.notificationId}
+                    title={notification.title}
+                    message={notification.message}
+                    onClose={() => toast.dismiss(notification.notificationId)}
+                />
+            ));
+        }
+    })
     const { toView, setView, open, setOpen, toDelete, setDelete } = useCrudState<Announcement>();
     
-    if (loading || authLoading) return <PapiverseLoading />
+    if (loading || authLoading || notifLoading) return <PapiverseLoading />
     return (
         <section className="stack-md animate-fade-in-up">
             <AppHeader label="Announcements" />
-            <div className="mx-auto max-w-[720px] w-full px-4 max-md:px-0">
-                {claims.roles[0] === 'FRANCHISOR' && (
-                    <div className="flex-center-y gap-2 bg-slate-50 py-3 px-4 m-4 rounded-md shadow-sm">
-                        <AppAvatar className="max-md:hidden" />
-                        <Button 
-                            onClick={ () => setOpen(true) }
-                            className="justify-start flex-1 !bg-light h-8 text-gray shadow-sm rounded-full"
-                        >
-                            Announce something to Papiverse
-                        </Button>
-                    </div>
-                )}
-                {announcements.map((item, index) => (
-                    <div 
-                        className="stack-md bg-light rounded-md shadow-sm m-4 p-4 animate-fade-in-up" key={ index }
-                    >
-                        <div className="flex justify-between">
-                            <div className="flex items-center gap-2 px-4">
-                                <AppAvatar fallback={ `${item.firstName![0]}${item.lastName![0]}` } />
-                                <div>
-                                    <div className="font-semibold">{ `${item.firstName} ${item.lastName}` }</div>
-                                    <div className="text-gray text-xs -mt-1">{ item.branchName }</div>
-                                </div>
+            <div className="grid grid-cols-4">
+                <div className="col-span-3 stack-md">
+                    <div className="mx-auto space-y-2 w-full px-4 max-md:px-0">
+                        {claims.roles[0] === 'FRANCHISOR' && (
+                            <div className="flex-center-y gap-2 bg-slate-50 py-3 px-4 rounded-md shadow-sm">
+                                <AppAvatar className="max-md:hidden" />
+                                <Button 
+                                    onClick={ () => setOpen(true) }
+                                    className="justify-start flex-1 !bg-light h-8 text-gray shadow-sm rounded-full"
+                                >
+                                    Announce something to Papiverse
+                                </Button>
                             </div>
-                            {claims.roles[0] === 'FRANCHISOR' && (
-                                <AppRUDSelection
-                                    item={ item }
-                                    icon={Ellipsis}
-                                    setDelete={ setDelete }
-                                />
-                            )}
-                        </div>
-                        <div className="px-4 text-sm">{ item.content }</div>
-                        <div className="px-2">
-                            {item.announcementImages.length > 0 && (
-                                <AnnouncementImages     
-                                    toView={ item } 
-                                    setView={ setView }
-                                />
-                            )}
-                        </div>
-                        <div className="text-xs text-gray text-end">{ formatCustomDate(item.datePosted) }</div>
+                        )}
+                        {announcements.map((item, index) => (
+                            <div 
+                                className="stack-md bg-light rounded-md shadow-sm p-4 animate-fade-in-up" key={ index }
+                            >
+                                <div className="flex justify-between">
+                                    <div className="flex items-center gap-2 px-4">
+                                        <AppAvatar fallback={ `${item.firstName![0]}${item.lastName![0]}` } />
+                                        <div>
+                                            <div className="font-semibold">{ `${item.firstName} ${item.lastName}` }</div>
+                                            <div className="text-gray text-xs -mt-1">{ item.branchName }</div>
+                                        </div>
+                                    </div>
+                                    {claims.roles[0] === 'FRANCHISOR' && (
+                                        <AppRUDSelection
+                                            item={ item }
+                                            icon={Ellipsis}
+                                            setDelete={ setDelete }
+                                        />
+                                    )}
+                                </div>
+                                <div className="px-4 text-sm">{ item.content }</div>
+                                <div className="px-2">
+                                    {item.announcementImages.length > 0 && (
+                                        <AnnouncementImages     
+                                            toView={ item } 
+                                            setView={ setView }
+                                        />
+                                    )}
+                                </div>
+                                <div className="text-xs text-gray text-end">{ formatCustomDate(item.datePosted) }</div>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                </div>
+                <NotificationSection 
+                    notifications={ notifications }
+                />
             </div>
+            
 
             {open && (
                 <CreateAnnouncement 

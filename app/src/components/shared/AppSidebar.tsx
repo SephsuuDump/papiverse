@@ -8,7 +8,6 @@ import Image from "next/image";
 import { adminRoute, franchiseeRoute } from "@/lib/routes";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { ChevronDown, ChevronsUpDown, CircleUserRound, LogOut, Menu } from "lucide-react";
-import { AuthPage } from "@/features/auth/AuthPage";
 import { AppAvatar } from "./AppAvatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Claim } from "@/types/claims";
@@ -20,23 +19,40 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { SidebarLoading } from "../ui/loader";
 import useNotifications from "@/hooks/use-notification";
 import { NotificationResponse } from "@/types/notification";
+import { Badge } from "../ui/badge";
+import { NotificationToaster } from "../ui/toaster";
 
 export function AppSidebar() {
+    console.log(process.env.NEXT_PUBLIC_API_WEBSOCKET);
+    
     const pathName = usePathname();
     const isMobile = useIsMobile();
-    if (pathName === '/auth' || pathName === '/unauthorized') return null;
-
     const { claims, loading } = useAuth();
     const { open } = useSidebar();
-    const { notifications, loading: notifLoading, refetch, unreadCount } = useNotifications({
+    const { notifications, loading: notifLoading, unreadCount } = useNotifications({
         claims, 
         onNewNotification: (notification: NotificationResponse) => {
-            toast.info(notification.title, {
-                description: notification.message
-            });
+            toast.custom((t) => (
+                <NotificationToaster
+                    id={notification.notificationId}
+                    title={notification.title}
+                    message={notification.message}
+                    onClose={() => toast.dismiss(notification.notificationId)}
+                />
+            ));
         }
-    })
+    });
     const [show, setShow] = useState(false);
+    const [supplyNotifCount, setSupplyNotifCount] = useState(0);
+
+    useEffect(() => {
+        setSupplyNotifCount(notifications.filter(n => n.type === "SUPPLY" || n.type === "ANNOUNCEMENT").length);
+    }, [notifications]);
+
+    // 🔥 THEN CONDITIONAL RETURNS
+    if (pathName === "/auth" || pathName === "/unauthorized") return null;
+    if (loading || notifLoading) return <SidebarLoading />;
+    if (!claims?.roles?.length) return null;
 
     async function handleLogout() {
         await AuthService.deleteCookie();
@@ -56,12 +72,14 @@ export function AppSidebar() {
         
     const role = claims.roles[0];
     let route;
+    console.log(notifications);
+    
+    console.log(supplyNotifCount);
+    
 
     if (role === "FRANCHISOR") route = adminRoute;
     else if (role === "FRANCHISEE") route = franchiseeRoute;
     else redirect("/unauthorized");
-
-    // const supplyNotifCount = notifications.filter(n => n.type ===)
 
     if (isMobile) {
         return (
@@ -106,9 +124,7 @@ export function AppSidebar() {
                                     height={150}
                                     className="mx-auto mt-4"
                                 />
-                                <div>{ unreadCount ?? 90 }</div>
                             </Link>
-
                             <SidebarMenu className="mt-4">
                             {route?.map((item, i) => (
                                 item.children.length > 0 ? (
@@ -126,6 +142,7 @@ export function AppSidebar() {
                                         <SidebarMenuButton key={index}>
                                             <Link href={sub.href} className="w-full h-full">
                                             {sub.title}
+                                            {supplyNotifCount}
                                             </Link>
                                         </SidebarMenuButton>
                                         ))}
@@ -138,6 +155,7 @@ export function AppSidebar() {
                                     <SidebarMenuButton className="flex gap-2 pl-4">
                                         <item.icon className="w-4 h-4" />
                                         {item.title}
+                                        { item.title === "Announcements" && <Badge className="rounded-full bg-darkred">{ supplyNotifCount }</Badge>}
                                     </SidebarMenuButton>
                                     </Link>
                                 </SidebarMenuItem>
@@ -202,6 +220,7 @@ export function AppSidebar() {
                                                         className="flex-center-y w-full h-full my-auto"
                                                     >
                                                         { sub.title }
+                                                        
                                                     </Link>
                                                 </SidebarMenuButton>
                                             ))}
@@ -219,6 +238,7 @@ export function AppSidebar() {
                                     <SidebarMenuButton className="flex gap-2 pl-4">
                                         <item.icon className="w-4 h-4" />
                                         { item.title }
+                                        { item.title === "Announcements" && <Badge className="rounded-full bg-darkred">{ supplyNotifCount }</Badge>}
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             </Link>

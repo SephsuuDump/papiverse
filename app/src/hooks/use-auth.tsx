@@ -7,6 +7,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 interface AuthContextType {
     claims: Claim;
     loading: boolean;
+    isFranchisor: boolean;
 }
 
 const claimsInit = {
@@ -25,11 +26,13 @@ const claimsInit = {
 
 type AuthProviderProps = React.PropsWithChildren<object>;
 
-const AuthContext = createContext<AuthContextType>({ claims: claimsInit, loading: true });
+const AuthContext = createContext<AuthContextType>({ claims: claimsInit, loading: true, isFranchisor: false });
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [claims, setClaims] = useState(claimsInit);
     const [loading, setLoading] = useState(true);
+
+    const isFranchisor = claims?.roles?.[0] === "FRANCHISOR";
 
     useEffect(() => {
         const fetchClaims = async () => {
@@ -49,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         fetchClaims();
     }, []);
 
-    return <AuthContext.Provider value={{ claims, loading }}>{children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={{ claims, loading, isFranchisor }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

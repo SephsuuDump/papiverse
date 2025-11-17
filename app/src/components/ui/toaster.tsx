@@ -1,6 +1,7 @@
 // Save this file as: @/components/ui/toaster.tsx
 
 "use client"
+import { X } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, ToasterProps } from "sonner"
 
@@ -42,5 +43,29 @@ const Toaster = ({ style, toastOptions, ...props }: ToasterProps) => {
     />
   )
 }
+
+export function NotificationToaster({ id, title, message, onClose }: {
+    id: number;
+    title: string;
+    message: string;
+    onClose: () => void;
+}) {
+    return (
+        <div className="bg-white shadow-lg border rounded-lg p-4 w-[300px] flex gap-3 animate-in fade-in-80 slide-in-from-right-5">
+            <div className="flex-1">
+                <div className="font-semibold text-gray-900">{title}</div>
+                <div className="text-sm text-gray-600">{message}</div>
+            </div>
+
+            <button
+                className="text-gray-400 hover:text-black"
+                onClick={onClose}
+            >
+                <X className="w-4 h-4" />
+            </button>
+        </div>
+    );
+}
+
 
 export { Toaster }

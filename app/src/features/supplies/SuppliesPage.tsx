@@ -18,6 +18,7 @@ import { UpdateSupply } from "./UpdateSupply";
 import { DeleteSupply } from "./DeleteSupply";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { useCrudState } from "@/hooks/use-crud-state";
+import { useAuth } from "@/hooks/use-auth";
 
 const columns = [
     { title: "SKU ID", style: "" },
@@ -29,9 +30,19 @@ const columns = [
     { title: 'Action', style: '' }
 ]
 
+const franchiseeColumns = [
+    { title: "SKU ID", style: "" },
+    { title: "Supply Name", style: "" },
+    { title: "Base Measurement", style: "" },
+    { title: "Converted Measurement", style: "" },
+    { title: "Price", style: "" },
+]
+
+
 const filters = ['All', 'Meat', 'Snow Frost', 'Non Deliverables'];
 
 export function SuppliesPage() {
+    const { loading: authLoading, isFranchisor } = useAuth();
     const [reload, setReload] = useState(false);
     const [filter, setFilter] = useState(filters[0]);
 
@@ -48,7 +59,7 @@ export function SuppliesPage() {
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20);    
     const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Supply>();
 
-    if (loading) return <PapiverseLoading />
+    if (loading || authLoading) return <PapiverseLoading />
     return(
         <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label="All Supplies" />
@@ -62,19 +73,20 @@ export function SuppliesPage() {
                 filters={ filters }
                 filter={ filter }
                 setFilter={ setFilter }
+                removeAdd={ !isFranchisor }
             />
 
             <div className="table-wrapper">
-                <div className="thead grid grid-cols-7 max-md:!w-250">
-                    {columns.map((item, _) => (
-                        <div key={_} className={`th ${item.style}`}>{ item.title }</div>
-                    ))}
+                <div className={`thead grid max-md:!w-250 ${isFranchisor ? "grid-cols-7" : "grid-cols-5"}`}>
+                    {(isFranchisor ? columns : franchiseeColumns).map((item, index) => (
+                        <div key={index} className={`th ${item.style}`}>{item.title}</div>
+                    ))}                     
                 </div>
                 
                 <div className="animate-fade-in-up" key={`${page}-${filter}`}>
                     {paginated.length > 0 ?
                         paginated.map((item, index) => (
-                            <div className="tdata grid grid-cols-7 max-md:!w-250" key={ index }>
+                            <div className={`tdata grid max-md:!w-250 ${isFranchisor ? "grid-cols-7" : "grid-cols-5"}`} key={ index }>
                                 <div className="td">{ item.code }</div>
                                 <div className="td flex gap-2">
                                     <Tooltip>
@@ -94,21 +106,28 @@ export function SuppliesPage() {
                                         ? `${item.convertedQuantity} ${item.convertedMeasurement}`
                                         : <div className="text-darkred font-semibold">N/A</div>}
                                 </div>
-                                <div className="td">
-                                    { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceInternal!) }
-                                </div>
-                                <div className="td">
-                                    { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceExternal!) }
-                                </div>
-                                <div className="td flex-center-y gap-2">
-                                    <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                    <button><Info className="w-4 h-4" /></button>
-                                    <button
-                                        onClick={ () => setDelete(item) }
-                                    >
-                                        <Trash2 className="w-4 h-4 text-darkred" />
-                                    </button>
-                                </div>
+                                {!isFranchisor && (
+                                    <div className="td">
+                                        { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceExternal!) }
+                                    </div>
+                                )}
+                                {isFranchisor && (
+                                    <><div className="td">
+                                        { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceInternal!) }
+                                    </div>
+                                    <div className="td">
+                                        { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceExternal!) }
+                                    </div>
+                                    <div className="td flex-center-y gap-2">
+                                        <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                                        <button><Info className="w-4 h-4" /></button>
+                                        <button
+                                            onClick={ () => setDelete(item) }
+                                        >
+                                            <Trash2 className="w-4 h-4 text-darkred" />
+                                        </button>
+                                    </div></>
+                                )}
                             </div>
                         ))
                         : (<div className="my-2 text-sm text-center col-span-6">There are no existing supplies yet.</div>)

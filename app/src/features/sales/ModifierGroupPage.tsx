@@ -11,7 +11,7 @@ import { formatToPeso } from "@/lib/formatter";
 import { ProductService } from "@/services/product.service";
 import { Product } from "@/types/products";
 import { Info, Salad, SquarePen, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { CreateProduct } from "./components/CreateProduct";
 import { UpdateProduct } from "./components/UpdateProduct";
 import { DeleteProduct } from "./components/DeleteProduct";
@@ -23,6 +23,7 @@ import { CreateModifierGroup } from "./components/CreateModifierGroup";
 import Link from "next/link";
 import { UpdateModifierGroup } from "./components/UpdateModifierGroup";
 import { DeleteModifierGroup } from "./components/DeleteModifierGroup";
+import { useAuth } from "@/hooks/use-auth";
 
 const columns = [
     { title: 'Name', style: '' },
@@ -30,9 +31,15 @@ const columns = [
     { title: 'Actions', style: '' },
 ]
 
+const franchiseeColumns = [
+    { title: 'Name', style: '' },
+    { title: 'Description', style: 'col-span-2' },
+]
+
 export function ModifierGroupsPage() {
+    const { loading: authLoading, isFranchisor } = useAuth();
     const [reload, setReload] = useState(false);
-    const { data, loading, error } = useFetchData<Modifier>(ModifierGroupService.getAllModifierGroups, [reload]);
+    const { data, loading } = useFetchData<Modifier>(ModifierGroupService.getAllModifierGroups, [reload]);
     const { setSearch, filteredItems } = useSearchFilter(data, ['name']);
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
 
@@ -40,7 +47,7 @@ export function ModifierGroupsPage() {
     const [toUpdate, setUpdate] = useState<Modifier | undefined>();
     const [toDelete, setDelete]  = useState<Modifier | undefined>();
 
-    if (loading) return <SectionLoading />
+    if (loading || authLoading) return <SectionLoading />
     return (
         <section className="stack-md animate-fade-in-up">
             <TableFilter
@@ -50,18 +57,19 @@ export function ModifierGroupsPage() {
                 setSize={ setSize }
                 buttonLabel="Add a group"
                 setOpen={ setOpen }
+                removeAdd={ !isFranchisor }
             />
 
             <div className="table-wrapper">
-                <div className="thead grid grid-cols-4">
-                    {columns.map((item, _) => (
+                <div className={`thead grid ${isFranchisor ? "grid-cols-4" : "grid-cols-3"}`}>
+                    {(isFranchisor ? columns : franchiseeColumns).map((item, _) => (
                         <div key={_} className={`th ${item.style}`}>{ item.title }</div>
                     ))}
                 </div>
                 <div className="animate-fade-in-up" key={page}>
                     {paginated.length > 0 ?
                         paginated.map((item, i) => (
-                            <div className="tdata grid grid-cols-4" key={i}>
+                            <div className={`tdata grid ${isFranchisor ? "grid-cols-4" : "grid-cols-3"}`} key={i}>
                                 <Link 
                                     href={`/sales/modifier/${item.id}`}
                                     className="td underline"
@@ -69,11 +77,13 @@ export function ModifierGroupsPage() {
                                     { item.name }
                                 </Link>
                                 <div className="td col-span-2">{ item.description }</div>
-                                <div className="td flex-center-y gap-2">
-                                    <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                    <button><Info className="w-4 h-4" /></button>
-                                    <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
-                                </div>
+                                {isFranchisor && (
+                                    <div className="td flex-center-y gap-2">
+                                        <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                                        <button><Info className="w-4 h-4" /></button>
+                                        <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
+                                    </div>
+                                )}
                             </div>
                         ))
                         : (<div className="my-2 text-sm text-center col-span-6">There are no existing products yet.</div>)

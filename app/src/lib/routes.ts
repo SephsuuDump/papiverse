@@ -1,4 +1,4 @@
-import { ChartNoAxesCombined, Container, Ham, Megaphone, MessageCircleMore, Store, UserRound, UsersRound, Wallet } from "lucide-react";
+import { BookMarked, ChartNoAxesCombined, Container, Ham, Megaphone, MessageCircleMore, Store, UserRound, UsersRound, Wallet } from "lucide-react";
 
 export const adminRoute = [
     { 
@@ -20,7 +20,7 @@ export const adminRoute = [
         children: []
     },
     { 
-        title: 'Announcement', 
+        title: 'Announcements', 
         icon: Megaphone,
         href: '/announcements',
         children: []
@@ -29,7 +29,7 @@ export const adminRoute = [
         title: 'Supplies', 
         icon: Ham,
         href: '/supplies',
-        children: []
+        children: [],
     },
     { 
         title: 'Inventory', 
@@ -47,7 +47,7 @@ export const adminRoute = [
             { title: 'Overview', href: '/sales' },
             { title: 'Products', href: '/sales/products' },
             { title: 'Paid Orders', href: '/sales/paid-orders' },
-            { title: 'Branch Sales', href: '/admin/sales/branches' },
+            { title: 'Branch Sales', href: '/sales/branches' },
         ]
     },
 ]
@@ -66,12 +66,6 @@ export const franchiseeRoute = [
         children: []
     },
     { 
-        title: 'Expenses', 
-        icon: Wallet,
-        href: '/expenses',
-        children: []
-    },
-    { 
         title: 'Inventory', 
         icon: Container,
         children: [
@@ -81,12 +75,26 @@ export const franchiseeRoute = [
             { title: 'Inventory Logs', href: '/inventory/logs' },
         ]
     },
-     { 
+    { 
+        title: 'Expenses', 
+        icon: Wallet,
+        href: '/expenses',
+        children: []
+    },
+    { 
         title: 'Messages', 
         icon: MessageCircleMore,
         children: [
             { title: 'Users', href: '/admin/messages/' },
             { title: 'Group', href: '/admin/messages/' },
+        ]
+    },
+    { 
+        title: 'Catalog', 
+        icon: BookMarked,
+        children: [
+            { title: 'Supplies', href: '/supplies' },
+            { title: 'Products', href: '/products' },
         ]
     },
 ]

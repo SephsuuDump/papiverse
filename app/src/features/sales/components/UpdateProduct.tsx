@@ -120,6 +120,11 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
         )
     }
 
+    useEffect(() => {
+        console.log(selectedItems);
+        
+    }, [selectedItems])
+
     async function handleSubmit() {
         try {
             setProcess(true);
@@ -186,14 +191,6 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
         finally { setProcess(false) }
     }
 
-    useEffect(() => {
-        console.log(selectedGroups);
-    }, [selectedGroups])
-
-    useEffect(() => {
-        console.log(removedGroups);
-    }, [removedGroups])
-
     if (loading || productsLoading || modifierLoading) return <ModalLoader />
     return(
         <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined)} }>
@@ -252,8 +249,8 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                             </div>  
                         </div>
 
-                        <div className="relative col-span-2 border-1 rounded-md shadow-xs mt-4 px-2 pb-2 h-50 overflow-y-auto">
-                            <div className="flex-center-y sticky top-0 bg-white">
+                        <div className="relative col-span-2 border-1 rounded-md shadow-xs mt-4 px-2 pb-2 h-50 overflow-y-auto overflow-x-scroll">
+                            <div className="flex-center-y sticky top-0 left-0 bg-white">
                                 <Select onValueChange={ handleSelect }>
                                     <SelectTrigger 
                                         hideIcon={ true }
@@ -330,7 +327,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="overflow-x-auto">
+                            <div className="">
                                 {selectedItems.map((item, index) => (
                                     <div className="w-130 flex tdata" key={index}>
                                         <div className="w-full grid grid-cols-3">
@@ -341,7 +338,7 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                                     min={0.00001} 
                                                     type="number"
                                                     step="any"
-                                                    defaultValue={item.quantity}
+                                                    value={item.quantity}
                                                     onChange={(e) => {
                                                         const value = e.target.value;
                                                         if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {

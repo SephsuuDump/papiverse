@@ -26,6 +26,7 @@ import { useFetchOne } from "@/hooks/use-fetch-one";
 import Link from "next/link";
 import { UpdateModifierItem } from "./components/UpdateModifierItem";
 import { DeleteModifierItem } from "./components/DeleteModifierItem";
+import { useAuth } from "@/hooks/use-auth";
 
 type ModifierGroupItems = {
     group: {
@@ -43,6 +44,13 @@ const columns = [
     { title: 'Actions', style: '' },
 ]
 
+const franchiseeColumns = [
+    { title: 'Name', style: '' },
+    { title: 'Description', style: '' },
+    { title: 'Items Needed', style: '' },
+]
+
+
 const productColumns = [
     { title: 'Product Name', style: '' },
     { title: 'Category', style: '' },
@@ -50,6 +58,7 @@ const productColumns = [
 
 export function  ViewModifierItemsPage() {
     const { id } = useParams();
+    const { loading: authLoading, isFranchisor } = useAuth();
     const [reload, setReload] = useState(false);
     const { data, loading, error } = useFetchOne<ModifierGroupItems>(
         ModifierItemService.getByModifierGroup, 
@@ -64,7 +73,7 @@ export function  ViewModifierItemsPage() {
     const [toUpdate, setUpdate] = useState<ModifierItem | undefined>();
     const [toDelete, setDelete]  = useState<ModifierItem | undefined>();
 
-    if (loading || !data) return <PapiverseLoading />
+    if (loading || !data || authLoading) return <PapiverseLoading />
     return (
         <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <div className="flex-center-y gap-4 w-full">
@@ -84,18 +93,19 @@ export function  ViewModifierItemsPage() {
                 setSize={ setSize }
                 buttonLabel="Add item"
                 setOpen={ setOpen }
+                removeAdd={ !isFranchisor }
             />
 
             <div className="table-wrapper">
-                <div className="thead grid grid-cols-4">
-                    {columns.map((item, _) => (
+                <div className={`thead grid ${isFranchisor ? "grid-cols-4" : "grid-cols-3"}`}>
+                    {(isFranchisor ? columns : franchiseeColumns).map((item, _) => (
                         <div key={_} className={`th ${item.style}`}>{ item.title }</div>
                     ))}
                 </div>
                 <div className="animate-fade-in-up" key={page}>
                     {paginated.length > 0 ?
                         paginated.map((item, i) => (
-                            <div className="tdata grid grid-cols-4" key={i}>
+                            <div className={`tdata grid ${isFranchisor ? "grid-cols-4" : "grid-cols-3"}`} key={i}>
                                 <div className="td">{ item.name }</div>
                                 <div className="td">{ item.description }</div>
                                 <Select>
@@ -128,11 +138,13 @@ export function  ViewModifierItemsPage() {
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
-                                <div className="td flex-center-y gap-2">
-                                    <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                    <button><Info className="w-4 h-4" /></button>
-                                    <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
-                                </div>
+                                {isFranchisor && (
+                                    <div className="td flex-center-y gap-2">
+                                        <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                                        <button><Info className="w-4 h-4" /></button>
+                                        <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
+                                    </div>
+                                )}
                             </div>
                         ))
                         : (<div className="my-2 text-sm text-center col-span-6">There are no existing modifier items yet.</div>)

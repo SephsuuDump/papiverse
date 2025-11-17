@@ -113,10 +113,6 @@ export function CreateProduct({ setOpen, setReload }: Props) {
         finally { setProcess(false) }
     }
 
-    useEffect(() => {
-        console.log(selectedItems);
-    }, [selectedItems]);
-
     if (loading || productLoading) return <ModalLoader />
     return(
         <Dialog open onOpenChange={ setOpen }>
@@ -173,8 +169,8 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                             </div>  
                         </div>
 
-                        <div className="relative col-span-2 border-1 rounded-md shadow-xs mt-4 px-2 pb-2 h-50 overflow-y-auto">
-                            <div className="flex-center-y sticky top-0 bg-white">
+                        <div className="relative col-span-2 border-1 rounded-md shadow-xs mt-4 px-2 pb-2 h-50 overflow-y-auto overflow-x-scroll">
+                            <div className="flex-center-y sticky top-0 left-0 bg-white">
                                 <Select onValueChange={ handleSelect }>
                                     <SelectTrigger 
                                         hideIcon={ true }
@@ -226,7 +222,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="overflow-x-auto">
+                            <div className="">
                                 {selectedItems.map((item, index) => (
                                     <div className="w-130 flex tdata" key={index}>
                                         <div className="w-full grid grid-cols-3" key={ index }>
@@ -237,7 +233,7 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                                     min={0.00001} 
                                                     type="number"
                                                     step="any"
-                                                    defaultValue={1}
+                                                    value={item.quantity}
                                                     onChange={(e) => {
                                                         const value = e.target.value;
                                                         if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
