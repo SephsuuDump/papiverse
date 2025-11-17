@@ -1,16 +1,19 @@
 import { AppHeader } from "@/components/shared/AppHeader";
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent } from "@/components/ui/alert-dialog";
-import { OrderStatusBadge } from "@/components/ui/badge";
+import { Badge, OrderStatusBadge } from "@/components/ui/badge";
 import { Button, UpdateButton } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormLoader, PapiverseLoading, SectionLoading } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { useFetchOne } from "@/hooks/use-fetch-one";
 import { useSupplyOrderApproval } from "@/hooks/use-supply-order-approval";
 import { formatDateToWords, formatToPeso } from "@/lib/formatter";
+import { InventoryService } from "@/services/inventory.service";
 import { SupplyOrderService } from "@/services/supplyOrder.service"
+import { Inventory } from "@/types/inventory";
 import { SupplyOrder } from "@/types/supplyOrder"
 import { Ham, MoveRight, Snowflake } from "lucide-react";
 import Image from "next/image";
@@ -32,6 +35,7 @@ export function ViewOrderPage({ id }: { id: number }) {
     const [reload, setReload] = useState(false);
     const { claims, loading: authLoading } = useAuth();
     const { data, loading, error } = useFetchOne<SupplyOrder>(SupplyOrderService.getSupplyOrderById, [id], [id, reload]);
+    const { data: inventories, loading: inventoryLoading } = useFetchData(InventoryService.getInventoryByBranch, [claims.branch.branchId], [claims.branch.branchId])
     const { onProcess, enableSave, handleSubmit } = useSupplyOrderApproval(data!, claims, setReload);
     
     const [tab, setTab] = useState('Meat Order');
@@ -46,7 +50,10 @@ export function ViewOrderPage({ id }: { id: number }) {
         }
     }, [data]);
 
-    if (loading || authLoading) return <PapiverseLoading /> 
+    console.log(inventories);
+    
+
+    if (loading || authLoading || inventoryLoading) return <PapiverseLoading /> 
     return (
         <section className="stack-md animate-fade-in-up">
             <AppHeader label={ `${data!.meatCategory?.meatOrderId} | ${data!.snowfrostCategory?.snowFrostOrderId}`  } />
@@ -126,8 +133,8 @@ export function ViewOrderPage({ id }: { id: number }) {
                         ))}
                     </div>
                     { tab === 'Meat Order' ? 
-                        <Orders orders={ data!.meatCategory!.meatItems } /> 
-                        : <Orders orders={ data!.snowfrostCategory!.snowFrostItems } /> 
+                        <Orders orders={ data!.meatCategory!.meatItems } inventories={ inventories } /> 
+                        : <Orders orders={ data!.snowfrostCategory!.snowFrostItems } inventories={ inventories } /> 
                     }
                 </div>
                 <div className="text-gray text-sm text-end mx-4 mt-2">
@@ -157,21 +164,25 @@ export function ViewOrderPage({ id }: { id: number }) {
     )
 }
 
-function Orders({ orders }: {
+function Orders({ orders, inventories }: {
     orders: any[];
+    inventories: Inventory[];
 })  {
     return (
         <>
-            {orders.map((item, i) => (
-                <div className="tdata grid grid-cols-[60px_1fr_1fr_60px_1fr_1fr]" key={i}>
-                    <div className="td text-center">{ i + 1 }</div>
-                    <div className="td">{ item.rawMaterialCode }</div>
-                    <div className="td">{ item.rawMaterialName }</div>
-                    <div className="td text-center">{ item.quantity }</div>
-                    <div className="td">{ formatToPeso(item.price) }</div>
-                    <div className="td">{ formatToPeso(item.price * item.quantity) }</div>
-                </div>
-            ))}
+            {orders.map((item, i) => {
+                const currentStock = inventories.find(i => i.code === item.rawMaterialCode)?.quantity;
+                return (
+                    <div className="tdata grid grid-cols-[60px_1fr_1fr_60px_1fr_1fr]" key={i}>
+                        <div className="td text-center">{ i + 1 }</div>
+                        <div className="td">{ item.rawMaterialCode }</div>
+                        <div className="td">{ item.rawMaterialName }</div>
+                        <div className="td text-center flex-center-y gap-2">{ item.quantity } <Badge className="text-[10px] rounded-full">{ currentStock }</Badge></div>
+                        <div className="td">{ formatToPeso(item.price) }</div>
+                        <div className="td">{ formatToPeso(item.price * item.quantity) }</div>
+                    </div>
+                )
+            })}
         </>     
     )
 }
