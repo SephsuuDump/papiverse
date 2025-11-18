@@ -26,7 +26,7 @@ const columns = [
     { title: 'Total Amount' , style: '' },
 ]
 
-export function CompletedOrders({ claims, paginated, setReload }: {
+export function RejectedOrders({ claims, paginated, setReload }: {
     claims: Claim;
     paginated: SupplyOrder[];
     setReload: Dispatch<SetStateAction<boolean>>;
@@ -69,7 +69,7 @@ export function CompletedOrders({ claims, paginated, setReload }: {
                 </div>
             </div>
             {paginated && paginated.length === 0 && (
-                <div className="w-full text-center my-2 text-sm">There are no completed supply orders as of now.</div>
+                <div className="w-full text-center my-2 text-sm">There are no rejected supply orders as of now.</div>
             )}
             {paginated.map((item, i) => (
                 <div className="flex-center-y tdata max-md:!w-250" key={i}>

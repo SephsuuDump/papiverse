@@ -22,7 +22,7 @@ const tabs = ['Input Logs', 'Order Logs', 'Sales Logs'];
 export function LogsPage() {
     const [activeTab, setActiveTab] = useState('Input Logs');
 
-    const { claims, loading: authLoading } = useAuth();
+    const { claims, loading: authLoading, isFranchisor } = useAuth();
     const { data, loading, error } = useFetchData<InventoryLog>(
         InventoryService.getInventoryAudits,
         [claims.branch.branchId],
@@ -75,9 +75,12 @@ export function LogsPage() {
             {activeTab === 'Input Logs' && (
                 <InputLogs logs={ paginated.filter(i => i.source === 'INPUT') } />
             )}
-            {activeTab === 'Sales Logs' && (
-                <InputLogs logs={ paginated.filter(i => i.source === 'SALES') } />
+            {isFranchisor && (
+                activeTab === 'Sales Logs' && (
+                    <InputLogs logs={ paginated.filter(i => i.source === 'SALES') } />
+                )
             )}
+
 
             <TablePagination 
                 data={ data }

@@ -18,6 +18,7 @@ import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
 import { CompletedOrders } from "./CompletedOrders";
 import { BranchService } from "@/services/branch.service";
 import { log } from "node:console";
+import { RejectedOrders } from "./RejectedOrders";
 
 const tabs = ['Pending', 'Completed', 'Rejected']
 
@@ -88,6 +89,14 @@ export default function SupplyOrdersPage() {
                 <CompletedOrders 
                     claims={ claims }
                     paginated={ paginated.filter(i => i.status === 'APPROVED' || i.status === 'DELIVERED') } 
+                    setReload={ setReload }
+                />
+            )}
+
+            {tab === 'Rejected' && (
+                <RejectedOrders 
+                    claims={ claims }
+                    paginated={ paginated.filter(i => i.status === 'REJECTED') } 
                     setReload={ setReload }
                 />
             )}

@@ -2,8 +2,9 @@ import { AppHeader } from "@/components/shared/AppHeader";
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Badge, OrderStatusBadge } from "@/components/ui/badge";
-import { Button, UpdateButton } from "@/components/ui/button";
+import { Button, DeleteButton, UpdateButton } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FormLoader, PapiverseLoading, SectionLoading } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
@@ -40,6 +41,7 @@ export function ViewOrderPage({ id }: { id: number }) {
     
     const [tab, setTab] = useState('Meat Order');
     const [open, setOpen] = useState(false);
+    const [toReject, setReject] = useState(false);
     const [meatApproved, setMeatApproved] = useState<boolean | undefined>(undefined);
     const [snowApproved, setSnowApproved] = useState<boolean | undefined>(undefined);
 
@@ -71,12 +73,19 @@ export function ViewOrderPage({ id }: { id: number }) {
                 </div>
                 <div className="flex gap-2 my-2">
                     {claims.roles[0] === 'FRANCHISOR' && (
-                        <Button className="!bg-darkgreen hover:opacity-90" 
-                            disabled={ enableSave(meatApproved!, snowApproved!) }
-                            onClick={ () => setOpen(true) }
-                        >
-                            <FormLoader onProcess={ onProcess } label="Save Order" loadingLabel="Saving Order" />
-                        </Button>
+                        <>
+                            <Button className="!bg-darkred hover:opacity-90" 
+                                onClick={ () => setReject(true) }
+                            >
+                                <FormLoader onProcess={ onProcess } label="Reject Order" loadingLabel="Rejecting Order" />
+                            </Button>
+                            <Button className="!bg-darkgreen hover:opacity-90" 
+                                disabled={ enableSave(meatApproved!, snowApproved!) }
+                                onClick={ () => setOpen(true) }
+                            >
+                                <FormLoader onProcess={ onProcess } label="Save Order" loadingLabel="Saving Order" />
+                            </Button>
+                        </>
                     )}
                     <Link href='/inventory/supply-orders'>
                         <Button>Back to Orders</Button>
@@ -159,6 +168,11 @@ export function ViewOrderPage({ id }: { id: number }) {
                 snowApproved={ snowApproved! }
                 onProcess={ onProcess }
                 handleSubmit={ handleSubmit }
+            />}
+
+            {toReject && <ConfirmReject
+                open={toReject}
+                setOpen={setReject}
             />}
         </section>
     )
@@ -259,5 +273,30 @@ function ConfirmSave({ setOpen, order, meatApproved, snowApproved, onProcess, ha
                 </form>
             </AlertDialogContent>
         </AlertDialog>
+    )
+}
+
+function ConfirmReject({ open, setOpen }: {
+    open: boolean;
+    setOpen: Dispatch<SetStateAction<boolean>>
+}) {
+    const [onProcess, setProcess] = useState(false);
+    return (
+        <Dialog open={ open } onOpenChange={ setOpen }>
+            <DialogContent>
+                <ModalTitle label="Are you sure to reject order?" />
+                <form 
+                    className="flex-center-y gap-4 justify-end"
+                >
+                    <DialogClose>Cancel</DialogClose>
+                    <DeleteButton 
+                        type="submit"
+                        onProcess={onProcess}
+                        label="Yes, I'm sure"
+                        loadingLabel="Rejecting Order"
+                    />
+                </form>
+            </DialogContent>
+        </Dialog>
     )
 }
