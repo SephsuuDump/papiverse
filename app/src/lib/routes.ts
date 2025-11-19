@@ -75,6 +75,13 @@ export const franchiseeRoute = [
         ]
     },
     { 
+        title: 'Sales', 
+        icon: ChartNoAxesCombined,
+        children: [
+            { title: 'Paid Orders', href: '/sales/paid-orders' },
+        ]
+    },
+    { 
         title: 'Expenses', 
         icon: Wallet,
         href: '/expenses',

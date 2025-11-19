@@ -44,7 +44,7 @@ export class SalesService {
         formData.append('file', file);
 
         return await requestData(
-            `${salesUrl}/upload`,
+            `${salesUrl}/upload?branchId=${branchId}`,
             'POST',
             undefined,
             formData

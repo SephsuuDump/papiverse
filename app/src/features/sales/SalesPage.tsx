@@ -12,6 +12,7 @@ import { Fragment, useState } from "react";
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { DateRangePicker } from "../dashboard/components/DataRangePicker";
 import { format } from "date-fns";
+import { EmptyState } from "@/components/ui/fallback";
 
 const chartTabs = ['Daily', 'Weekly', 'Monthly']
 
@@ -31,7 +32,7 @@ const today = format(new Date(), "yyyy-MM-dd");
 export function SalesPage({ branchId }: {
     branchId?: number;
 }) {
-    const { claims, loading: authLoading } = useAuth();
+    const { claims, loading: authLoading, isFranchisor } = useAuth();
     const [chartTab, setChartTab] = useState("Daily");
     const [startDate, setStartDate] = useState<string>(today);
     const [endDate, setEndDate] = useState<string>(today);
@@ -187,6 +188,13 @@ export function SalesPage({ branchId }: {
                             </thead>
 
                             <tbody className="text-sm">
+                                {(!data.topProducts || data.topProducts.length === 0) && (
+                                    <tr>
+                                        <td colSpan={4}>
+                                            <EmptyState message="No top products available" />
+                                        </td>
+                                    </tr>
+                                )}
                                 {data.topProducts.map((item: any, index: number) => (
                                     <tr key={index} className="border-b hover:bg-gray-50 transition">
                                         <td className="py-2 px-3 font-semibold">{index + 1}</td>
@@ -205,7 +213,7 @@ export function SalesPage({ branchId }: {
                 {/* ---------------------- */}
                 {/* TOP BRANCHES */}
                 {/* ---------------------- */}
-                {!branchId && (
+                {!branchId && isFranchisor && (
                     <div className="bg-white shadow-sm rounded-lg overflow-hidden border">
                         <div className="px-4 py-3 border-b flex items-center justify-between">
                             <h3 className="text-lg font-semibold tracking-tight text-darkbrown">
@@ -224,6 +232,13 @@ export function SalesPage({ branchId }: {
                                 </thead>
 
                                 <tbody className="text-sm">
+                                    {(!data.topProducts || data.topProducts.length === 0) && (
+                                        <tr>
+                                            <td colSpan={4}>
+                                                <EmptyState message="No top products available" />
+                                            </td>
+                                        </tr>
+                                    )}
                                     {data.topBranches.map((item: any, index: number) => (
                                         <tr key={index} className="border-b hover:bg-gray-50 transition">
                                             <td className="py-2 px-3 font-semibold">{index + 1}</td>

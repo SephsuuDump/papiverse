@@ -17,6 +17,14 @@ import { SalesService } from "@/services/sales.service";
 import { useAuth } from "@/hooks/use-auth";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { usePagination } from "@/hooks/use-pagination";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function PaidOrdersPage() {
     const [reload, setReload] = useState(false);
