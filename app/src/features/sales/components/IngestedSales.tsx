@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSearchFilter } from "@/hooks/use-search-filter";
 import { Plus, X } from "lucide-react";
 
 const columns = [
@@ -13,6 +14,7 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
     setOpen: (i: boolean) => void,
     className?: string
 }) {
+    const { setSearch, filteredItems } = useSearchFilter(paidOrders, ["orderId"])
     return (
         <section className={`py-2 space-y-2 ${className}`}>
             <div className="text-lg font-semibold">
@@ -22,11 +24,13 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
             <div className="flex-center-y gap-2">
                 <Input
                     placeholder="Search for a paid order"
+                    onChange={ e => setSearch(e.target.value) }
                 />
                 <Button 
                     onClick={ () => setOpen(true) }
                     className="!bg-darkgreen hover:opacity-90"
                     size="sm"
+                    disabled={ paidOrders.length > 0}
                 >
                     <Plus />Insert Excel
                 </Button>
@@ -37,7 +41,7 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
                         <div className="td">{ item.title }</div>
                     ))}
                 </div>
-                {paidOrders.map((item: any, i: number) => (
+                {filteredItems.map((item: any, i: number) => (
                     <div className="tdata grid grid-cols-2" key={i}>
                         <div className="td">{ item.orderId }</div>
                         <div className="td">

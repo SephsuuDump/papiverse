@@ -7,70 +7,52 @@ import { Truck } from "lucide-react";
 import { Fragment } from "react";
 
 interface Props {
-    logs: InventoryLog[];
+    logs: {
+        "date": string,
+        "logs": InventoryLog[]
+    }[];
 }
 
-export function OrderLogs({ logs }: Props) {
-    const groupedByDateAndOrder = logs.reduce<Record<string, Record<string, InventoryLog[]>>>((acc, log) => {
-        if (!log.dateTime) {
-            return acc; 
-        }
-        const dateOnly = log.dateTime.slice(0, 10);
-        if (!acc[dateOnly]) {
-            acc[dateOnly] = {};
-        }
-        const orderKey = String(log.orderId);
-        if (!acc[dateOnly][orderKey]) {
-            acc[dateOnly][orderKey] = [];
-        }
-        acc[dateOnly][orderKey].push(log);
-        return acc;
-    }, {});
-
-    console.log(groupedByDateAndOrder);
-    
+export function OrderLogs({ logs }: Props) {    
     return(
         <section>
-            {flattenGroupedLogsWithOrders(groupedByDateAndOrder).map((item, index) => (
+            {logs.map((item, index) => (
                 <div className="my-1" key={ item.date }>
                     <Accordion type="multiple">
                         <div className="flex gap-2 items-center w-fit font-semibold py-2 px-4 border-1 border-gray-300 shadow-xs bg-light rounded-t-xl z-50">
                             <div>{formatDateToWords(item.date)}</div> 
                             <div className="bg-dark h-fit rounded-sm text-light px-2 font-semibold text-[10px]">{getWeekday(item.date)}</div>
                         </div>
-                        {item.orders.map((subItem, index) => (
-                            <AccordionItem value={ String(subItem.order.id) } key={ index }>
-                                <AccordionTrigger className="rounded-none bg-light px-4 shadow-xs">
-                                    <div className="w-full grid grid-cols-3">
-                                        <div>Order ID: <span className="font-semibold">{ subItem.order.id || "None" }</span></div>
-                                        {/* <div>Source: <span className="font-semibold">{ subItem.logs[0].source }</span></div> */}
-                                        <div>Type: <span className="font-semibold">{ subItem.logs[0].type === "IN" ? "INGOING" : "OUTGOING" }</span></div>
-                                        <div className="flex-center-y gap-2">
-                                            <Truck className="w-4 h-4 text-darkbrown" />
-                                            <div className="text-sm">{ subItem.order.orderDestination }</div>
-                                        </div>
+                        <AccordionItem value={ item.date } key={ index }>
+                            <AccordionTrigger className="rounded-none bg-light px-4 shadow-xs">
+                                <div className="w-full grid grid-cols-3">
+                                    <div>Order ID: <span className="font-semibold">{ item.logs[0].order?.id }</span></div>
+                                    {/* <div>Source: <span className="font-semibold">{ subItem.logs[0].source }</span></div> */}
+                                    <div>Type: <span className="font-semibold">{ item.logs[0].type === "IN" ? "INGOING" : "OUTGOING" }</span></div>
+                                    <div className="flex-center-y gap-2">
+                                        <Truck className="w-4 h-4 text-darkbrown" />
+                                        <div className="text-sm">{ item.logs[0].branchName }</div>
                                     </div>
-                                </AccordionTrigger> 
-                                <AccordionContent className="table-wrapper px-4 bg-light border-b-darkred border-1">
-                                    
-                                        {subItem.logs.map((subSubItem, index) => (
-                                            <Fragment key={ index }>
-                                                <div className="tdata grid grid-cols-4 py-2">
-                                                    <div>{ subSubItem.rawMaterialCode }</div>
-                                                    <div>Qty: { subSubItem.quantityChanged }</div>
-                                                    <div>{ subSubItem.rawMaterialName }</div>
-                                                    <div>
-                                                        {dayjs(subSubItem.dateTime).format("dddd, MMMM D, YYYY h:mm A")}
-                                                    </div>
+                                </div>
+                            </AccordionTrigger> 
+                            <AccordionContent className="table-wrapper px-4 bg-light border-b-darkred border-1">
+                                
+                                    {item.logs.map((subItem, index) => (
+                                        <Fragment key={ index }>
+                                            <div className="tdata grid grid-cols-4 py-2">
+                                                <div>{ subItem.rawMaterialCode }</div>
+                                                <div>Qty: { subItem.quantityChanged }</div>
+                                                <div>{ subItem.rawMaterialName }</div>
+                                                <div>
+                                                    {dayjs(subItem.dateTime).format("dddd, MMMM D, YYYY h:mm A")}
                                                 </div>
-                                                <Separator />
-                                            </Fragment>
-                                        ))}
-                                    
-                                </AccordionContent>
-                            </AccordionItem>
-        
-                        ))}
+                                            </div>
+                                            <Separator />
+                                        </Fragment>
+                                    ))}
+                                
+                            </AccordionContent>
+                        </AccordionItem>
                     </Accordion>
                 </div>
             ))}

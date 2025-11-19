@@ -32,7 +32,7 @@ const today = format(new Date(), "yyyy-MM-dd");
 export function SalesPage({ branchId }: {
     branchId?: number;
 }) {
-    const { claims, loading: authLoading, isFranchisor } = useAuth();
+    const { loading: authLoading, isFranchisor } = useAuth();
     const [chartTab, setChartTab] = useState("Daily");
     const [startDate, setStartDate] = useState<string>(today);
     const [endDate, setEndDate] = useState<string>(today);

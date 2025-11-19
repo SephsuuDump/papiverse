@@ -17,38 +17,22 @@ import { Button } from "@/components/ui/button";
 import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
 import { flattenGroupedLogsWithOrders } from "@/lib/formatter";
 
-const tabs = ['Input Logs', 'Order Logs', 'Sales Logs'];
+const tabs = ['INPUT', 'ORDER', 'SALES'];
 
 export function LogsPage() {
-    const [activeTab, setActiveTab] = useState('Input Logs');
+    const [activeTab, setActiveTab] = useState(tabs[0]);
 
     const { claims, loading: authLoading, isFranchisor } = useAuth();
-    const { data, loading, error } = useFetchData<InventoryLog>(
+    const { data, loading, error } = useFetchData<{
+        date: string;
+        logs: InventoryLog[]
+    }>(
         InventoryService.getInventoryAudits,
         [claims.branch.branchId],
-        [claims.branch.branchId],
+        [claims.branch.branchId, activeTab],
     );
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['dateTime', 'orderId']);
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 100);
-
-    const groupedByDateAndOrder = data.reduce<Record<string, Record<string, InventoryLog[]>>>((acc, log) => {
-            if (!log.dateTime) {
-                return acc; 
-            }
-            const dateOnly = log.dateTime.slice(0, 10);
-            if (!acc[dateOnly]) {
-                acc[dateOnly] = {};
-            }
-            const orderKey = String(log.orderId);
-            if (!acc[dateOnly][orderKey]) {
-                acc[dateOnly][orderKey] = [];
-            }
-            acc[dateOnly][orderKey].push(log);
-            return acc;
-        }, {});
-    
-    console.log(flattenGroupedLogsWithOrders(groupedByDateAndOrder));
-    
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
@@ -69,16 +53,14 @@ export function LogsPage() {
                 setSelectedTab={ setActiveTab }
             />
 
-            {activeTab === 'Order Logs' && (
-                <OrderLogs logs={ paginated.filter(i => i.source === 'ORDER') } />
+            {activeTab === 'INPUT' && (
+                <InputLogs logs={ paginated } />
             )}
-            {activeTab === 'Input Logs' && (
-                <InputLogs logs={ paginated.filter(i => i.source === 'INPUT') } />
+            {activeTab === 'ORDER' && (
+                <OrderLogs logs={ paginated } />
             )}
-            {isFranchisor && (
-                activeTab === 'Sales Logs' && (
-                    <InputLogs logs={ paginated.filter(i => i.source === 'SALES') } />
-                )
+            {activeTab === 'SALES' && (
+                <InputLogs logs={ paginated } />
             )}
 
 

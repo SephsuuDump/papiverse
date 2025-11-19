@@ -83,13 +83,13 @@ export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel
                         </SelectContent>
                     </Select>
                 )}
-                <Button 
+                {/* <Button 
                     variant="secondary"
                     className="bg-light shadow-xs"
                 >
                     <Download />
                     Export
-                </Button>
+                </Button> */}
                 {!removeAdd && (
                     <Button 
                         onClick={ () => setOpen?.(prev => !prev) }

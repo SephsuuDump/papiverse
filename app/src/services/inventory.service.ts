@@ -12,9 +12,9 @@ export class InventoryService {
     );
   }
 
-  static async getInventoryAudits(id: number, page: number, size: number) {
+  static async getInventoryAudits(id: number, source: string, page: number, size: number) {
     return await requestData(
-        `${url}/get-audits?branchId=${id}&page=${page}&size=${size}`,
+        `${url}/get-audits?branchId=${id}&source=${source}&page=${page}&size=${size}`,
         "GET"
     );
   }
