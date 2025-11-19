@@ -11,6 +11,7 @@ import { SupplyItem } from "@/types/supplyOrder";
 import { Ham, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";
+import { toast } from "sonner";
 
 const columns = [
     { title: 'SKU ID', style: '' },
@@ -35,7 +36,10 @@ export function MeatOrder({ supplies, selectedItems, setActiveForm, onSelect, on
     const { search, setSearch, filteredItems: filteredSupplies } = useSearchFilter(supplies, ['name', 'code'])
 
     const handleSubmit = async () => {
-        setActiveForm("snow");
+        if (selectedItems.length > 0) {
+            return setActiveForm("snow");
+        }
+        toast.info('MEAT ORDER CANNOT BE EMPTY')
     };
 
     return(

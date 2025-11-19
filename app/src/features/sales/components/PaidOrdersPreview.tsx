@@ -35,27 +35,25 @@ export function PaidOrdersPreview({ paidOrdersPreview, setPaidOrdersPreview, cla
     async function handleSubmit() {
         try {
             setProcess(true);
-            
             const blob = new Blob([JSON.stringify(paidOrdersPreview, null, 2)], {
-                type: "application/json",
+                type: "application/json"
             });
             const file = new File([blob], "paid_orders.json", { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = "paid_orders.json";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-
-            const data = await SalesService.uploadPaidOrders(claims.branch.branchId, file);
+            const data = await SalesService.uploadPaidOrders(
+                claims.branch.branchId,
+                file
+            );
             if (data) toast.success('Excel for paid orders inserted successfully.');
-            setProcess(false);
             setReload(prev => !prev);
             setPaidOrdersPreview([]);
-        } catch (error) { toast.error(`${error}`) }
+
+        } catch (error) {
+            toast.error(`${error}`);
+        } finally {
+            setProcess(false);
+        }
     }
+
     return(
         <Dialog open onOpenChange={ (open) => { if (!open) setPaidOrdersPreview([]) }}>
             <DialogContent>
@@ -109,8 +107,8 @@ export function PaidOrdersPreview({ paidOrdersPreview, setPaidOrdersPreview, cla
                             <AddButton 
                                 type="submit"
                                 onProcess={ onProcess }
-                                label="Create User"
-                                loadingLabel="Creating User"
+                                label="Ingest Orders"
+                                loadingLabel="Ingesting Orders"
                             />
                         </div>
                     </form>

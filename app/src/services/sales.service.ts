@@ -20,9 +20,9 @@ export class SalesService {
         )
     }
 
-    static async getPaidOrders(branchId: number, start: string, end: string) {
+    static async getPaidOrders(branchId: number, start: string, end: string, page: number, size: number) {
         return await requestData(
-            `${salesUrl}/get-detailed?branchId=${branchId}&start=${start}&end=${end}`,
+            `${salesUrl}/get-detailed?branchId=${branchId}&start=${start}&end=${end}&page=${page}&size=${size}`,
             'GET'
         )
     }

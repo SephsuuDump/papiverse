@@ -1,4 +1,4 @@
-import PaidOrdersPage from "@/features/sales/components/PaidOrdersPage";
+import PaidOrdersPage from "@/features/sales/PaidOrdersPage";
 
 export default function PaidOrder() {
     return (

@@ -35,10 +35,10 @@ export function SnowOrder({ supplies, selectedItems, setActiveForm, onSelect, on
     const { search, setSearch, filteredItems: filteredSupplies } = useSearchFilter(supplies, ['name', 'code'])
 
     const handleSubmit = async () => {
-        if (selectedItems.length > 0) {
-            setActiveForm("receipt");
+        if (selectedItems.filter(i => i.category === 'SNOWFROST').length > 0) {
+            return setActiveForm("receipt");
         } else {
-            toast.info("Please select a supply to order.")
+            toast.info("SNOW ORDER CANNOT BE EMPTY.")
         }
     };
 

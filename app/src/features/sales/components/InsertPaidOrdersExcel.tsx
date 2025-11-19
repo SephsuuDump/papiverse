@@ -94,7 +94,7 @@ export function InsertPaidOrdersExcel({ setOpen, setPaidOrdersPreview }: Props) 
                         )}
                         <p className={`text-gray text-sm mb-1 ${fileName && "!text-dark font-semibold"}`}>{ fileName ?? "No excel file selected" }</p>
                         <p className="text-xs text-gray">
-                        Click "Add Images" to upload multiple images (max 10MB each)
+                        Click the canvas to upload excel file (max 10MB each)
                         </p>
                     </button>
                     <div className="flex justify-end gap-4">

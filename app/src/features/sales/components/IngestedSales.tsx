@@ -1,0 +1,67 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Plus, X } from "lucide-react";
+
+const columns = [
+    { title: "Order ID", style: "" },
+    { title: "Products", style: "" },
+]
+
+export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
+    paidOrders: any,
+    selectedDay: string,
+    setOpen: (i: boolean) => void,
+    className?: string
+}) {
+    return (
+        <section className={`py-2 space-y-2 ${className}`}>
+            <div className="text-lg font-semibold">
+                Ingested Orders on 
+                <span className="text-darkbrown"> { formatDate(selectedDay) }</span>
+            </div>
+            <div className="flex-center-y gap-2">
+                <Input
+                    placeholder="Search for a paid order"
+                />
+                <Button 
+                    onClick={ () => setOpen(true) }
+                    className="!bg-darkgreen hover:opacity-90"
+                    size="sm"
+                >
+                    <Plus />Insert Excel
+                </Button>
+            </div>
+            <div className="table-wrapper">
+                <div className="thead grid grid-cols-2">
+                    {columns.map((item) => (
+                        <div className="td">{ item.title }</div>
+                    ))}
+                </div>
+                {paidOrders.map((item: any, i: number) => (
+                    <div className="tdata grid grid-cols-2" key={i}>
+                        <div className="td">{ item.orderId }</div>
+                        <div className="td">
+                            {item.items.map((subItem: any) => (
+                                <div className="flex-center-y gap-1 py-1">
+                                    <p>{ subItem.productName }</p>
+                                    <X className="w-3 h-3"/> 
+                                    { subItem.quantity }
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+        </section>
+    )
+}
+
+function formatDate(dateStr: string) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+    });
+}
