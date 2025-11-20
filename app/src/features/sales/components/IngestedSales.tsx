@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useSearchFilter } from "@/hooks/use-search-filter";
 import { formatToPeso } from "@/lib/formatter";
 import { Plus, X } from "lucide-react";
 
