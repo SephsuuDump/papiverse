@@ -44,7 +44,7 @@ export default function PaidOrdersPage() {
         <section className="flex flex-col gap-2">
             <AppHeader label="Paid Orders" />
             
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid lg:grid-cols-5 gap-2">
                 <SalesCalendar 
                     className="col-span-3"
                     selectedDay={ selectedDay }

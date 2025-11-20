@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useSearchFilter } from "@/hooks/use-search-filter";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { formatToPeso } from "@/lib/formatter";
 import { Plus, X } from "lucide-react";
 
 const columns = [
@@ -35,15 +37,24 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
                     <Plus />Insert Excel
                 </Button>
             </div>
-            <div className="table-wrapper">
-                <div className="thead grid grid-cols-2">
+            <ScrollArea className="table-wrapper h-[120vh]">
+                <div className="thead grid grid-cols-2 sticky top-0">
                     {columns.map((item) => (
                         <div className="td">{ item.title }</div>
                     ))}
                 </div>
-                {filteredItems.map((item: any, i: number) => (
-                    <div className="tdata grid grid-cols-2" key={i}>
-                        <div className="td">{ item.orderId }</div>
+                {paidOrders.map((item: any, i: number) => (
+                    <div className="tdata grid grid-cols-2 !border-gray !border-b-1" key={i}>
+                        <div className="td border-r-1">
+                            <div className="font-semibold text-xs">ORDER ID</div>
+                            <div>{ item.orderId }</div>
+                            <div className="font-semibold text-xs mt-2">PAYMENT TYPE</div>
+                            <div>{ item.cash !== 0 ? "Cash" : "G-cash" }</div>
+                            <div className="font-semibold text-xs mt-2">ORDER TYPE</div>
+                            <div>{ item.orderType }</div>
+                            <div className="font-semibold text-xs mt-3">TOTAL AMOUNT</div>
+                            <div className="font-bold text-darkgreen">{ formatToPeso(item.totalPaid) }</div>
+                        </div>
                         <div className="td">
                             {item.items.map((subItem: any) => (
                                 <div className="flex-center-y gap-1 py-1">
@@ -55,7 +66,7 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
                         </div>
                     </div>
                 ))}
-            </div>
+            </ScrollArea>
 
         </section>
     )

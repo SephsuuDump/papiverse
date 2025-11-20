@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -20,6 +21,7 @@ export function SalesCalendar({
     setSelectedDay: (i: string) => void;
 }) {
     const today = new Date();
+    const isMobile = useIsMobile();
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
 
@@ -114,12 +116,22 @@ export function SalesCalendar({
                                     ${isWeekend && !isSelected ? "text-darkred" : ""}
                                 `}
                             >
-                                <div className="text-lg font-bold tracking-widest">
-                                    {String(day).padStart(2, "0")}
-                                </div>
-                                <div className="text-xs font-bold tracking-wider">
-                                    DONE
-                                </div>
+                                {isMobile ? (
+                                    <><div className="text-4xl font-bold">
+                                        {String(day).padStart(2, "0")}
+                                    </div>
+                                    <div className="font-bold tracking-wider">
+                                        DONE
+                                    </div></>
+                                ) : (
+                                    <><div className="text-[2vw] font-bold">
+                                        {String(day).padStart(2, "0")}
+                                    </div>
+                                    <div className="text-[1vw] font-bold tracking-wider">
+                                        DONE
+                                    </div></>
+                                )}
+                                
                             </div>
                         );
                     })}

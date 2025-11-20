@@ -40,7 +40,6 @@ export function formatDateTime(dateStr: string): string {
     return `${formattedDate} ${formattedTime}`;
 }
 
-
 export function getWeekday(dateString: string) {
     const options: Intl.DateTimeFormatOptions = { weekday: 'long' };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -209,3 +208,27 @@ export function getPhilippineTimeISO() {
     const localISOTime = new Date(now.getTime() - tzOffset).toISOString().slice(0, -1);
     return localISOTime;
 }
+
+export function formatCompactNumber(value: number | string): string {
+    if (value == null) return "0";
+
+    // If value is a string like "₱45,900.75", extract numeric part
+    if (typeof value === "string") {
+        // Remove Peso sign, commas, spaces, and any non-digit except period
+        value = Number(value.replace(/[₱P,\s]/g, ""));
+    }
+
+    if (isNaN(value)) return "0"; // Safety check
+
+    // No compact when less than 1,000
+    if (value < 1_000) {
+        return value.toLocaleString("en-US");
+    }
+
+    // Use compact notation for thousands, millions, billions
+    return Intl.NumberFormat("en-US", {
+        notation: "compact",
+        maximumFractionDigits: 1,
+    }).format(value);
+}
+
