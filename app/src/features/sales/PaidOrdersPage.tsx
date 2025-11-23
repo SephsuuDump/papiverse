@@ -29,7 +29,16 @@ export default function PaidOrdersPage() {
     const [open, setOpen] = useState(false);
 
     const { claims, loading: authLoading } = useAuth();
-    const { data, loading, error } = useFetchData<PaidOrder>(
+    const { data, loading, error } = useFetchData<{
+        orderId: string;
+        cash: number;
+        orderType: string;
+        totalPaid: number;
+        items: {
+            productName: string;
+            quantity: number;
+        } []
+    }>(
         SalesService.getPaidOrders, 
         [reload, selectedDay], 
         [claims.branch.branchId, selectedDay, selectedDay]
