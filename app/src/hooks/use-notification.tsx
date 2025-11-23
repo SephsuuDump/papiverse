@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { BASE_URL, WEBSOCKET_URL } from "@/lib/urls";
 import { Claim } from "@/types/claims";
 import { NotificationResponse } from "@/types/notification";

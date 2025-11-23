@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-// ✅ Always returns a single item
 export function useFetchOne<T>(
     fetchFn: (...args: any[]) => Promise<T>,
     deps: any[] = [],
