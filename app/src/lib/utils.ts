@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function hasEmptyField<T extends Record<string, any>>(
+export function hasEmptyField<T extends Record<string, unknown>>(
     obj: T,
     exemptKeys: (keyof T)[] = []
 ): boolean {

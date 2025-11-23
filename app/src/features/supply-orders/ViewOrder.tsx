@@ -185,7 +185,12 @@ export function ViewOrderPage({ id }: { id: number }) {
 }
 
 function Orders({ orders, inventories }: {
-    orders: any[];
+    orders: {
+        rawMaterialCode: string;
+        rawMaterialName: string;
+        quantity: number;
+        price: number;
+    } [];
     inventories: Inventory[];
 })  {
     return (

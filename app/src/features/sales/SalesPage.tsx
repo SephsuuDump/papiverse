@@ -234,7 +234,14 @@ export function SalesPage({ branchId }: {
                                     </tr>
                                 )}
 
-                                {data.topProducts.map((item: any, index: number) => {
+                                {data.topProducts.map((
+                                    item: {
+                                        productName: string,
+                                        amount: number;
+                                        quantity: number;
+                                    }, 
+                                    index: number
+                                ) => {
                                     const rankColor =
                                         index === 0 ? "text-yellow-600" :
                                         index === 1 ? "text-gray-500" :
@@ -295,7 +302,13 @@ export function SalesPage({ branchId }: {
                                         </tr>
                                     )}
 
-                                    {data.topBranches.map((item: any, index: number) => {
+                                    {data.topBranches.map((
+                                        item: {
+                                            branchName: string;
+                                            totalSales: number
+                                        }, 
+                                        index: number
+                                    ) => {
                                         const rankColor =
                                             index === 0 ? "text-yellow-600" :
                                             index === 1 ? "text-gray-500" :

@@ -55,39 +55,6 @@ export function capitalizeWords(str: string): string {
         .join(' ');                   
 }
 
-export function flattenGroupedLogsWithOrders(
-    groupedLogsByDateOrder: Record<string, Record<string, InventoryLog[]>>
-): { date: string; orders: { order: any | null; logs: InventoryLog[] }[] }[] {
-    
-    const result: { date: string; orders: { order: any | null; logs: InventoryLog[] }[] }[] = [];
-
-    const sortedDates = Object.keys(groupedLogsByDateOrder).sort((a, b) => (a < b ? 1 : -1));
-
-    for (const date of sortedDates) {
-        const orders = groupedLogsByDateOrder[date];
-        const ordersList: { order: any | null; logs: InventoryLog[] }[] = [];
-
-        const sortedOrderKeys = Object.keys(orders).sort((a, b) => {
-            const aNum = Number(a);
-            const bNum = Number(b);
-            if (!isNaN(aNum) && !isNaN(bNum)) {
-                return bNum - aNum;
-            }
-            return a < b ? 1 : -1;
-        });
-
-        for (const orderId of sortedOrderKeys) {
-            const logs = orders[orderId];
-            const order = logs[0]?.order ?? null; // ✅ extract order object
-            ordersList.push({ order, logs });
-        }
-
-        result.push({ date, orders: ordersList });
-    }
-    
-    return result;
-}
-
 export const fromatMessageDateTime = (messageDateTime: string): string => {
     const now = new Date();
     let date: Date;

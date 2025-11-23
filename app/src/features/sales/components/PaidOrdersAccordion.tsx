@@ -36,11 +36,11 @@ export function PaidOrdersAccordion({ paidOrders }: {
                                 <div className="tdata grid grid-cols-5 !border-b-gray" key={ index }>
                                     <div className="td">{ item.orderId }</div>
                                     <div>
-                                        {item.items.map((subItem, productIndex) => {
+                                        {item.items!.map((subItem, productIndex) => {
                                             const globalIndex = 
                                             paidOrders
                                                 .slice(0, index)
-                                                .reduce((acc: any, o: any) => acc + o.items.length, 0) 
+                                                .reduce((acc: number, o) => acc + o.items!.length, 0) 
                                             + productIndex; 
 
                                             return (

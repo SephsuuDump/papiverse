@@ -13,7 +13,16 @@ const columns = [
 ]
 
 export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
-    paidOrders: any,
+    paidOrders: {
+        orderId: string;
+        cash: number;
+        orderType: string;
+        totalPaid: number;
+        items: {
+            productName: string;
+            quantity: number;
+        } []
+    } [],
     selectedDay: string,
     setOpen: (i: boolean) => void,
     className?: string
@@ -54,7 +63,19 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
                         </div>
                     </div>
                 ) : (
-                    filteredItems.map((item: any, i: number) => (
+                    filteredItems.map((
+                        item: {
+                            orderId: string;
+                            cash: number;
+                            orderType: string;
+                            totalPaid: number;
+                            items: {
+                                productName: string;
+                                quantity: number;
+                            } []
+                        }, 
+                        i: number
+                    ) => (
                         <div className="tdata grid grid-cols-2 !border-gray !border-b-1" key={i}>
                             <div className="td border-r-1">
                                 <div className="font-semibold text-xs">ORDER ID</div>
@@ -73,7 +94,7 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
                             </div>
 
                             <div className="td">
-                                {item.items.map((subItem: any, i: number) => (
+                                {item.items.map((subItem, i) => (
                                     <div className="flex-center-y gap-1 py-1" key={i}>
                                         <p>{ subItem.productName }</p>
                                         <X className="w-3 h-3" />

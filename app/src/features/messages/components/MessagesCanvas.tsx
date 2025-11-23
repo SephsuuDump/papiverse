@@ -29,7 +29,8 @@ import {
     sendMessage,
     sendStopTyping,
     sendTyping,
-    MessagingService, // assumes you have REST methods here (e.g., getMessages)
+    MessagingService,
+    WSMessage, // assumes you have REST methods here (e.g., getMessages)
 } from "@/services/messaging.service";
 
 interface Props {
@@ -144,7 +145,7 @@ export function MessagesCanvas({ claims, selected }: Props) {
         const content = messageInput.trim();
         if (!content) return;
 
-        const msg: Message = {
+        const msg: WSMessage = {
             id: Date.now(),
             senderId: claims.userId,
             content,
@@ -152,7 +153,7 @@ export function MessagesCanvas({ claims, selected }: Props) {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             conversationId: selected.id,
-        } as any;
+        };
 
         sendMessage(msg);
         setMessageInput("");

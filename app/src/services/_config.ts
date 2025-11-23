@@ -2,7 +2,7 @@ export async function requestData(
     url: string,
     method: string,
     headers?: HeadersInit,
-    body?: any
+    body?: unknown
 ) {
     console.log('Endpoint:', url);
     console.log('Method:', method);

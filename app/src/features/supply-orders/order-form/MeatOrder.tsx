@@ -62,7 +62,7 @@ export function MeatOrder({ supplies, selectedItems, setActiveForm, onSelect, on
                                 min="1"
                                 value={item.quantity || ""}
                                 onChange={(e) => {
-                                    let value = e.target.value;
+                                    const value = e.target.value;
                                     if (value === "") {
                                         onQuantityChange(item.code!, 0);
                                         return;

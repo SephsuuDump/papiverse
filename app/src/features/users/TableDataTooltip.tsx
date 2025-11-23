@@ -4,7 +4,7 @@ export function TableDataTooltip({ content, className, element, action }: {
     content?: string;
     element?: React.ReactNode
     className?: string;
-    action?: (...args: any[]) => any;
+    action?: (event: React.MouseEvent) => void;
 }) {
     return (
         <Tooltip>
