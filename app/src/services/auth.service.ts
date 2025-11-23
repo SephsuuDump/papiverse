@@ -56,4 +56,11 @@ export class AuthService {
             credentials
         )
     }
+
+    static async resendCredential(id: number) {
+        return await requestData(
+            `${url}/resend-credentials?id=${id}`,
+            'GET',
+        )
+    }
 }

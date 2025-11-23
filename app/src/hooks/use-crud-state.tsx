@@ -5,6 +5,7 @@ export function useCrudState<T>() {
     const [toView, setView] = useState<T | undefined>();
     const [toUpdate, setUpdate] = useState<T | undefined>();
     const [toDelete, setDelete] = useState<T | undefined>();
+    const [showNotif, setShowNotif] = useState(false);
 
     return {
         open,
@@ -15,5 +16,7 @@ export function useCrudState<T>() {
         setUpdate,
         toDelete,
         setDelete,
+        showNotif,
+        setShowNotif
     };
 }

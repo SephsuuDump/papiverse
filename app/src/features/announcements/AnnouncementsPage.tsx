@@ -17,10 +17,9 @@ import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { ViewAnnouncement } from "./components/ViewAnnouncement";
 import { Ellipsis } from "lucide-react";
 import { DeleteAnnouncement } from "./components/DeleteAnnouncement";
-import NotificationSection from "./components/NotificationSection";
+import { NotificationSection } from "./components/NotificationSection";
 import useNotifications from "@/hooks/use-notification";
 import { toast } from "sonner";
-import { NotificationToaster } from "@/components/ui/toaster";
 import { NotificationResponse } from "@/types/notification";
 
 export function AnnouncementPage() {
@@ -28,22 +27,10 @@ export function AnnouncementPage() {
 
     const { claims, loading: authLoading } = useAuth();
     const { data: announcements, loading, error } = useFetchData<Announcement>(AnnouncementService.getAllAnnouncements, [reload], []);
-    const { notifications, loading: notifLoading } = useNotifications({
-        claims, 
-        onNewNotification: (notification: NotificationResponse) => {
-            toast.custom((t) => (
-                <NotificationToaster
-                    id={notification.notificationId}
-                    title={notification.title}
-                    message={notification.message}
-                    onClose={() => toast.dismiss(notification.notificationId)}
-                />
-            ));
-        }
-    })
+    const { notifications, loading: notifLoading } = useNotifications({claims})
     const { toView, setView, open, setOpen, toDelete, setDelete } = useCrudState<Announcement>();
     
-    if (loading || authLoading || notifLoading) return <PapiverseLoading />
+    if (loading || authLoading) return <PapiverseLoading />
     return (
         <section className="stack-md animate-fade-in-up">
             <AppHeader label="Announcements" />

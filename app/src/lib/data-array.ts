@@ -67,6 +67,14 @@ export const sales = [
     { date: "2025-05-14", sales: 10250 },
 ];
 
+
+[
+    { day: "1", ingested: true },
+    { day: "2", ingested: true },
+    { day: "3", ingested: true },
+    { day: "4", ingested: true },
+]
+
 export const  topSelling = [
     { "name": "Spaghetti Bolognese", "orders": 85 },
     { "name": "Chicken Adobo", "orders": 120 },

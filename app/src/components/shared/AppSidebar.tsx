@@ -20,21 +20,18 @@ import { SidebarLoading } from "../ui/loader";
 import useNotifications from "@/hooks/use-notification";
 import { NotificationResponse } from "@/types/notification";
 import { Badge } from "../ui/badge";
-import { NotificationToaster } from "../ui/toaster";
+import { ElegantToast } from "../ui/toaster";
 
 export function AppSidebar() {
-    console.log(process.env.NEXT_PUBLIC_API_WEBSOCKET);
-    
     const pathName = usePathname();
     const isMobile = useIsMobile();
     const { claims, loading } = useAuth();
     const { open } = useSidebar();
-    const { notifications, loading: notifLoading, unreadCount } = useNotifications({
+    const { notifications, loading: notifLoading } = useNotifications({
         claims, 
         onNewNotification: (notification: NotificationResponse) => {
             toast.custom((t) => (
-                <NotificationToaster
-                    id={notification.notificationId}
+                <ElegantToast
                     title={notification.title}
                     message={notification.message}
                     onClose={() => toast.dismiss(notification.notificationId)}
@@ -43,15 +40,9 @@ export function AppSidebar() {
         }
     });
     const [show, setShow] = useState(false);
-    const [supplyNotifCount, setSupplyNotifCount] = useState(0);
-
-    useEffect(() => {
-        setSupplyNotifCount(notifications.filter(n => n.type === "SUPPLY" || n.type === "ANNOUNCEMENT").length);
-    }, [notifications]);
-
-    // 🔥 THEN CONDITIONAL RETURNS
+    
     if (pathName === "/auth" || pathName === "/unauthorized") return null;
-    if (loading || notifLoading) return <SidebarLoading />;
+    if (loading) return <SidebarLoading />;
     if (!claims?.roles?.length) return null;
 
     async function handleLogout() {
@@ -61,7 +52,6 @@ export function AppSidebar() {
         window.location.href = '/auth'
     }
     
-    if (loading || notifLoading) return <SidebarLoading />
     if (!claims || !claims.roles || claims.roles.length === 0) {
         if (typeof window !== 'undefined') {
             window.location.href = '/auth';
@@ -72,14 +62,20 @@ export function AppSidebar() {
         
     const role = claims.roles[0];
     let route;
-    console.log(notifications);
-    
-    console.log(supplyNotifCount);
-    
 
     if (role === "FRANCHISOR") route = adminRoute;
     else if (role === "FRANCHISEE") route = franchiseeRoute;
     else redirect("/unauthorized");
+
+    const notifCounts = {
+        SUPPLY: notifications.filter(n => n.type === "SUPPLY").length,
+        SUPPLYORDER: notifications.filter(n => n.type === "SUPPLY ORDER").length,
+        PRODUCT: notifications.filter(n => n.type === "PRODUCT").length,
+        ANNOUNCEMENT: notifications.filter(n => n.type === "ANNOUNCEMENT").length,
+        MESSAGE: notifications.filter(n => n.type === "MESSAGE").length,
+        SYSTEM: notifications.filter(n => n.type === "SYSTEM").length,
+    };
+
 
     if (isMobile) {
         return (
@@ -142,7 +138,6 @@ export function AppSidebar() {
                                         <SidebarMenuButton key={index}>
                                             <Link href={sub.href} className="w-full h-full">
                                             {sub.title}
-                                            {supplyNotifCount}
                                             </Link>
                                         </SidebarMenuButton>
                                         ))}
@@ -155,7 +150,11 @@ export function AppSidebar() {
                                     <SidebarMenuButton className="flex gap-2 pl-4">
                                         <item.icon className="w-4 h-4" />
                                         {item.title}
-                                        { item.title === "Announcements" && <Badge className="rounded-full bg-darkred">{ supplyNotifCount }</Badge>}
+                                        { item.title === "Announcements" && (
+                                            <Badge className="rounded-full bg-darkred">
+                                                { notifications.filter(i => i.type === "ANNOUNCEMENT").length }
+                                            </Badge>
+                                        )}
                                     </SidebarMenuButton>
                                     </Link>
                                 </SidebarMenuItem>
@@ -208,6 +207,16 @@ export function AppSidebar() {
                                         <SidebarMenuButton className="flex gap-2 pl-4">
                                             <item.icon className="w-4 h-4" />
                                             { item.title }
+                                            { item.title === "Catalog" && (notifCounts.PRODUCT > 0 || notifCounts.SUPPLY > 0) && (
+                                                <Badge className="bg-darkred">
+                                                    { notifCounts.PRODUCT + notifCounts.SUPPLY }
+                                                </Badge>
+                                            )}
+                                            { item.title === "Inventory" && notifCounts.SUPPLYORDER > 0 && (
+                                                <Badge className="bg-darkred">
+                                                    { notifCounts.PRODUCT + notifCounts.SUPPLYORDER }
+                                                </Badge>
+                                            )}
                                             <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
                                         </SidebarMenuButton>
                                     </CollapsibleTrigger>
@@ -217,10 +226,24 @@ export function AppSidebar() {
                                                 <SidebarMenuButton className="py-0" key={ index }>
                                                     <Link 
                                                         href={ sub.href } 
-                                                        className="flex-center-y w-full h-full my-auto"
+                                                        className="flex-center-y gap-2 w-full h-full my-auto"
                                                     >
                                                         { sub.title }
-                                                        
+                                                        { sub.title === "Supplies" && notifCounts.SUPPLY > 0 && (
+                                                            <Badge className="ms-auto bg-darkred text-[8px]">
+                                                                { notifCounts.SUPPLY }
+                                                            </Badge>
+                                                        )}
+                                                        { sub.title === "Products" && notifCounts.PRODUCT > 0 && (
+                                                            <Badge className="ms-auto bg-darkred text-[8px]">
+                                                                { notifCounts.PRODUCT }
+                                                            </Badge>
+                                                        )}
+                                                        { sub.title === "Supply Orders" || sub.title === "My Supply Orders" && notifCounts.SUPPLYORDER > 0 && (
+                                                            <Badge className="ms-auto bg-darkred text-[8px]">
+                                                                { notifCounts.SUPPLYORDER }
+                                                            </Badge>
+                                                        )}
                                                     </Link>
                                                 </SidebarMenuButton>
                                             ))}
@@ -238,7 +261,11 @@ export function AppSidebar() {
                                     <SidebarMenuButton className="flex gap-2 pl-4">
                                         <item.icon className="w-4 h-4" />
                                         { item.title }
-                                        { item.title === "Announcements" && <Badge className="rounded-full bg-darkred">{ supplyNotifCount }</Badge>}
+                                        { item.title === "Announcements" && notifCounts.ANNOUNCEMENT > 0 && (
+                                            <Badge className="bg-darkred">
+                                                { notifCounts.ANNOUNCEMENT }
+                                            </Badge>
+                                        )}
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             </Link>

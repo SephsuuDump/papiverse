@@ -5,16 +5,17 @@ import { useAuth } from "@/hooks/use-auth";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { useFetchOne } from "@/hooks/use-fetch-one";
 import { brownColors, sales, topSelling } from "@/lib/data-array";
-import { formatCustomDate, formatDateTime, formatDateToWords, formatToPeso } from "@/lib/formatter"
+import { formatCompactNumber, formatCustomDate, formatDateTime, formatDateToWords, formatToPeso } from "@/lib/formatter"
 import { SalesService } from "@/services/sales.service";
-import { NotepadText } from "lucide-react";
+import { LineChart, NotepadText } from "lucide-react";
 import { Fragment, useState } from "react";
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { DateRangePicker } from "../dashboard/components/DataRangePicker";
 import { format } from "date-fns";
 import { EmptyState } from "@/components/ui/fallback";
+import { Tooltip as ShadcnTooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-const chartTabs = ['Daily', 'Weekly', 'Monthly']
+const chartTabs = ['DAY', 'WEEK', 'MONTH']
 
 const productColumns = [
     { title: 'Product Name', style: '' },
@@ -32,34 +33,49 @@ const today = format(new Date(), "yyyy-MM-dd");
 export function SalesPage({ branchId }: {
     branchId?: number;
 }) {
-    const { loading: authLoading, isFranchisor } = useAuth();
-    const [chartTab, setChartTab] = useState("Daily");
+    const { claims, loading: authLoading, isFranchisor } = useAuth();
+    const [chartTab, setChartTab] = useState(chartTabs[0]);
     const [startDate, setStartDate] = useState<string>(today);
     const [endDate, setEndDate] = useState<string>(today);
 
-    const params = branchId
-        ? [branchId, startDate, endDate]
+    const branch = branchId ?? claims.branch.branchId;
+
+    const deps = [branch, startDate, endDate, chartTab];
+    const graphParams = [branch, startDate, endDate, chartTab];
+
+    const { data: salesGraph, loading: graphLoading } = useFetchData(
+        SalesService.generateGraph,
+        deps,
+        graphParams
+    )
+
+    const dateRange = formatSummaryDate(startDate, endDate);
+    const params = !isFranchisor
+        ? [branch, startDate, endDate]
         : [startDate, endDate];
 
-    const service = branchId
+    const service = !isFranchisor
         ? SalesService.getSalesByBranch
         : SalesService.getOverallSummary;
 
-    const { data, loading, error } = useFetchOne(
+    const { data, loading } = useFetchOne(
         service,
         params,
         params
     );
 
-    if (loading || authLoading) return <SectionLoading />
+    console.log(data);
+    
+
+    if (loading || authLoading || graphLoading) return <SectionLoading />
     
     const summary = [
-        { title: 'Total Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: data.totalOrders  },
+        { title: 'Total Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: data.totalOrders ?? 0  },
         { title: 'Payment Methods', date: formatCustomDate('2025-08-21 22:45:19'), count: formatToPeso(data.totalCash), type: "Cash"  },
-        { title: 'Payment Methods', date: formatCustomDate('2025-08-21 22:45:19'), count: formatToPeso(data.totalGcash), type: "G-cash"  },
-        { title: 'Type of Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: data.totalDineIn ?? 0, type: "Dine in"  },
-        { title: 'Type of Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: data.totalTakeAway ?? 0, type: "Take out"  },
-        { title: 'Total Income', date: formatCustomDate('2025-08-21 22:45:19'), count: formatToPeso(data.totalIncome)  },
+        { title: 'Payment Methods', count: formatToPeso(data.totalGcash), type: "G-cash"  },
+        { title: 'Type of Orders', count: data.totalDineIn ?? 0, type: "Dine in"  },
+        { title: 'Type of Orders', count: data.totalTakeAway ?? 0, type: "Take out"  },
+        { title: 'Total Sales', count: formatToPeso(data.totalIncome)  },
     ]
 
     const grouped = summary.reduce((acc, item) => {
@@ -72,12 +88,17 @@ export function SalesPage({ branchId }: {
 
     return (
         <section className="stack-md animate-fade-in-up">
-            <DateRangePicker 
-                startDate={ startDate }
-                endDate={ endDate }
-                setStartDate={ setStartDate }
-                setEndDate={ setEndDate }
-            />
+            <div className="flex-center-y justify-between">
+                <div className="text-lg font-semibold pl-2 scale-x-110 origin-left">
+                    { formatSummaryDate(startDate, endDate) }
+                </div>
+                <DateRangePicker 
+                    startDate={ startDate }
+                    endDate={ endDate }
+                    setStartDate={ setStartDate }
+                    setEndDate={ setEndDate }
+                />
+            </div>
 
             <div className="flex items-stretch gap-2">
                 {Object.entries(grouped).map(([key, value]) => (
@@ -95,15 +116,21 @@ export function SalesPage({ branchId }: {
                                 {item.type ? (
                                     <div>
                                         <div className="text-xs">{ item.type }</div>
-                                        <div className={`${["Cash", "G-cash"].includes(item.type) && "text-[15px]"} ml-3 text-2xl font-semibold scale-x-120 text-darkbrown`}>
-                                            {item.count}
-                                        </div>
+                                     
+                                        <ShadcnTooltip>
+                                            <TooltipTrigger className={`${["Cash", "G-cash"].includes(item.type) && "text-[15px]"} ml-3 text-2xl font-semibold scale-x-120 text-darkbrown`}>
+                                                {typeof item.count === "string"
+                                                    ? `₱${formatCompactNumber(item.count)}`
+                                                    : formatCompactNumber(item.count)       
+                                                }
+                                            </TooltipTrigger>
+                                            <TooltipContent>{ item.count }</TooltipContent>
+                                        </ShadcnTooltip>
                                     </div>                                            
                                 ) : (<div className="ml-3 text-2xl font-semibold scale-x-120 text-darkbrown">{item.count}</div>)}
                             </Fragment>
                         ))}
                         </div>
-                       <div className="text-xs text-gray">As of { grouped[key][0].date }</div>
                     </div>
                 ))}
             </div>
@@ -124,130 +151,175 @@ export function SalesPage({ branchId }: {
                     </div>
                     
                 </div>
-                <ResponsiveContainer width="100%" height={280}>
-                    <AreaChart data={sales} margin={{ top: 40, right: 10, left: 10, bottom: 0 }}>
-                        <XAxis 
-                            dataKey="date" 
-                            tickFormatter={(dateStr) => {
-                                const date = new Date(dateStr);
-                                const monthName = date.getMonth() + 1
-                                const day = date.getDate();
-                                return `${monthName}/${day}`; 
-                            }}
-                            tick={
-                                {fontSize: 12}
-                            }
-                        />
-                        <YAxis 
-                            tickFormatter={(sales) => (sales === 0 ? "" : formatToPeso(sales))}
-                            tick={
-                                {fontSize: 12}
-                            }
-                        />
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <Tooltip 
-                            formatter={(value: number) => [`${formatToPeso(value)}`, "Sales"]} 
-                            labelFormatter={(date: string) => formatDateToWords(date) }
-                            contentStyle={{ fontSize: 12, backgroundColor: "#fff", border: "1px solid #ccc" }} 
-                            itemStyle={{ fontSize: 12, color: "#8884d8" }}
-                        />
-                        <defs>
-                            <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#8884d8" stopOpacity={0.8} />
-                                <stop offset="100%" stopColor="#8884d8" stopOpacity={0} />
-                            </linearGradient>
-                        </defs>
-                        <Area 
-                            type="linear" 
-                            dataKey="sales" 
-                            stroke="#8884d8"     
-                            strokeWidth={3} 
-                            fill="url(#colorSales)" 
-                        />
-                    </AreaChart>
-                </ResponsiveContainer>
+                {graphLoading ? (
+                    <SectionLoading />
+                ) : !salesGraph || salesGraph.length === 0 ? (
+                    <div className="flex-center flex-col h-[200px] text-gray-400 gap-2">
+                        <LineChart className="w-15 h-15sal text-gray-300" />
+                        <div>No sales data available for this range.</div>
+                    </div>
+                ) : (
+                    <ResponsiveContainer width="100%" height={280}>
+                        <AreaChart data={salesGraph} margin={{ top: 40, right: 10, left: 10, bottom: 0 }}>
+                            <XAxis 
+                                dataKey="date" 
+                                tickFormatter={(dateStr) => {
+                                    const date = new Date(dateStr);
+                                    const monthName = date.getMonth() + 1;
+                                    const day = date.getDate();
+                                    return `${monthName}/${day}`; 
+                                }}
+                                tick={{ fontSize: 12 }}
+                            />
+
+                            <YAxis 
+                                tickFormatter={(sales) => (sales === 0 ? "" : formatToPeso(sales))}
+                                tick={{ fontSize: 12 }}
+                            />
+
+                            <CartesianGrid strokeDasharray="3 3" />
+
+                            <Tooltip 
+                                formatter={(value: number) => [`${formatToPeso(value)}`, "Sales"]} 
+                                labelFormatter={(date: string) => formatDateToWords(date)}
+                                contentStyle={{ fontSize: 12, backgroundColor: "#fff", border: "1px solid #ccc" }} 
+                                itemStyle={{ fontSize: 12, color: "#8884d8" }}
+                            />
+
+                            <defs>
+                                <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#8884d8" stopOpacity={0.8} />
+                                    <stop offset="100%" stopColor="#8884d8" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+
+                            <Area 
+                                type="linear"
+                                dataKey="sales"
+                                stroke="#8884d8"
+                                strokeWidth={3}
+                                fill="url(#colorSales)"
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                )}
+
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
-                <div className="bg-white shadow-sm rounded-lg overflow-hidden border">
-                    <div className="px-4 py-3 border-b flex items-center justify-between">
-                        <h3 className="text-lg font-semibold tracking-tight text-darkbrown">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
+                <div className={`bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden ${!isFranchisor && "col-span-2"}`}>
+                    <div className="px-5 py-4 border-b bg-gray-50">
+                        <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
                             Top Selling Products
                         </h3>
                     </div>
 
                     <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-50 text-darkbrown text-sm">
-                                <tr>
-                                    <th className="py-2 px-3 text-left w-10">#</th>
-                                    <th className="py-2 px-3 text-left">Product Name</th>
-                                    <th className="py-2 px-3 text-left">Total Sales</th>
-                                    <th className="py-2 px-3 text-left">Total Orders</th>
+                        <table className="w-full text-sm">
+                            <thead className="sticky top-0 bg-white border-b text-darkbrown text-xs uppercase">
+                                <tr className="text-dark text-sm">
+                                    <th className="py-3 px-4 text-left w-12">#</th>
+                                    <th className="py-3 px-4 text-left">Product Name</th>
+                                    <th className="py-3 px-4 text-right">Total Sales</th>
+                                    <th className="py-3 px-4 text-right">Orders</th>
                                 </tr>
                             </thead>
 
-                            <tbody className="text-sm">
+                            <tbody>
                                 {(!data.topProducts || data.topProducts.length === 0) && (
                                     <tr>
-                                        <td colSpan={4}>
+                                        <td colSpan={4} className="py-6">
                                             <EmptyState message="No top products available" />
                                         </td>
                                     </tr>
                                 )}
-                                {data.topProducts.map((item: any, index: number) => (
-                                    <tr key={index} className="border-b hover:bg-gray-50 transition">
-                                        <td className="py-2 px-3 font-semibold">{index + 1}</td>
-                                        <td className="py-2 px-3">{item.productName}</td>
-                                        <td className="py-2 px-3 font-semibold text-darkbrown">
-                                            {formatToPeso(item.amount)}
-                                        </td>
-                                        <td className="py-2 px-3">{item.quantity}</td>
-                                    </tr>
-                                ))}
+
+                                {data.topProducts.map((item: any, index: number) => {
+                                    const rankColor =
+                                        index === 0 ? "text-yellow-600" :
+                                        index === 1 ? "text-gray-500" :
+                                        index === 2 ? "text-amber-700" : "text-darkbrown";
+
+                                    return (
+                                        <tr
+                                            key={index}
+                                            className="border-b last:border-b-0 hover:bg-gray-50/70 transition-all"
+                                        >
+                                            <td className={`py-3 px-4 font-bold ${rankColor}`}>
+                                                {index + 1}
+                                            </td>
+
+                                            <td className="py-3 px-4 font-medium text-gray-700">
+                                                {item.productName}
+                                            </td>
+
+                                            <td className="py-3 px-4 font-semibold text-right text-darkbrown">
+                                                {formatToPeso(item.amount)}
+                                            </td>
+
+                                            <td className="py-3 px-4 text-right text-gray-700">
+                                                {item.quantity}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                {/* ---------------------- */}
-                {/* TOP BRANCHES */}
-                {/* ---------------------- */}
                 {!branchId && isFranchisor && (
-                    <div className="bg-white shadow-sm rounded-lg overflow-hidden border">
-                        <div className="px-4 py-3 border-b flex items-center justify-between">
-                            <h3 className="text-lg font-semibold tracking-tight text-darkbrown">
-                                Top Branches
+                    <div className="bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
+                        <div className="px-5 py-4 border-b bg-gray-50">
+                            <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
+                                Top Performing Branches
                             </h3>
                         </div>
 
                         <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gray-50 text-darkbrown text-sm">
-                                    <tr>
-                                        <th className="py-2 px-3 text-left w-10">#</th>
-                                        <th className="py-2 px-3 text-left">Branch Name</th>
-                                        <th className="py-2 px-3 text-left">Total Sales</th>
+                            <table className="w-full text-sm">
+                                <thead className="sticky top-0 bg-white border-b text-darkbrown text-xs uppercase">
+                                    <tr className="text-dark text-sm">
+                                        <th className="py-3 px-4 text-left w-12">#</th>
+                                        <th className="py-3 px-4 text-left">Branch Name</th>
+                                        <th className="py-3 px-4 text-right">Total Sales</th>
                                     </tr>
                                 </thead>
 
-                                <tbody className="text-sm">
-                                    {(!data.topProducts || data.topProducts.length === 0) && (
+                                <tbody>
+                                    {(!data.topBranches || data.topBranches.length === 0) && (
                                         <tr>
-                                            <td colSpan={4}>
-                                                <EmptyState message="No top products available" />
+                                            <td colSpan={3} className="py-6">
+                                                <EmptyState message="No top branches available" />
                                             </td>
                                         </tr>
                                     )}
-                                    {data.topBranches.map((item: any, index: number) => (
-                                        <tr key={index} className="border-b hover:bg-gray-50 transition">
-                                            <td className="py-2 px-3 font-semibold">{index + 1}</td>
-                                            <td className="py-2 px-3">{item.branchName}</td>
-                                            <td className="py-2 px-3 font-semibold text-darkbrown">
-                                                {formatToPeso(item.totalSales)}
-                                            </td>
-                                        </tr>
-                                    ))}
+
+                                    {data.topBranches.map((item: any, index: number) => {
+                                        const rankColor =
+                                            index === 0 ? "text-yellow-600" :
+                                            index === 1 ? "text-gray-500" :
+                                            index === 2 ? "text-amber-700" : "text-darkbrown";
+
+                                        return (
+                                            <tr
+                                                key={index}
+                                                className="border-b last:border-b-0 hover:bg-gray-50/70 transition-all"
+                                            >
+                                                <td className={`py-3 px-4 font-bold ${rankColor}`}>
+                                                    {index + 1}
+                                                </td>
+
+                                                <td className="py-3 px-4 font-medium text-gray-700">
+                                                    {item.branchName}
+                                                </td>
+
+                                                <td className="py-3 px-4 font-semibold text-right text-darkbrown">
+                                                    {formatToPeso(item.totalSales)}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
@@ -255,6 +327,23 @@ export function SalesPage({ branchId }: {
                 )}
             </div>
 
+
         </section>
     )
 }
+
+function formatSummaryDate(start: string, end: string) {
+    const startFormatted = format(new Date(start), "MMMM d, yyyy");
+    const endFormatted = format(new Date(end), "MMMM d, yyyy");
+
+    if (start === end) {
+        return (
+            <div>As of <span className="text-darkorange">{`${startFormatted}`}</span></div>
+        );
+    }
+
+    return (
+        <div>From <span className="text-darkorange">{`${startFormatted} - ${endFormatted}`}</span></div>
+    )
+}
+

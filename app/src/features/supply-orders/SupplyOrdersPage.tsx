@@ -19,6 +19,9 @@ import { CompletedOrders } from "./CompletedOrders";
 import { BranchService } from "@/services/branch.service";
 import { log } from "node:console";
 import { RejectedOrders } from "./RejectedOrders";
+import useNotifications from "@/hooks/use-notification";
+import { useCrudState } from "@/hooks/use-crud-state";
+import { NotificationSheet } from "@/components/shared/NotificationSheet";
 
 const tabs = ['Pending', 'Completed', 'Rejected']
 
@@ -26,15 +29,15 @@ export default function SupplyOrdersPage() {
     const router = useRouter();
     const [reload, setReload] = useState(false);
     const [tab, setTab] = useState('Pending');
-    const [open, setOpen] = useState(false);
 
     const { claims, loading: authLoading } = useAuth();
-    
+    const { open, setOpen, showNotif, setShowNotif } = useCrudState();
     const isCommisary = claims.branch.branchId === 1;
     const fetchAll = useFetchData<SupplyOrder>(SupplyOrderService.getAllSupply, [reload, claims]);
     const fetchByBranch = useFetchData<SupplyOrder>(SupplyOrderService.getSupplyOrderByBranch, [reload, claims], [claims.branch.branchId]);
     
     const { data, loading, error } = isCommisary ? fetchAll : fetchByBranch;
+    const { filteredNotifications } = useNotifications({ claims, type: "SUPPLY ORDER" });
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['branchName', 'snowfrostCategory.snowFrostOrderId', 'meatCategory.meatOrderId']);
     const { data: branches, loading: branhesLoading } = useFetchData(BranchService.getAllBranches);
     
@@ -75,6 +78,8 @@ export default function SupplyOrdersPage() {
                 filter={ filter }
                 filters={ filters }
                 setFilter={ setFilter }
+                filteredNotifications={ filteredNotifications }
+                setShowNotif={ setShowNotif }
             />
 
             {tab === 'Pending' && (
@@ -108,6 +113,13 @@ export default function SupplyOrdersPage() {
                 setPage={ setPage }
                 page={ page }
             />
+
+            {showNotif && (
+                <NotificationSheet 
+                    notifications={ filteredNotifications }
+                    setOpen={ setShowNotif }
+                />
+            )}
         </section>
     );
 }

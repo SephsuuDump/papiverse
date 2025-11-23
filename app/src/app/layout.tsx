@@ -39,7 +39,7 @@ export default function RootLayout({
           <SidebarProvider className="bg-slate-100 max-w-[2560px] mx-auto">
             <AppSidebar />
             <Toaster position="top-center" />
-            <AppCanvas children={ children } />
+            <AppCanvas>{ children }</AppCanvas>
           </SidebarProvider>
         </AuthProvider>
       </body>

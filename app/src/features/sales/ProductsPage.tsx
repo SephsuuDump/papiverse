@@ -20,6 +20,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
+import useNotifications from "@/hooks/use-notification";
+import { useCrudState } from "@/hooks/use-crud-state";
+import { NotificationSheet } from "@/components/shared/NotificationSheet";
 
 const columns = [
     { title: 'Product Name', style: '' },
@@ -39,10 +42,11 @@ const franchiseeColumns = [
 const filters = ["ALL PRODUCTS", "A'LA CARTE", "AFFORDABLE RICE MEALS", "ALL IN RICE BOWL", "BIG EVENT? WE GOT YOU", "BILAO BLOW OUT", "BINALOT NI PAPI", "BITES", "BURGERS", "CHEF'S PASTA", "CHEF'S PASTA 4-5 PAX", "COMBO A", "COMBO B", "COMBO C", "COMBO D", "COMBO E", "CRUNCHICKEN", "CRUNCHY BAGNET", "DINNER NIGHT TIME", "EXTRAS", "GRILLED SIZZLING BBQ DEALS", "KOPI NI PAPI", "KRISPY DELIGHTS", "KRISPY SISIG", "OVERLOAD SARAP", "PAPI FRIES", "PAPI'S FRUIT SODA", "PREMIUM BUNDLE DEALS", "QUENCHERS", "SALAD BLENDS", "SALO SALO SPECIAL", "SIGNATURE PLATES", "SIZZLING MEALS", "SNOWFROST HALO MIX", "SULIT RICE MIX", "ULTIMATE BUNDLE DEALS", "UNLI DEALS"];
 
 export function ProductsPage() {
-    const { loading: authLoading, isFranchisor } = useAuth();
+    const { claims, loading: authLoading, isFranchisor } = useAuth();
     const [reload, setReload] = useState(false);
     const [filter, setFilter] = useState(filters[0]);
     const { data, loading } = useFetchData<Product>(ProductService.getAllProducts, [reload]);
+    const { filteredNotifications } = useNotifications({ claims, type: "PRODUCT" })
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['name']);
 
     const filteredData = filteredItems.filter(i => {
@@ -52,11 +56,9 @@ export function ProductsPage() {
 
     const { page, setPage, size, setSize, paginated } = usePagination(filteredData, 20);
 
-    const [open, setOpen] = useState(false);
-    const [toUpdate, setUpdate] = useState<Product | undefined>();
-    const [toDelete, setDelete]  = useState<Product | undefined>();
+    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete, showNotif, setShowNotif } = useCrudState<Product>();
 
-    if (loading) return <SectionLoading />
+    if (loading || authLoading) return <SectionLoading />
     return (
         <section className="stack-md animate-fade-in-up">
             <TableFilter
@@ -70,6 +72,8 @@ export function ProductsPage() {
                 filters={ filters }
                 setFilter={ setFilter }
                 removeAdd={ !isFranchisor }
+                filteredNotifications={ filteredNotifications }
+                setShowNotif={ setShowNotif }
             />
 
             <div className="table-wrapper">
@@ -175,6 +179,12 @@ export function ProductsPage() {
                 />
             }
 
+            {showNotif && (
+                <NotificationSheet
+                    notifications={ filteredNotifications }
+                    setOpen={ setShowNotif }
+                />
+            )}
 
         </section>
     )

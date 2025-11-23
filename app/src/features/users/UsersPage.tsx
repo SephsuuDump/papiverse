@@ -2,8 +2,8 @@
 
 import { PapiverseLoading } from "@/components/ui/loader";
 import { User } from "@/types/user";
-import { Info, SquarePen, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Info, Mails, SquarePen, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { CreateUser } from "./CreateUser";
 import { UpdateUser } from "./UpdateUser";
@@ -15,8 +15,10 @@ import { TableFilter } from "@/components/shared/TableFilter";
 import { TableDataTooltip } from "./TableDataTooltip";
 import { usePagination } from "@/hooks/use-pagination";
 import { TablePagination } from "@/components/shared/TablePagination";
-import { requireRole } from "@/lib/auth";
 import { useCrudState } from "@/hooks/use-crud-state";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
+import { AuthService } from "@/services/auth.service";
 
 const columns = [
     { title: "Full Name", style: "" },
@@ -41,8 +43,19 @@ export function UsersPage() {
         return true;
     });
 
-    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20);
+    const { page, setPage, size, setSize, paginated } = usePagination(filteredData, 20);
     const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<User>();
+
+    async function handleSendEmail(id: number) {
+        try {   
+            const data = await AuthService.resendCredential(id);
+            if (data) {
+                toast.success('E-meil sent successfully.')
+            }
+        } catch (error) {
+            toast.error(`${error}`)
+        }        
+    }
 
     if (loading) return <PapiverseLoading />
     return(
@@ -80,6 +93,15 @@ export function UsersPage() {
                                     <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
                                     <button><Info className="w-4 h-4" /></button>
                                     <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
+                                    <Tooltip>
+                                        <TooltipTrigger 
+                                            onClick={ () => handleSendEmail(item.id!) }
+                                            className="mx-auto"
+                                        >
+                                            <Mails className="w-4 h-4 text-blue" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>Resend Account Credentials via E-mail</TooltipContent>
+                                    </Tooltip>
                                 </div>
                             </div>
                         ))

@@ -2,6 +2,12 @@ import { BookMarked, ChartNoAxesCombined, Container, Ham, Megaphone, MessageCirc
 
 export const adminRoute = [
     { 
+        title: 'Announcements', 
+        icon: Megaphone,
+        href: '/announcements',
+        children: []
+    },
+    { 
         title: 'Users', 
         icon: UserRound,
         href: '/users',
@@ -12,24 +18,6 @@ export const adminRoute = [
         icon: Store,
         href: '/branches',
         children: []
-    },
-    { 
-        title: 'Messages', 
-        icon: MessageCircleMore,
-        href: '/messages',
-        children: []
-    },
-    { 
-        title: 'Announcements', 
-        icon: Megaphone,
-        href: '/announcements',
-        children: []
-    },
-    { 
-        title: 'Supplies', 
-        icon: Ham,
-        href: '/supplies',
-        children: [],
     },
     { 
         title: 'Inventory', 
@@ -44,11 +32,26 @@ export const adminRoute = [
         title: 'Sales', 
         icon: ChartNoAxesCombined,
         children: [
-            { title: 'Products', href: '/sales/products' },
-            { title: 'Paid Orders', href: '/sales/paid-orders' },
+            // { title: 'Paid Orders', href: '/sales/paid-orders' },
             { title: 'Branch Sales', href: '/sales/branches' },
         ]
     },
+    { 
+        title: 'Messages', 
+        icon: MessageCircleMore,
+        href: '/messages',
+        children: []
+    },
+    { 
+        title: 'Catalog', 
+        icon: BookMarked,
+        children: [
+            { title: 'Supplies', href: '/supplies' },
+            { title: 'Products', href: '/products' },
+        ]
+    },
+    
+    
 ]
 
 export const franchiseeRoute = [
@@ -90,10 +93,8 @@ export const franchiseeRoute = [
     { 
         title: 'Messages', 
         icon: MessageCircleMore,
-        children: [
-            { title: 'Users', href: '/admin/messages/' },
-            { title: 'Group', href: '/admin/messages/' },
-        ]
+        href: '/messages',
+        children: []
     },
     { 
         title: 'Catalog', 

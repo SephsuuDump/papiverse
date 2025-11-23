@@ -97,10 +97,10 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
         }
     };
 
-    const handleQuantityChange = async (id: number, quantity: number) => {
+    const handleQuantityChange = async (id: number, quantity: number | string | null) => {
         setSelectedItems(selectedItems.map((item: SupplyItem) => 
             item.id === id 
-                ? { ...item, quantity: quantity || 0 } 
+                ? { ...item, quantity: quantity } 
                 : item
         ));
     };
@@ -119,11 +119,6 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
             )
         )
     }
-
-    useEffect(() => {
-        console.log(selectedItems);
-        
-    }, [selectedItems])
 
     async function handleSubmit() {
         try {
@@ -334,20 +329,40 @@ export function UpdateProduct({ toUpdate, setUpdate, setReload }: Props) {
                                             <div className="td">{ item.name }</div>
                                             <div className="w-50 td flex-center-y gap-2">
                                                 <X className="w-3 h-3" />
-                                                <Input 
-                                                    min={0.00001} 
-                                                    type="number"
-                                                    step="any"
-                                                    value={item.quantity}
+                                                <Input
+                                                    type="text"
+                                                    inputMode="decimal"
+                                                    value={item.quantity ?? ""}
                                                     onChange={(e) => {
                                                         const value = e.target.value;
-                                                        if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
-                                                            if (value !== "" && !isNaN(Number(value))) {
-                                                                handleQuantityChange(item.id!, Number(value));
-                                                            }
+
+                                                        // Allow empty
+                                                        if (value === "") {
+                                                            handleQuantityChange(item.id!, "");
+                                                            return;
+                                                        }
+
+                                                        // Allow decimal point patterns: . | .digits | digits | digits. | digits.digits
+                                                        if (/^\d*\.?\d*$/.test(value)) {
+                                                            handleQuantityChange(item.id!, value);
+                                                        }
+                                                        // If regex fails, the input is rejected (no state update = no render)
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        // Allow navigation and deletion keys
+                                                        if (
+                                                            e.key === 'Backspace' ||
+                                                            e.key === 'Delete' ||
+                                                            e.key === 'ArrowLeft' ||
+                                                            e.key === 'ArrowRight' ||
+                                                            e.key === 'Tab'
+                                                        ) {
+                                                            return;
                                                         }
                                                     }}
-                                                    className="basis-1/2 text-sm pl-2 py-1 bg-white h-8 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    className="basis-1/2 text-sm pl-2 py-1 bg-white h-8 appearance-none
+                                                        [&::-webkit-outer-spin-button]:appearance-none
+                                                        [&::-webkit-inner-spin-button]:appearance-none"
                                                 />
                                                 <div>
                                                     { item.type === 'PRODUCT' ?

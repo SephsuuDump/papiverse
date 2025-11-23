@@ -1,13 +1,15 @@
-import { Download, Funnel, Plus } from "lucide-react";
+import { BellRing, Download, Funnel, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Button } from "../ui/button";
 import { Dispatch, SetStateAction } from "react";
 import { addBusinessDays } from "date-fns";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Badge } from "../ui/badge";
+import { NotificationResponse } from "@/types/notification";
 
 const pages = [10, 20, 30, 40, 50, 100]
 
-export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel, size, setSize, removeAdd, filters, filter,  setFilter, removeFilter }: {
+export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel, size, setSize, removeAdd, filters, filter,  setFilter, removeFilter, filteredNotifications, setShowNotif }: {
     setSearch: (i: string) => void;
     searchPlaceholder: string;
     size: number;
@@ -19,6 +21,8 @@ export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel
     filters?: (string | { label: string; value: string })[];
     filter?: string;
     setFilter?: (value: string) => void;
+    filteredNotifications?: NotificationResponse[];
+    setShowNotif?: Dispatch<SetStateAction<boolean>>;
 }) {
     return (
         <div className={`flex items-center max-md:flex-col max-md:gap-2`}>
@@ -83,13 +87,17 @@ export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel
                         </SelectContent>
                     </Select>
                 )}
-                {/* <Button 
-                    variant="secondary"
-                    className="bg-light shadow-xs"
-                >
-                    <Download />
-                    Export
-                </Button> */}
+                {filteredNotifications && filteredNotifications.length > 0 && (
+                    <Button 
+                        onClick={ () => setShowNotif?.(true) }
+                        className="my-auto bg-light shadow-sm border-1 hover:bg-slate-200"
+                        size="sm"
+                    >   
+                        <BellRing className="text-dark" />
+                        <Badge className="bg-darkred">{ filteredNotifications.length }</Badge>
+                        
+                    </Button>
+                )}
                 {!removeAdd && (
                     <Button 
                         onClick={ () => setOpen?.(prev => !prev) }

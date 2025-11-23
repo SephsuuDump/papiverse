@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/fallback";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useSearchFilter } from "@/hooks/use-search-filter";
-import { formatToPeso } from "@/lib/formatter";
-import { Plus, X } from "lucide-react";
+import { formatDateToWords, formatToPeso } from "@/lib/formatter";
+import { Inbox, Plus, X } from "lucide-react";
 
 const columns = [
     { title: "Order ID", style: "" },
@@ -41,32 +42,48 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
             <ScrollArea className="table-wrapper h-[120vh]">
                 <div className="thead grid grid-cols-2 sticky top-0">
                     {columns.map((item) => (
-                        <div className="td">{ item.title }</div>
+                        <div className="td" key={item.title}>{ item.title }</div>
                     ))}
                 </div>
-                {paidOrders.map((item: any, i: number) => (
-                    <div className="tdata grid grid-cols-2 !border-gray !border-b-1" key={i}>
-                        <div className="td border-r-1">
-                            <div className="font-semibold text-xs">ORDER ID</div>
-                            <div>{ item.orderId }</div>
-                            <div className="font-semibold text-xs mt-2">PAYMENT TYPE</div>
-                            <div>{ item.cash !== 0 ? "Cash" : "G-cash" }</div>
-                            <div className="font-semibold text-xs mt-2">ORDER TYPE</div>
-                            <div>{ item.orderType }</div>
-                            <div className="font-semibold text-xs mt-3">TOTAL AMOUNT</div>
-                            <div className="font-bold text-darkgreen">{ formatToPeso(item.totalPaid) }</div>
-                        </div>
-                        <div className="td">
-                            {item.items.map((subItem: any) => (
-                                <div className="flex-center-y gap-1 py-1">
-                                    <p>{ subItem.productName }</p>
-                                    <X className="w-3 h-3"/> 
-                                    { subItem.quantity }
-                                </div>
-                            ))}
+
+                {paidOrders.length === 0 ? (
+                    <div className="flex-center flex-col w-full bg-light h-100 rounded-b-md">
+                        <Inbox className="w-30 h-30 text-gray-300" strokeWidth={2} />
+                        <div className="text-gray">
+                            You have no ingested sales for day { formatDateToWords(selectedDay) }
                         </div>
                     </div>
-                ))}
+                ) : (
+                    filteredItems.map((item: any, i: number) => (
+                        <div className="tdata grid grid-cols-2 !border-gray !border-b-1" key={i}>
+                            <div className="td border-r-1">
+                                <div className="font-semibold text-xs">ORDER ID</div>
+                                <div>{ item.orderId }</div>
+
+                                <div className="font-semibold text-xs mt-2">PAYMENT TYPE</div>
+                                <div>{ item.cash !== 0 ? "Cash" : "G-cash" }</div>
+
+                                <div className="font-semibold text-xs mt-2">ORDER TYPE</div>
+                                <div>{ item.orderType }</div>
+
+                                <div className="font-semibold text-xs mt-3">TOTAL AMOUNT</div>
+                                <div className="font-bold text-darkgreen">
+                                    { formatToPeso(item.totalPaid) }
+                                </div>
+                            </div>
+
+                            <div className="td">
+                                {item.items.map((subItem: any, i: number) => (
+                                    <div className="flex-center-y gap-1 py-1" key={i}>
+                                        <p>{ subItem.productName }</p>
+                                        <X className="w-3 h-3" />
+                                        { subItem.quantity }
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))
+                )}
             </ScrollArea>
 
         </section>

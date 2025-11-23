@@ -161,6 +161,12 @@ export function ViewOrderPage({ id }: { id: number }) {
                 </div>
             </div>
 
+            {data?.remarks && (
+                <div className="border-1 border-dashed border-gray w-full bg-light p-4">
+                    <span className="font-semibold">Commisary Remarks: </span> { data?.remarks }
+                </div>
+            )}
+
             {open && <ConfirmSave 
                 setOpen={ setOpen }
                 order={ data! }

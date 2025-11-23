@@ -41,6 +41,7 @@ export function AccountPage() {
       const [openCreds, setOpenCreds] = useState(false);
       const [confirmOpen, setConfirmOpen] = useState(false);
 
+      const [oldPass, setOldPass] = useState("");
       const [newPass, setNewPass] = useState("");
       const [confirmPass, setConfirmPass] = useState("");
       const [showPass, setShowPass] = useState(false);
@@ -115,7 +116,8 @@ export function AccountPage() {
                         id: credentials.id,
                         username: credentials.username,
                         email: credentials.email,
-                        password: newPass
+                        password: newPass,
+                        oldPassword: oldPass,
                   };
 
                   const res = await AuthService.updateCredentials(payload);
@@ -216,6 +218,8 @@ export function AccountPage() {
                                     setOpenCreds={setOpenCreds}
                                     showPass={showPass}
                                     setShowPass={setShowPass}
+                                    oldPass={ oldPass }
+                                    setOldPass={ setOldPass }
                                     newPass={newPass}
                                     setNewPass={setNewPass}
                                     confirmPass={confirmPass}
@@ -281,7 +285,9 @@ function AccountInfo(props: any) {
             setOpenCreds,
             showPass,
             setShowPass,
+            oldPass,
             newPass,
+            setOldPass,
             setNewPass,
             confirmPass,
             setConfirmPass,
@@ -318,6 +324,7 @@ function AccountInfo(props: any) {
                               <div className="space-y-3">
                                     <InputField label="Username" value={credentials.username} onChange={(e: any) => handleChange(e, setCredentials)} name="username" />
                                     <InputField label="Email" value={credentials.email} onChange={(e: any) => handleChange(e, setCredentials)} name="email" />
+                                    <InputField label="Old Password" type="password" value={oldPass} onChange={(e: any) => handleChangeSolo(e, setOldPass)} name="oldPassword" />
                                     <InputField label="New Password" type="password" value={newPass} onChange={(e: any) => handleChangeSolo(e, setNewPass)} name="newPassword" />
                                     <InputField label="Confirm Password" type="password" value={confirmPass} onChange={(e: any) => handleChangeSolo(e, setConfirmPass)} name="confirmPassword" />
 

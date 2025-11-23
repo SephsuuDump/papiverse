@@ -19,6 +19,8 @@ import { DeleteSupply } from "./DeleteSupply";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { useAuth } from "@/hooks/use-auth";
+import useNotifications from "@/hooks/use-notification";
+import { NotificationSheet } from "@/components/shared/NotificationSheet";
 
 const columns = [
     { title: "SKU ID", style: "" },
@@ -42,12 +44,14 @@ const franchiseeColumns = [
 const filters = ['All', 'Meat', 'Snow Frost', 'Non Deliverables'];
 
 export function SuppliesPage() {
-    const { loading: authLoading, isFranchisor } = useAuth();
+    const { claims, loading: authLoading, isFranchisor } = useAuth();
     const [reload, setReload] = useState(false);
     const [filter, setFilter] = useState(filters[0]);
 
     const { data, loading, error } = useFetchData<Supply>(SupplyService.getAllSupplies, [reload]);
+    const { filteredNotifications,notifications, loading: notifLoading } = useNotifications({ claims, type: "SUPPLY" })
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['code', 'name']); 
+    
 
     const filteredData = filteredItems.filter(i => {
         if (filter === 'Meat') return i.category === 'MEAT';
@@ -57,7 +61,7 @@ export function SuppliesPage() {
     });
 
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20);    
-    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Supply>();
+    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete, showNotif, setShowNotif } = useCrudState<Supply>();
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
@@ -74,6 +78,8 @@ export function SuppliesPage() {
                 filter={ filter }
                 setFilter={ setFilter }
                 removeAdd={ !isFranchisor }
+                filteredNotifications={ filteredNotifications }
+                setShowNotif={ setShowNotif }
             />
 
             <div className="table-wrapper">
@@ -165,6 +171,13 @@ export function SuppliesPage() {
                     toDelete={ toDelete }
                     setDelete={ setDelete }
                     setReload={ setReload }
+                />
+            )}
+
+            {showNotif && (
+                <NotificationSheet
+                    notifications={ notifications }
+                    setOpen={ setShowNotif }
                 />
             )}
 

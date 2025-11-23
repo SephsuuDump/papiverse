@@ -60,7 +60,6 @@ export function RejectedOrders({ claims, paginated, setReload }: {
         <section className="table-wrapper animate-fade-in-up">
             <div className="flex-center-y thead max-md:!w-250">
                 <div className="th"><SquareMinus className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
-                <div className="th"><FileSpreadsheet className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
                 <div className="th"><Truck className="w-4 h-4 mx-auto" strokeWidth={ 3 }/></div>
                 <div className="grid grid-cols-5 w-full">
                     {columns.map((item, _) => (
@@ -80,11 +79,6 @@ export function RejectedOrders({ claims, paginated, setReload }: {
                             className="mx-auto td"
                         />
                     </Link>
-                    <TableDataTooltip
-                        element={<Download className="w-4 h-4 text-gray mx-auto" strokeWidth={3} />}
-                        content="Download PDF"
-                        className="mx-auto td"
-                    />
                     {claims.roles[0] === 'FRANCHISOR' ? (
                         <TableDataTooltip
                             action={ () => setOrder(item) }

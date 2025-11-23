@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/pagination";
 import { Dispatch, SetStateAction, useEffect } from "react";
 
-export function TablePagination({ data, page, size, setPage, paginated, search, filter }: {
-    data: any[];
-    paginated: any[];
+export function TablePagination<T>({ data, page, size, setPage, paginated, search, filter }: {
+    data: T[];
+    paginated: T[];
     page: number;
     size: number;
     setPage: Dispatch<SetStateAction<number>>;

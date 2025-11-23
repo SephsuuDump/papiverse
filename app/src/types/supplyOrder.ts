@@ -44,7 +44,7 @@ export interface SupplyItem {
     category?: string;        
     code?: string;          
     name?: string;           
-    quantity?: number;        
+    quantity?: any;        
     unitMeasurement?: string; 
     convertedMeasurement?: string;
     unitPrice?: number;

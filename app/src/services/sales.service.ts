@@ -27,6 +27,13 @@ export class SalesService {
         )
     }
 
+    static async generateGraph(branchId: number, start: string, end: string, filter: string) {
+        return await requestData(
+            `${salesUrl}/generate-graph?branchId=${branchId}&startDate=${start}&endDate=${end}&filter=${filter}`,
+            'GET'
+        )
+    }
+
     static async readPaidOrders(file: File) {
         const formData = new FormData();
         formData.append('file', file);
@@ -44,7 +51,7 @@ export class SalesService {
         formData.append('file', file);
 
         return await requestData(
-            `${salesUrl}/upload?branchId=${branchId}`,
+            `${salesUrl}/upload?branchId=${branchId}&historical=true`,
             'POST',
             undefined,
             formData
