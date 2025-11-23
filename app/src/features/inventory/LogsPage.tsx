@@ -15,7 +15,6 @@ import { TablePagination } from "@/components/shared/TablePagination";
 import { TableFilter } from "@/components/shared/TableFilter";
 import { Button } from "@/components/ui/button";
 import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
-import { flattenGroupedLogsWithOrders } from "@/lib/formatter";
 
 const tabs = ['INPUT', 'ORDER', 'SALES'];
 
