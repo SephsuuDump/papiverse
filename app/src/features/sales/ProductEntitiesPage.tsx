@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { AppHeader } from "@/components/shared/AppHeader";
 import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
