@@ -58,7 +58,7 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
                 {paidOrders.length === 0 ? (
                     <div className="flex-center flex-col w-full bg-light h-100 rounded-b-md">
                         <Inbox className="w-30 h-30 text-gray-300" strokeWidth={2} />
-                        <div className="text-gray">
+                        <div className="text-gray text-center text-sm">
                             You have no ingested sales for day { formatDateToWords(selectedDay) }
                         </div>
                     </div>

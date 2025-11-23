@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { BranchService } from "@/services/branch.service";
 import { Branch } from "@/types/branch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SalesPage } from "./SalesPage";
 
 export function BranchSalesPage() {
@@ -17,15 +17,22 @@ export function BranchSalesPage() {
 
     const [selectedBranch, setSelectedBranch] = useState<number | null>(null);
 
+    useEffect(() => {
+        if (branches?.length) {
+            setSelectedBranch(branches[0].branchId!);
+        }
+    }, [branches]);
+
+
     if (branchesLoading) return <PapiverseLoading />;
 
     return (
-        <div className="flex gap-2 h-screen">
+        <div className="flex gap-2">
 
             {/* -------------------- */}
             {/* SIDEBAR */}
             {/* -------------------- */}
-            <aside className="w-64 bg-white shadow-md border-r h-full p-4 flex flex-col">
+            <aside className="w-64 bg-white shadow-md border-r h-full p-4 flex flex-col rounded-md">
                 <h2 className="text-lg font-semibold text-darkbrown mb-4">
                     Branches
                 </h2>

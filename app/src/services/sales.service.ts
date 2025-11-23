@@ -46,12 +46,12 @@ export class SalesService {
         )
     }
 
-    static async uploadPaidOrders(branchId: number, file: File) {
+    static async uploadPaidOrders(branchId: number, file: File, isHistorical: boolean) {
         const formData = new FormData();
         formData.append('file', file);
 
         return await requestData(
-            `${salesUrl}/upload?branchId=${branchId}&historical=true`,
+            `${salesUrl}/upload?branchId=${branchId}&historical=${isHistorical}`,
             'POST',
             undefined,
             formData

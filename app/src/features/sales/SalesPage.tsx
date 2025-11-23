@@ -135,9 +135,9 @@ export function SalesPage({ branchId }: {
                 ))}
             </div>
 
-            <div className="relative rounded-md shadow-sm bg-white p-4">
-                <div className="absolute z-50 top-3 left-5 w-full flex items-center justify-between">
-                    <div className="text-lg scale-x-110 font-semibold">Sales Revenue</div>
+            <div className="shadow-sm bg-white rounded-xl overflow-hidden">
+                <div className="w-full flex items-center justify-between bg-slate-50 px-5 py-4">
+                    <div className="text-lg scale-x-110 font-semibold text-darkbrown px-2">Sales Revenue</div>
                     <div className="flex items-center gap-4 mr-12">
                         {chartTabs.map((item, index) => (
                             <button
@@ -155,7 +155,7 @@ export function SalesPage({ branchId }: {
                     <SectionLoading />
                 ) : !salesGraph || salesGraph.length === 0 ? (
                     <div className="flex-center flex-col h-[200px] text-gray-400 gap-2">
-                        <LineChart className="w-15 h-15sal text-gray-300" />
+                        <LineChart className="w-15 h-15 text-gray-300" />
                         <div>No sales data available for this range.</div>
                     </div>
                 ) : (
@@ -206,8 +206,8 @@ export function SalesPage({ branchId }: {
 
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
-                <div className={`bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden ${!isFranchisor && "col-span-2"}`}>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-2">
+                <div className={`bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden ${!isFranchisor && "col-span-2"}`}>
                     <div className="px-5 py-4 border-b bg-gray-50">
                         <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
                             Top Selling Products
@@ -276,7 +276,7 @@ export function SalesPage({ branchId }: {
                 </div>
 
                 {!branchId && isFranchisor && (
-                    <div className="bg-white shadow-md rounded-xl border border-gray-200 overflow-hidden">
+                    <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
                         <div className="px-5 py-4 border-b bg-gray-50">
                             <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
                                 Top Performing Branches

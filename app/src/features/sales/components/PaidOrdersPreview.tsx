@@ -1,11 +1,12 @@
 import { ModalTitle } from "@/components/shared/ModalTitle";
-import { AddButton } from "@/components/ui/button";
+import { AddButton, Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { formatDateTime, formatToPeso } from "@/lib/formatter";
 import { SalesService } from "@/services/sales.service";
 import { Claim } from "@/types/claims";
 import { PaidOrder } from "@/types/sales";
+import { LoaderCircle, X } from "lucide-react";
 import Image from "next/image";
 import { Dispatch, Fragment, SetStateAction, useState } from "react";
 import { toast } from "sonner";
@@ -29,20 +30,18 @@ const columns = [
 
 export function PaidOrdersPreview({ paidOrdersPreview, setPaidOrdersPreview, claims, setReload }: Props) {
     const [onProcess, setProcess] = useState(false);
+    const [onConfirm, setConfirm] = useState(false);
 
     const grandTotal = paidOrdersPreview.reduce((acc, order) => acc + order.totalPaid, 0);
 
-    async function handleSubmit() {
+    async function handleSubmit(isHistorical: boolean) {
         try {
             setProcess(true);
             const blob = new Blob([JSON.stringify(paidOrdersPreview, null, 2)], {
                 type: "application/json"
             });
             const file = new File([blob], "paid_orders.json", { type: "application/json" });
-            const data = await SalesService.uploadPaidOrders(
-                claims.branch.branchId,
-                file
-            );
+            const data = await SalesService.uploadPaidOrders(claims.branch.branchId, file, isHistorical);
             if (data) toast.success('Excel for paid orders inserted successfully.');
             setReload(prev => !prev);
             setPaidOrdersPreview([]);
@@ -56,10 +55,10 @@ export function PaidOrdersPreview({ paidOrdersPreview, setPaidOrdersPreview, cla
 
     return(
         <Dialog open onOpenChange={ (open) => { if (!open) setPaidOrdersPreview([]) }}>
-            <DialogContent>
+            <DialogContent className="h-10/11 overflow-y-auto">
                 <ModalTitle label="Confirm Insertion of Paid Orders?" />
              
-                    <div className="w-full h-[60vh] overflow-auto">
+                    <div className="w-full h-[64vh] overflow-auto">
                         <div className="thead grid grid-cols-6 min-w-[1000px] sticky top-0 z-10">
                             {columns.map((item, _) => (
                                 <div key={_} className={`th ${item.style}`}>{ item.title }</div>
@@ -91,29 +90,54 @@ export function PaidOrdersPreview({ paidOrdersPreview, setPaidOrdersPreview, cla
                             </div>
                         ))}
                     </div>
-                    <form 
-                        className="flex-center-y justify-between"
-                        onSubmit={ e => {
-                            e.preventDefault();
-                            handleSubmit();
-                        }}
-                    >
+                    <div className="flex-center-y justify-between">
                         <div>
                             <div className="text-dark font-semibold text-sm"><span className="text-gray">Orders Count: </span> { paidOrdersPreview.length }</div>
                             <div className="text-dark font-semibold text-sm"><span className="text-gray">Grand Total: </span> { formatToPeso(grandTotal) }</div>
                         </div>
                         <div className="flex gap-4">
                             <DialogClose className="text-sm">Close</DialogClose>
-                            <AddButton 
-                                type="submit"
-                                onProcess={ onProcess }
-                                label="Ingest Orders"
-                                loadingLabel="Ingesting Orders"
-                            />
+                            <Button
+                                onClick={ () => setConfirm(true) }
+                                className="!bg-darkgreen hover:opacity-90"
+                                size="sm"
+                            >
+                                Ingest Order
+                            </Button>
                         </div>
-                    </form>
-             
-                
+                    </div>
+
+                    {onConfirm && (
+                        <div className={`relative bg-white border-1 shadow-sm rounded-lg -mt-30 z-50 p-4 animate-fade-in-up`}>
+                            <X
+                                className="absolute top-4 right-4 w-4 h-4 text-gray cursor-pointer"
+                                onClick={ () => setConfirm(false) }
+                            />
+                            {!onProcess ? (
+                                <div className="text-sm">Do you wish to deduct inventory as this paid orders will be ingested?</div>
+                            ) : (
+                                <LoaderCircle className="mx-auto animate-spin" />
+                            )}
+                            <div className="flex-center-y justify-end mt-2">
+                                <Button
+                                    onClick={ () => handleSubmit(true) }
+                                    className="text-sm h-7 w-12 font-bold bg-white"
+                                    variant="secondary"
+                                    disabled={ onProcess }
+                                >
+                                    No
+                                </Button>
+                                <Button
+                                    onClick={ () => handleSubmit(false) }
+                                    className="text-sm h-7 w-12 font-bold bg-white"
+                                    variant="secondary"
+                                    disabled={ onProcess }
+                                >
+                                    Yes
+                                </Button>
+                            </div>
+                        </div>
+                    )}
             </DialogContent>
         </Dialog>
     );
