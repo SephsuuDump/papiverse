@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -5,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function hasEmptyField<T extends Record<string, unknown>>(
+export function hasEmptyField<T extends Record<string, any>>(
     obj: T,
     exemptKeys: (keyof T)[] = []
 ): boolean {
