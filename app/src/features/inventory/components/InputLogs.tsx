@@ -1,6 +1,6 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import { flattenGroupedLogsWithOrders, formatDateToWords, getWeekday } from "@/lib/formatter";
+import { formatDateToWords, getWeekday } from "@/lib/formatter";
 import { InventoryLog } from "@/types/inventory-log";
 import { Fragment } from "react";
 import dayjs from "dayjs"
