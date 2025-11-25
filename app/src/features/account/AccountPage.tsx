@@ -30,6 +30,7 @@ import FieldSkeleton from "@/components/custom/FieldSkeleton";
 import type { User } from "@/types/user";
 import { userInit } from "@/types/user";
 import { format } from "date-fns";
+import { NEXT_URL } from "@/lib/urls";
 
 const genders = ["Male", "Female", "Gay", "Lesbian", "Others"];
 
@@ -162,7 +163,7 @@ export function AccountPage() {
           <div className="relative w-28 h-28 sm:w-36 sm:h-36 mx-auto sm:mx-0">
             <Avatar className="w-full h-full bg-amber-400 rounded-full">
               <AvatarImage
-                src={user?.imageUrl || ""}
+                src={`${NEXT_URL}/${user?.imageUrl}` || ""}
                 className="object-cover rounded-full"
               />
             </Avatar>
