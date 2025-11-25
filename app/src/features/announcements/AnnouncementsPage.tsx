@@ -21,6 +21,8 @@ import { NotificationSection } from "./components/NotificationSection";
 import useNotifications from "@/hooks/use-notification";
 import { toast } from "sonner";
 import { NotificationResponse } from "@/types/notification";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { EventsCalendar } from "./components/EventsCalendar";
 
 export function AnnouncementPage() {
     const [reload, setReload] = useState(false);
@@ -35,7 +37,7 @@ export function AnnouncementPage() {
         <section className="stack-md animate-fade-in-up">
             <AppHeader label="Announcements" />
             <div className="grid grid-cols-4">
-                <div className="col-span-3 stack-md">
+                <ScrollArea className="col-span-3 stack-md h-screen">
                     <div className="mx-auto space-y-2 w-full px-4 max-md:px-0">
                         {claims.roles[0] === 'FRANCHISOR' && (
                             <div className="flex-center-y gap-2 bg-slate-50 py-3 px-4 rounded-md shadow-sm">
@@ -81,10 +83,8 @@ export function AnnouncementPage() {
                             </div>
                         ))}
                     </div>
-                </div>
-                <NotificationSection 
-                    notifications={ notifications }
-                />
+                </ScrollArea>
+                <EventsCalendar />
             </div>
             
 

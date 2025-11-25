@@ -59,7 +59,7 @@ export function UpdateInventory({ toUpdate, setUpdate, setReload }: Props) {
                         width={40}
                         height={40}
                     />
-                    <div className="font-semibold text-xl">Create Supply</div>      
+                    <div className="font-semibold text-xl">Update Inventory Quantity</div>      
                 </DialogTitle>
                 <form 
                     className="flex flex-col gap-4"
@@ -74,7 +74,7 @@ export function UpdateInventory({ toUpdate, setUpdate, setReload }: Props) {
                             <Input    
                                 className="w-full border-1 border-gray rounded-md max-md:w-full" 
                                 value={ inventory.code }
-                                readOnly
+                                disabled
                             />  
                         </div>
                         <div className="flex flex-col gap-1">
@@ -82,7 +82,7 @@ export function UpdateInventory({ toUpdate, setUpdate, setReload }: Props) {
                             <Input    
                                 className="w-full border-1 border-gray rounded-md max-md:w-full" 
                                 value={ inventory.name }
-                                readOnly
+                                disabled
                             />  
                         </div>                
                     </div>

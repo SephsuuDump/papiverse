@@ -3,7 +3,7 @@
 import { PapiverseLoading } from "@/components/ui/loader";
 import { User } from "@/types/user";
 import { Info, Mails, SquarePen, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { CreateUser } from "./CreateUser";
 import { UpdateUser } from "./UpdateUser";
@@ -19,6 +19,7 @@ import { useCrudState } from "@/hooks/use-crud-state";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { AuthService } from "@/services/auth.service";
+import { useAuth } from "@/hooks/use-auth";
 
 const columns = [
     { title: "Full Name", style: "" },
@@ -31,6 +32,7 @@ const columns = [
 const filters = ['All', 'Franchisor', 'Franchisee'];
 
 export function UsersPage() {
+    const { claims, loading: authLoading } = useAuth();
     const [reload, setReload] =  useState(false);
     const [filter, setFilter] = useState(filters[0]);
 
@@ -57,7 +59,7 @@ export function UsersPage() {
         }        
     }
 
-    if (loading) return <PapiverseLoading />
+    if (loading || authLoading) return <PapiverseLoading />
     return(
         <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label="All Users" />
@@ -83,28 +85,38 @@ export function UsersPage() {
 
                 <div className="animate-fade-in-up" key={`${page}-${filter}`}>
                     {paginated.length > 0 ?
-                        paginated.map((item, index) => (
-                            <div className="tdata grid grid-cols-5" key={ index }>
-                                <div className="td break-words">{ `${item.lastName}, ${item.firstName} ${item.middleName}` }</div>
-                                <TableDataTooltip content={ item.email! } className="truncate" />
-                                <div className="td-wrap">{ item.username }</div>
-                                <div className="td break-words">{ item.branch?.branchName }</div>
-                                <div className="td flex-center-y gap-2">
-                                    <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                    <button><Info className="w-4 h-4" /></button>
-                                    <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
-                                    <Tooltip>
-                                        <TooltipTrigger 
-                                            onClick={ () => handleSendEmail(item.id!) }
-                                            className="mx-auto"
-                                        >
-                                            <Mails className="w-4 h-4 text-blue" />
-                                        </TooltipTrigger>
-                                        <TooltipContent>Resend Account Credentials via E-mail</TooltipContent>
-                                    </Tooltip>
-                                </div>
-                            </div>
-                        ))
+                        paginated.map((item, index) => {
+                            const loggedUser = claims.userId;
+                            return (
+                                <Fragment key={ index }>
+                                    {loggedUser !== item.id && (
+                                        <div className="tdata grid grid-cols-5">
+                                            <div className="td break-words">{ `${item.lastName}, ${item.firstName} ${item.middleName}` }</div>
+                                            <TableDataTooltip content={ item.email! } className="truncate" />
+                                            <div className="td-wrap">{ item.username }</div>
+                                            <div className="td break-words">{ item.branch?.branchName }</div>
+                                            <div className="td flex-center-y gap-2">
+                                                <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
+                                                <button><Info className="w-4 h-4" /></button>
+                                                <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
+                                                {!item.hasLoggedIn && (
+                                                    <Tooltip>
+                                                        <TooltipTrigger 
+                                                            onClick={ () => handleSendEmail(item.id!) }
+                                                            className="mx-auto rounded-md text-white h-7 text-xs px-2 bg-blue"
+                                                        >
+                                                            Resend Email
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>Resend Account Credentials via E-mail</TooltipContent>
+                                                    </Tooltip>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </Fragment>
+                            )
+                            
+                        })
                         : (<div className="my-2 text-sm text-center col-span-6">There are no existing users yet.</div>)
                     }
                 </div>  

@@ -32,12 +32,12 @@ export function BranchSalesPage() {
             {/* -------------------- */}
             {/* SIDEBAR */}
             {/* -------------------- */}
-            <aside className="w-64 bg-white shadow-md border-r h-full p-4 flex flex-col rounded-md">
-                <h2 className="text-lg font-semibold text-darkbrown mb-4">
+            <ScrollArea className="w-64 h-[95vh] bg-white shadow-md border-r p-4 flex flex-col rounded-md">
+                <h2 className="sticky top-0 text-lg font-semibold text-darkbrown mb-4 bg-white pb-2">
                     Branches
                 </h2>
 
-                <ScrollArea className="flex flex-col overflow-y-auto">
+                <div className="flex flex-col overflow-y-auto">
                     {branches.map((item) => (
                         <div key={item.branchId}>
                             <button
@@ -55,13 +55,13 @@ export function BranchSalesPage() {
                             <Separator className="my-1" />
                         </div>
                     ))}
-                </ScrollArea>
-            </aside>
+                </div>
+            </ScrollArea>
 
             {/* -------------------- */}
             {/* MAIN CONTENT AREA */}
             {/* -------------------- */}
-            <main className="flex-1">
+            <ScrollArea className="flex-1 h-[95vh]">
                 {selectedBranch ? (
                     <div>
                         <AppHeader label={`${branches.find((b) => b.branchId === selectedBranch)?.branchName} Sales`} />
@@ -70,7 +70,7 @@ export function BranchSalesPage() {
                 ) : (
                     <div className="text-gray-500">Select a branch to view sales.</div>
                 )}
-            </main>
+            </ScrollArea>
         </div>
     );
 }

@@ -20,7 +20,7 @@ export function NotificationSheet({ setOpen, notifications }: {
             setProcess(true);
             const data = await NotificationService.bulkDelete({ toDelete: toDelete });
             if (data) {
-                toast.success("Notifications deleted successfully.");
+                toast.success("Notification read successfully.");
             }
         } catch (error) { 
             toast.error(`${error}`); 
@@ -62,11 +62,11 @@ export function NotificationSheet({ setOpen, notifications }: {
                     <Button
                         onClick={ handleDelete }
                         disabled={ toDelete.length === 0 || onProcess || isEmpty }
-                        className="w-fit"
+                        className="w-fit !bg-darkgreen hover:opacity-90"
                     >
                         {notifications.length === toDelete.length && !isEmpty
-                            ? "Delete All"
-                            : "Delete Selected Item"}
+                            ? "Mark all as read"
+                            : "Mark selected as read"}
                     </Button>
                 </div>
 

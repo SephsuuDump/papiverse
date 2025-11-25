@@ -96,7 +96,7 @@ export function MessagesSidebar({
                                 {renderConversationName(item)}
                             </div>
                             <div className="w-6/10 text-start text-xs text-gray truncate">
-                                {item.updated_message || "No existing message"}
+                                {item.updatedMessage || "No existing message"}
                             </div>
                         </div>
                         <div className="absolute bottom-2 right-2 text-[10px]">

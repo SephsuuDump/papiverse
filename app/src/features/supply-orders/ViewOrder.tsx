@@ -20,6 +20,7 @@ import { Ham, MoveRight, Snowflake } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const tabs = ['Meat Order', 'Snow Order']
 
@@ -74,8 +75,10 @@ export function ViewOrderPage({ id }: { id: number }) {
                 <div className="flex gap-2 my-2">
                     {claims.roles[0] === 'FRANCHISOR' && (
                         <>
-                            <Button className="!bg-darkred hover:opacity-90" 
+                            <Button 
+                                className="!bg-darkred hover:opacity-90" 
                                 onClick={ () => setReject(true) }
+                                disabled={ ["APPROVED", "DELIVERED", "REJECTED"].includes(data!.status!) }
                             >
                                 <FormLoader onProcess={ onProcess } label="Reject Order" loadingLabel="Rejecting Order" />
                             </Button>
@@ -100,8 +103,9 @@ export function ViewOrderPage({ id }: { id: number }) {
                             className="rounded-full border-gray data-[state=checked]:bg-darkgreen" 
                             checked={ tab === 'Snow Order' ? snowApproved : meatApproved }
                             onCheckedChange={(checked: boolean) => { tab === 'Snow Order' ? setSnowApproved(checked) : setMeatApproved(checked)}}
+                            disabled={ ["APPROVED", "DELIVERED", "REJECTED"].includes(data!.status!) }
                         />
-                        <label htmlFor="meat" className="text-sm font-semibold">
+                        <label htmlFor="meat" className={`text-sm font-semibold ${["APPROVED", "DELIVERED", "REJECTED"].includes(data!.status!) && "text-gray"}`}>
                             {tab === 'Snow Order' ? 
                                 snowApproved ? 'Approved' : 'Not Approved'
                                 : meatApproved ? 'Approved' : 'Not Approved'
@@ -177,8 +181,10 @@ export function ViewOrderPage({ id }: { id: number }) {
             />}
 
             {toReject && <ConfirmReject
+                orderId={ id }
                 open={toReject}
                 setOpen={setReject}
+                setReload={setReload}
             />}
         </section>
     )
@@ -202,7 +208,10 @@ function Orders({ orders, inventories }: {
                         <div className="td text-center">{ i + 1 }</div>
                         <div className="td">{ item.rawMaterialCode }</div>
                         <div className="td">{ item.rawMaterialName }</div>
-                        <div className="td text-center flex-center-y gap-2">{ item.quantity } <Badge className="text-[10px] rounded-full">{ currentStock }</Badge></div>
+                        <div className="td text-center flex-center-y gap-2">
+                            { item.quantity } 
+                            <Badge className="text-[10px] rounded-full">{ currentStock }</Badge>
+                        </div>
                         <div className="td">{ formatToPeso(item.price) }</div>
                         <div className="td">{ formatToPeso(item.price * item.quantity) }</div>
                     </div>
@@ -287,17 +296,36 @@ function ConfirmSave({ setOpen, order, meatApproved, snowApproved, onProcess, ha
     )
 }
 
-function ConfirmReject({ open, setOpen }: {
+function ConfirmReject({ orderId, open, setOpen, setReload }: {
+    orderId: number;
     open: boolean;
     setOpen: Dispatch<SetStateAction<boolean>>
+    setReload: Dispatch<SetStateAction<boolean>>
 }) {
     const [onProcess, setProcess] = useState(false);
+
+    async function handleReject() {
+        try {
+            const data = await SupplyOrderService.updateOrderStatus(orderId, "REJECTED", false, false);
+            if (data) {
+                toast.success('Supply order has been rejected.');
+                setOpen(false)
+                setReload(prev => !prev);
+            }
+        } catch (error) {
+            toast.error(`${error}`)
+        } finally { setProcess(false) }
+    }
     return (
         <Dialog open={ open } onOpenChange={ setOpen }>
             <DialogContent>
                 <ModalTitle label="Are you sure to reject order?" />
                 <form 
                     className="flex-center-y gap-4 justify-end"
+                    onSubmit={  e => {
+                        e.preventDefault();
+                        handleReject();
+                    }}
                 >
                     <DialogClose>Cancel</DialogClose>
                     <DeleteButton 

@@ -278,12 +278,12 @@ export function MessagesCanvas({ claims, selected }: Props) {
                         placeholder="Enter your message here"
                     />
                     <div className="flex gap-2">
-                        <button type="button">
+                        {/* <button type="button">
                             <SmilePlus className="w-4 h-4" strokeWidth={2} />
                         </button>
                         <button type="button">
                             <Mic className="w-4 h-4" strokeWidth={2} />
-                        </button>
+                        </button> */}
                         <Button
                             type="submit"
                             disabled={!messageInput.trim()}

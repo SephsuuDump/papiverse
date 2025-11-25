@@ -40,16 +40,20 @@ export function SalesPage({ branchId }: {
 
     const branch = branchId ?? claims.branch.branchId;
 
-    const deps = [branch, startDate, endDate, chartTab];
-    const graphParams = [branch, startDate, endDate, chartTab];
+    const salesGraphService = !isFranchisor
+        ? SalesService.generateGraph
+        : SalesService.generateFranchisorGraph;
+
+    const graphParams = !isFranchisor
+        ? [branch, startDate, endDate, chartTab]
+        : [startDate, endDate, chartTab];
 
     const { data: salesGraph, loading: graphLoading } = useFetchData(
-        SalesService.generateGraph,
-        deps,
+        salesGraphService,
+        graphParams,
         graphParams
     )
 
-    const dateRange = formatSummaryDate(startDate, endDate);
     const params = !isFranchisor
         ? [branch, startDate, endDate]
         : [startDate, endDate];

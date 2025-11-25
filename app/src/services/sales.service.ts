@@ -27,6 +27,13 @@ export class SalesService {
         )
     }
 
+    static async generateFranchisorGraph(start: string, end: string, filter: string) {
+        return await requestData(
+            `${salesUrl}/generate-graph-franchisor?startDate=${start}&endDate=${end}&filter=${filter}`,
+            'GET'
+        )
+    }
+
     static async generateGraph(branchId: number, start: string, end: string, filter: string) {
         return await requestData(
             `${salesUrl}/generate-graph?branchId=${branchId}&startDate=${start}&endDate=${end}&filter=${filter}`,

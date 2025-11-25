@@ -16,7 +16,7 @@ import { useSearchFilter } from "@/hooks/use-search-filter";
 import { usePagination } from "@/hooks/use-pagination";
 import { TableFilter } from "@/components/shared/TableFilter";
 
-const tabs = [ 'Weekly', 'Monthly', 'Yearly'];
+const tabs = [ 'Weekly'];
 
 export default function ExpensesPage() {
     const [reload, setReload] = useState(false);

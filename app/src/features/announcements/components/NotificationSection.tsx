@@ -18,7 +18,7 @@ export function NotificationSection({
 
     return (
         <section className="p-4 h-screen">
-            
+            <div className="font-semibold text-lg">Notifications</div>
             {/* 🔥 Fallback */}
             {isEmpty && (
                 <div className="flex flex-col items-center justify-center h-[70vh] text-center text-slate-500">
@@ -29,9 +29,9 @@ export function NotificationSection({
 
             {!isEmpty && (
                 <ScrollArea className="h-full pr-2">
-                    {notifications.map((notif) => (
+                    {notifications.map((notif, i) => (
                         <Link
-                            key={notif.notificationId}
+                            key={i}
                             href={notif.link}
                             className="flex gap-3 p-4 bg-white border rounded-xl shadow-sm hover:shadow-md transition-all my-2"
                         >

@@ -12,6 +12,8 @@ export interface User {
     position? : string;
     branchId?: string | undefined;
     role?: string;
+    hasLoggedIn?: boolean;
+    
 
     imageUrl?: string;
     confirmPassword?: string;
