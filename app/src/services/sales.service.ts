@@ -34,6 +34,13 @@ export class SalesService {
         )
     }
 
+    static async getSalesCalendar(branchId: number, month: string, year: string) {
+        return await requestData(
+            `${salesUrl}/get-calendar?branchId=${branchId}&month=${month}&year=${year}`,
+            'GET'
+        )
+    }
+
     static async readPaidOrders(file: File) {
         const formData = new FormData();
         formData.append('file', file);

@@ -22,7 +22,7 @@ export function FranchiseeDashboard() {
     return(
         <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label={`Welcome Back, ${claims.username}!`} />
-            <div className="row-md">
+            {/* <div className="row-md">
                 {tabs.map((item, i) => (
                     <div className={`w-full stack-sm p-4 bg-white rounded-md shadow-sm ${tab === item && "!bg-gradient-to-r from-orange-50 to-yellow-50"}`} key={i}>
                         <div className={`flex justify-between ${tab === item ? "text-dark" : "text-gray"}`}>
@@ -42,7 +42,7 @@ export function FranchiseeDashboard() {
                         </Button>
                     </div>
                 ))}
-            </div>
+            </div> */}
             <Separator className="h-2 my-2" />
             {tab === tabs[0] && <SalesPage />}
         </section>

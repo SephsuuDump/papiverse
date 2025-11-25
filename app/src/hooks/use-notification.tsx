@@ -125,7 +125,7 @@ const useNotifications = ({
     useEffect(() => {
         if (!claims.branch.branchId) return;
 
-        // fetchNotifications();
+        fetchNotifications();
 
         // Create SockJS connection
         const socket = new SockJS(WEBSOCKET_URL!);

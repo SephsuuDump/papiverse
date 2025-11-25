@@ -55,6 +55,7 @@ export default function PaidOrdersPage() {
             
             <div className="grid lg:grid-cols-5 gap-2">
                 <SalesCalendar 
+                    claims={ claims }
                     className="col-span-3 max-md:col-span-5"
                     selectedDay={ selectedDay }
                     setSelectedDay={ setSelectedDay }

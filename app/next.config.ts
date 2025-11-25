@@ -8,6 +8,12 @@ const nextConfig = {
         port: "",
         pathname: "/uploads/**",
       },
+       {
+        protocol: "https",
+        hostname: "beasjqzoohaxzldbbhlq.supabase.co",
+        port: "",
+        pathname: "/storage/v1/object/public/**",
+      },
       {
         protocol: "https",
         hostname: "papiverse-app-o63sp.ondigitalocean.app",

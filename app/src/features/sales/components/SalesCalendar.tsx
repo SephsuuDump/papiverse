@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Claim } from "@/types/claims";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { SalesService } from "@/services/sales.service";
+import { PapiverseLoading, SectionLoading } from "@/components/ui/loader";
 
 const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -12,10 +16,12 @@ const monthNames = [
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export function SalesCalendar({
+    claims,
     className,
     selectedDay,
     setSelectedDay
 }: {
+    claims: Claim
     className?: string;
     selectedDay: string;
     setSelectedDay: (i: string) => void;
@@ -23,7 +29,13 @@ export function SalesCalendar({
     const today = new Date();
     const isMobile = useIsMobile();
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
-    const [currentYear, setCurrentYear] = useState(today.getFullYear());
+    const [currentYear, setCurrentYear] = useState(today.getFullYear());    
+
+    const { data, loading } = useFetchData<{ day: string, ingested: boolean }>(
+        SalesService.getSalesCalendar,
+        [currentMonth, currentYear],
+        [claims.branch.branchId, currentMonth + 1, currentYear]
+    )
 
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
@@ -49,11 +61,11 @@ export function SalesCalendar({
         }
     };
 
-    // helper for formatting YYYY-MM-DD
     const toYMD = (y: number, m: number, d: number) => {
         return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     };
 
+    if (loading) return <SectionLoading className="col-span-3 max-md:col-span-5" />
     return (
         <section className={`${className}`}>
             <div className="flex-center-y gap-1 text-lg font-bold">Sales Calendar</div>
@@ -127,9 +139,11 @@ export function SalesCalendar({
                                     <><div className="text-[2vw] font-bold">
                                         {String(day).padStart(2, "0")}
                                     </div>
-                                    <div className="text-[1vw] font-bold tracking-wider">
-                                        DONE
-                                    </div></>
+                                    { data && data.length > 0 && (
+                                        <div className="text-[1vw] font-bold tracking-wider">
+                                            {data?.find(i => String(i.day) === String(day))?.ingested && "DONE"}
+                                        </div>
+                                    )}</>
                                 )}
                                 
                             </div>
