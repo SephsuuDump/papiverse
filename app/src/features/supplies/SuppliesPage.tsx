@@ -49,7 +49,7 @@ export function SuppliesPage() {
     const [filter, setFilter] = useState(filters[0]);
 
     const { data, loading, error } = useFetchData<Supply>(SupplyService.getAllSupplies, [reload]);
-    const { filteredNotifications,notifications, loading: notifLoading } = useNotifications({ claims, type: "SUPPLY" })
+    const { filteredNotifications, loading: notifLoading } = useNotifications({ claims, type: "SUPPLY" })
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['code', 'name']); 
     
 
@@ -176,7 +176,7 @@ export function SuppliesPage() {
 
             {showNotif && (
                 <NotificationSheet
-                    notifications={ notifications }
+                    notifications={ filteredNotifications }
                     setOpen={ setShowNotif }
                 />
             )}

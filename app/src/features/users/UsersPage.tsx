@@ -52,7 +52,7 @@ export function UsersPage() {
         try {   
             const data = await AuthService.resendCredential(id);
             if (data) {
-                toast.success('E-meil sent successfully.')
+                toast.success('E-mail sent successfully.')
             }
         } catch (error) {
             toast.error(`${error}`)

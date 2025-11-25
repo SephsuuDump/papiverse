@@ -58,7 +58,7 @@ export function ViewOrderPage({ id }: { id: number }) {
 
     if (loading || authLoading || inventoryLoading) return <PapiverseLoading /> 
     return (
-        <section className="stack-md animate-fade-in-up">
+        <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label={ `${data!.meatCategory?.meatOrderId} | ${data!.snowfrostCategory?.snowFrostOrderId}`  } />
             <div className="flex justify-between items-center">
                 <div className="flex-center bg-slate-50 shadow-sm rounded-full">
@@ -139,8 +139,8 @@ export function ViewOrderPage({ id }: { id: number }) {
                     <div className="text-sm ms-auto"><span className="font-bold">Delivery within: </span>{ data!.branchName }</div>
                 </div>
 
-                <div className="mt-4">
-                    <div className="thead grid grid-cols-[60px_1fr_1fr_60px_1fr_1fr]">
+                <div className="mt-4 table-wrapper">
+                    <div className="thead grid grid-cols-[60px_1fr_1fr_90px_1fr_1fr]">
                         {columns.map((item, _) => (
                             <div key={_} className={`th ${item.style}`}>{ item.title }</div>
                         ))}
@@ -204,7 +204,7 @@ function Orders({ orders, inventories }: {
             {orders.map((item, i) => {
                 const currentStock = inventories.find(i => i.code === item.rawMaterialCode)?.quantity;
                 return (
-                    <div className="tdata grid grid-cols-[60px_1fr_1fr_60px_1fr_1fr]" key={i}>
+                    <div className="tdata grid grid-cols-[60px_1fr_1fr_90px_1fr_1fr]" key={i}>
                         <div className="td text-center">{ i + 1 }</div>
                         <div className="td">{ item.rawMaterialCode }</div>
                         <div className="td">{ item.rawMaterialName }</div>
