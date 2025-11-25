@@ -239,7 +239,12 @@ export function AppSidebar() {
                                                                 { notifCounts.PRODUCT }
                                                             </Badge>
                                                         )}
-                                                        { sub.title === "Supply Orders" || sub.title === "My Supply Orders" && notifCounts.SUPPLYORDER > 0 && (
+                                                        { sub.title === "Supply Orders" && notifCounts.SUPPLYORDER > 0 && (
+                                                            <Badge className="ms-auto bg-darkred text-[8px]">
+                                                                { notifCounts.SUPPLYORDER }
+                                                            </Badge>
+                                                        )}
+                                                        { sub.title === "My Supply Orders" && notifCounts.SUPPLYORDER > 0 && (
                                                             <Badge className="ms-auto bg-darkred text-[8px]">
                                                                 { notifCounts.SUPPLYORDER }
                                                             </Badge>
