@@ -37,7 +37,7 @@ export function AnnouncementPage() {
         <section className="stack-md animate-fade-in-up">
             <AppHeader label="Announcements" />
             <div className="grid grid-cols-4">
-                <ScrollArea className="col-span-3 stack-md h-screen">
+                <ScrollArea className="col-span-3 stack-md h-[95vh]">
                     <div className="mx-auto space-y-2 w-full px-4 max-md:px-0">
                         {claims.roles[0] === 'FRANCHISOR' && (
                             <div className="flex-center-y gap-2 bg-slate-50 py-3 px-4 rounded-md shadow-sm">

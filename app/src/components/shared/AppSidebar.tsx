@@ -266,11 +266,11 @@ export function AppSidebar() {
                                     <SidebarMenuButton className="flex gap-2 pl-4">
                                         <item.icon className="w-4 h-4" />
                                         { item.title }
-                                        { item.title === "Announcements" && notifCounts.ANNOUNCEMENT > 0 && (
+                                        {/* { item.title === "Announcements" && notifCounts.ANNOUNCEMENT > 0 && (
                                             <Badge className="bg-darkred">
                                                 { notifCounts.ANNOUNCEMENT }
                                             </Badge>
-                                        )}
+                                        )} */}
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             </Link>

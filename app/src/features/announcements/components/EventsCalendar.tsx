@@ -58,7 +58,7 @@ export function EventsCalendar() {
     };
 
     return (
-        <ScrollArea className="space-y-2 h-screen">
+        <ScrollArea className="space-y-2 h-[95vh]">
             <div className="flex-center-y gap-1 text-lg font-bold">Events Calendar</div>
 
             <div className="bg-slate-50 my-2 p-2 rounded-md shadow-sm">
