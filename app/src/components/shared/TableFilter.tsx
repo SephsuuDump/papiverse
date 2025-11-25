@@ -87,14 +87,16 @@ export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel
                         </SelectContent>
                     </Select>
                 )}
-                {filteredNotifications && filteredNotifications.length > 0 && (
+                {filteredNotifications && (
                     <Button 
                         onClick={ () => setShowNotif?.(true) }
                         className="my-auto bg-light shadow-sm border-1 hover:bg-slate-200"
                         size="sm"
                     >   
                         <BellRing className="text-dark" />
-                        <Badge className="bg-darkred">{ filteredNotifications.length }</Badge>
+                        {filteredNotifications.length > 0 && (
+                            <Badge className="bg-darkred">{ filteredNotifications.length }</Badge>
+                        )}
                         
                     </Button>
                 )}
