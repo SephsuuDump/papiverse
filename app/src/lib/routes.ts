@@ -25,7 +25,7 @@ export const adminRoute = [
         children: [
             { title: 'Inventories', href: '/inventory/inventories' },
             { title: 'Inventory Logs', href: '/inventory/logs' },
-            { title: 'Supply Orders', href: '/inventory/supply-orders' },
+            { title: 'My Supply Orders', href: '/inventory/supply-orders' },
         ]
     },
     { 
