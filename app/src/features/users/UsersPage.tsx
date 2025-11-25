@@ -99,17 +99,16 @@ export function UsersPage() {
                                                 <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
                                                 <button><Info className="w-4 h-4" /></button>
                                                 <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
-                                                {!item.hasLoggedIn && (
-                                                    <Tooltip>
-                                                        <TooltipTrigger 
-                                                            onClick={ () => handleSendEmail(item.id!) }
-                                                            className="mx-auto rounded-md text-white h-7 text-xs px-2 bg-blue"
-                                                        >
-                                                            Resend Email
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>Resend Account Credentials via E-mail</TooltipContent>
-                                                    </Tooltip>
-                                                )}
+                                                <Tooltip>
+                                                    <TooltipTrigger 
+                                                        onClick={ () => handleSendEmail(item.id!) }
+                                                        className="mx-auto rounded-md text-white h-7 text-xs px-2 bg-blue"
+                                                        disabled={item.hasLoggedIn}
+                                                    >
+                                                        Resend Email
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>Resend Account Credentials via E-mail</TooltipContent>
+                                                </Tooltip>
                                             </div>
                                         </div>
                                     )}
