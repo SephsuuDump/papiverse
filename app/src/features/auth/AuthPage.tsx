@@ -46,7 +46,7 @@ export function AuthPage() {
                     handleSubmit();
                 } }
                 method='post'
-                className='flex flex-col gap-4 bg-light w-[400px] shadow-lg rounded-xl max-md:shadow-none max-md:border-0 max-md:-mt-24 px-8 py-12 max-sm:mx-2'
+                className='flex flex-col gap-4 bg-light w-[400px] shadow-lg rounded-xl max-md:shadow-none max-md:border-0 max-md:-mt-24 px-8 py-12 pb-24 max-sm:mx-2'
             >
                 <div>
                     <Image
@@ -91,14 +91,14 @@ export function AuthPage() {
                 >
                     <FormLoader onProcess={ onProcess } label='LOG IN' loadingLabel='LOGGING IN' />
                 </Button>
-                <div className='flex-center-y justify-evenly text-sm text-gray gap-3'>
+                {/* <div className='flex-center-y justify-evenly text-sm text-gray gap-3'>
                     <Link className="underline hover:text-dark" href="#">
                         Forgot Password
                     </Link>
                     <Link className="underline hover:text-dark" href="#">
                         Reset Password
                     </Link>
-                </div>
+                </div> */}
             </form>
         </section>
     );

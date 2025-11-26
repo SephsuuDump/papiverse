@@ -24,7 +24,7 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
         } []
     } [],
     selectedDay: string,
-    setOpen: (i: boolean) => void,
+    setOpen?: (i: boolean) => void,
     className?: string
 }) {
     const { setSearch, filteredItems } = useSearchFilter(paidOrders, ["orderId"])
@@ -40,7 +40,7 @@ export function IngestedSales({ paidOrders, selectedDay, setOpen, className }: {
                     onChange={ e => setSearch(e.target.value) }
                 />
                 <Button 
-                    onClick={ () => setOpen(true) }
+                    onClick={ () => setOpen?.(true) }
                     className="!bg-darkgreen hover:opacity-90"
                     size="sm"
                     disabled={ paidOrders.length > 0}

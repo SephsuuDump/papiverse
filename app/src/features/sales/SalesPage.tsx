@@ -4,37 +4,35 @@ import { PapiverseLoading, SectionLoading } from "@/components/ui/loader";
 import { useAuth } from "@/hooks/use-auth";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { useFetchOne } from "@/hooks/use-fetch-one";
-import { brownColors, sales, topSelling } from "@/lib/data-array";
 import { formatCompactNumber, formatCustomDate, formatDateTime, formatDateToWords, formatToPeso } from "@/lib/formatter"
 import { SalesService } from "@/services/sales.service";
-import { LineChart, NotepadText } from "lucide-react";
+import { Inbox, LineChart, NotepadText, X } from "lucide-react";
 import { Fragment, useState } from "react";
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { DateRangePicker } from "../dashboard/components/DataRangePicker";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { EmptyState } from "@/components/ui/fallback";
 import { Tooltip as ShadcnTooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { IngestedSales } from "./components/IngestedSales";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSearchFilter } from "@/hooks/use-search-filter";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 
 const chartTabs = ['DAY', 'WEEK', 'MONTH']
-
-const productColumns = [
-    { title: 'Product Name', style: '' },
-    { title: 'Total Sales', style: '' },
-    { title: 'Total Orders', style: '' },
-]
-
-const branchesColumns = [
-    { title: 'Branch Name', style: '' },
-    { title: 'Total Sales', style: '' },
-]
-
 const today = format(new Date(), "yyyy-MM-dd");
+const columns = [
+    { title: "Order ID", style: "" },
+    { title: "Products", style: "" },
+]
 
 export function SalesPage({ branchId }: {
     branchId?: number;
 }) {
     const { claims, loading: authLoading, isFranchisor } = useAuth();
     const [chartTab, setChartTab] = useState(chartTabs[0]);
+    const [selectedDay, setSelectedDay] = useState(new Date().toISOString().split("T")[0]);
     const [startDate, setStartDate] = useState<string>(today);
     const [endDate, setEndDate] = useState<string>(today);
 
@@ -66,12 +64,27 @@ export function SalesPage({ branchId }: {
         service,
         params,
         params
+    );    
+
+    const { data: paidOrders, loading: paidOrdersLoading } = useFetchData<{
+        orderId: string;
+        cash: number;
+        orderType: string;
+        totalPaid: number;
+        items: {
+            productName: string;
+            quantity: number;
+        } []
+    }>(
+        SalesService.getPaidOrders, 
+        [selectedDay], 
+        [claims.branch.branchId, selectedDay, selectedDay]
     );
+    const { setSearch, filteredItems } = useSearchFilter(paidOrders, ["orderId"])   
+    const selectedDate = selectedDay ? parseISO(selectedDay) : undefined;
+ 
 
-    console.log(data);
-    
-
-    if (loading || authLoading || graphLoading) return <SectionLoading />
+    if (loading || authLoading || graphLoading || paidOrdersLoading) return <SectionLoading />
     
     const summary = [
         { title: 'Total Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: data.totalOrders ?? 0  },
@@ -210,8 +223,8 @@ export function SalesPage({ branchId }: {
 
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-2">
-                <div className={`bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden ${!isFranchisor && "col-span-2"}`}>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-2 pb-4">
+                <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
                     <div className="px-5 py-4 border-b bg-gray-50">
                         <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
                             Top Selling Products
@@ -340,6 +353,103 @@ export function SalesPage({ branchId }: {
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                )}
+
+                {!isFranchisor && (
+                    <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                        <div className="flex-center-y justify-between px-5 py-4 border-b bg-gray-50">
+                            <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
+                                Ingested Sales on { selectedDay }
+                            </h3>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="w-[220px] justify-start text-left font-normal"
+                                    >
+                                        {selectedDate
+                                            ? format(selectedDate, "MMMM d, yyyy")
+                                            : "Pick a date"}
+                                    </Button>
+                                </PopoverTrigger>
+
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                    mode="single"
+                                    selected={selectedDate}
+                                    onSelect={(date) => {
+                                        if (!date) return;
+
+                                        // convert Date → YYYY-MM-DD
+                                        const formatted = format(date, "yyyy-MM-dd");
+                                        setSelectedDay(formatted);
+                                    }}
+                                    initialFocus
+                                    />
+                                </PopoverContent>
+                                </Popover>
+
+                        </div>
+
+                        <ScrollArea className="table-wrapper h-100">
+                            <div className="thead grid grid-cols-2 sticky top-0">
+                                {columns.map((item) => (
+                                    <div className="td" key={item.title}>{ item.title }</div>
+                                ))}
+                            </div>
+            
+                            {filteredItems.length === 0 ? (
+                                <div className="flex-center flex-col w-full bg-light h-100 rounded-b-md">
+                                    <Inbox className="w-30 h-30 text-gray-300" strokeWidth={2} />
+                                    <div className="text-gray text-center text-sm">
+                                        You have no ingested sales for day { formatDateToWords(selectedDay) }
+                                    </div>
+                                </div>
+                            ) : (
+                                filteredItems.map((
+                                    item: {
+                                        orderId: string;
+                                        cash: number;
+                                        orderType: string;
+                                        totalPaid: number;
+                                        items: {
+                                            productName: string;
+                                            quantity: number;
+                                        } []
+                                    }, 
+                                    i: number
+                                ) => (
+                                    <div className="tdata grid grid-cols-2 !border-gray !border-b-1" key={i}>
+                                        <div className="td border-r-1">
+                                            <div className="font-semibold text-xs">ORDER ID</div>
+                                            <div>{ item.orderId }</div>
+            
+                                            <div className="font-semibold text-xs mt-2">PAYMENT TYPE</div>
+                                            <div>{ item.cash !== 0 ? "Cash" : "G-cash" }</div>
+            
+                                            <div className="font-semibold text-xs mt-2">ORDER TYPE</div>
+                                            <div>{ item.orderType }</div>
+            
+                                            <div className="font-semibold text-xs mt-3">TOTAL AMOUNT</div>
+                                            <div className="font-bold text-darkgreen">
+                                                { formatToPeso(item.totalPaid) }
+                                            </div>
+                                        </div>
+            
+                                        <div className="td">
+                                            {item.items.map((subItem, i) => (
+                                                <div className="flex-center-y gap-1 py-1" key={i}>
+                                                    <p>{ subItem.productName }</p>
+                                                    <X className="w-3 h-3" />
+                                                    { subItem.quantity }
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </ScrollArea>
                     </div>
                 )}
             </div>

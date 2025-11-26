@@ -5,7 +5,7 @@ import { useMemo } from "react";
 export function useToday() {
     // Generate today's date only once (memoized)
     const today = useMemo(() => new Date(), []);
-
+    
     // Day of the month, always 2 digits (e.g., "08")
     const day = String(today.getDate()).padStart(2, "0");
 

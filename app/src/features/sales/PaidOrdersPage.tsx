@@ -50,13 +50,13 @@ export default function PaidOrdersPage() {
     
 
     return(
-        <section className="flex flex-col gap-2">
+        <section className="flex flex-col gap-2 h-[130vh]">
             <AppHeader label="Paid Orders" />
             
             <div className="grid lg:grid-cols-5 gap-2">
                 <SalesCalendar 
                     claims={ claims }
-                    className="col-span-3 max-md:col-span-5"
+                    className="col-span-3 max-md:col-span-5 h-[95vh]"
                     selectedDay={ selectedDay }
                     setSelectedDay={ setSelectedDay }
                 />
@@ -68,7 +68,7 @@ export default function PaidOrdersPage() {
                         <IngestedSales 
                             selectedDay={selectedDay}
                             paidOrders={data}
-                            className="col-span-2 max-md:col-span-5"
+                            className="col-span-2 max-md:col-span-5 h-[95vh]"
                             setOpen={setOpen}
                         />
                     )

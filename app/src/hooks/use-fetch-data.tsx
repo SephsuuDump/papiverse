@@ -10,12 +10,14 @@ export function useFetchData<T>(
     args: any[] = [], 
     page = 0,
     size = 1000,
+    enabled = true,
 ) {
     const [items, setItems] = useState<T | T[] | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (!enabled) return;
         let isMounted = true;
 
         async function fetchData() {

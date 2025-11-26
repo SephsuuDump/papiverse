@@ -92,7 +92,7 @@ export function CreateUser({ setOpen, setReload }: {
                                 onChange={ e => handleChange(e, setUser)}
                             />
                         </div>
-                        <div className="flex flex-col gap-1">
+                        {/* <div className="flex flex-col gap-1">
                             <div>Password</div>
                             <Input    
                                 className="w-full border-1 border-gray max-md:w-full" 
@@ -111,7 +111,7 @@ export function CreateUser({ setOpen, setReload }: {
                                 value={user.confirmPassword}
                                 onChange={ e => handleChange(e, setUser)}
                             />
-                        </div>
+                        </div> */}
                         <div className="flex flex-col gap-1 col-span-2">
                             <div>Position</div>
                             <Input    
