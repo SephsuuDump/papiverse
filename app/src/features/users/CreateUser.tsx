@@ -60,21 +60,15 @@ export function CreateUser({ setOpen, setReload }: {
                 setProcess(false);
                 return
             }
-            if (user.password !== user.confirmPassword || !user.password || !user.confirmPassword) {
-                toast.info("Passwords do not match!");
-                setProcess(false);
-                return
-            } else {
-                const data = await AuthService.registerUser(user);
-                if (data) {
-                    toast.success("User registered successfully!");   
-                    setProcess(false);
-                    setReload(prev => !prev);
-                    setOpen(!open); 
-                }
+            const data = await AuthService.registerUser(user);
+            if (data) {
+                toast.success("User registered successfully!");   
+                setReload(prev => !prev);
+                setOpen(!open); 
             }
         }
         catch(error){ toast.error(`${error}`) }
+        finally { setProcess(false) }
     }
 
     return(

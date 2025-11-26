@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { BellRing, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Claim } from "@/types/claims";
 import { SectionLoading } from "@/components/ui/loader";
@@ -9,6 +9,10 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToday } from "@/hooks/use-today";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import useNotifications from "@/hooks/use-notification";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { NotificationSheet } from "@/components/shared/NotificationSheet";
 
 const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -23,8 +27,10 @@ export function EventsCalendar() {
     const isMobile = useIsMobile();
 
     const { claims, loading } = useAuth();
+    const { filteredNotifications, loading: notifLoading } = useNotifications({claims, type: "ANNOUNCEMENT"}); 
     const { monthShort, dayLong, day } = useToday();
 
+    const [showNotif, setShowNotif] =  useState(false);
     const [selectedDay, setSelectedDay] = useState(todayFormatted);
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
@@ -57,9 +63,23 @@ export function EventsCalendar() {
         return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     };
 
+    if (loading || notifLoading) return <SectionLoading />
     return (
         <ScrollArea className="space-y-2 h-[95vh]">
-            <div className="flex-center-y gap-1 text-lg font-bold">Events Calendar</div>
+            <div className="flex-center-y justify-between">
+                <div className="flex-center-y gap-1 text-lg font-bold">Events Calendar</div>
+                <Button 
+                    onClick={ () => setShowNotif?.(true) }
+                    className="my-auto bg-light shadow-sm border-1 hover:bg-slate-200"
+                    size="sm"
+                >   
+                    <BellRing className="text-dark" />
+                    {filteredNotifications.length > 0 && (
+                        <Badge className="bg-darkred">{ filteredNotifications.length }</Badge>
+                    )}
+                    
+                </Button>
+            </div>
 
             <div className="bg-slate-50 my-2 p-2 rounded-md shadow-sm">
                 
@@ -145,6 +165,13 @@ export function EventsCalendar() {
                 <Calendar className="w-20 h-20 text-gray" />
                 <div className="text-gray">Events Coming Soon</div>
             </div>
+
+            {showNotif && (
+                <NotificationSheet
+                    notifications={ filteredNotifications }
+                    setOpen={ setShowNotif }
+                />
+            )}
         </ScrollArea>
     );
 }

@@ -64,7 +64,6 @@ export type userCredentials = Pick<User, 'id' | 'username' | 'email' | 'password
 export const userFields: (keyof User)[] = [
     "email",
     "username",
-    "password",
     "firstName",
     "lastName",
     "dateOfBirth",
