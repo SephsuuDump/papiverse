@@ -102,12 +102,14 @@ export function UsersPage() {
                                                 <Tooltip>
                                                     <TooltipTrigger 
                                                         onClick={ () => handleSendEmail(item.id!) }
-                                                        className="mx-auto rounded-md text-white h-7 text-xs px-2 bg-blue"
+                                                        className="mx-auto rounded-md text-white h-7 text-xs px-2 bg-blue disabled:opacity-20"
                                                         disabled={item.hasLoggedIn}
                                                     >
                                                         Resend Email
                                                     </TooltipTrigger>
-                                                    <TooltipContent>Resend Account Credentials via E-mail</TooltipContent>
+                                                    <TooltipContent>
+                                                        {item.hasLoggedIn ? "Account has already logged in." : "Resend Account Credentials via E-mail"}
+                                                    </TooltipContent>
                                                 </Tooltip>
                                             </div>
                                         </div>

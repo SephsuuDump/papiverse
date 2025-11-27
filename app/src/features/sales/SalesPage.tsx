@@ -4,11 +4,11 @@ import { PapiverseLoading, SectionLoading } from "@/components/ui/loader";
 import { useAuth } from "@/hooks/use-auth";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { useFetchOne } from "@/hooks/use-fetch-one";
-import { formatCompactNumber, formatCustomDate, formatDateTime, formatDateToWords, formatToPeso } from "@/lib/formatter"
+import { formatCompactNumber, formatCustomDate, formatDateToWords, formatToPeso } from "@/lib/formatter"
 import { SalesService } from "@/services/sales.service";
-import { Inbox, LineChart, NotepadText, X } from "lucide-react";
+import { Inbox, LineChart, NotepadText, X, CalendarRange, Calendar1, CalendarSync } from "lucide-react";
 import { Fragment, useState } from "react";
-import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { DateRangePicker } from "../dashboard/components/DataRangePicker";
 import { format, parseISO } from "date-fns";
 import { EmptyState } from "@/components/ui/fallback";
@@ -19,8 +19,10 @@ import { useSearchFilter } from "@/hooks/use-search-filter";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { MonthPicker } from "../dashboard/components/MonthPicker";
 
-const chartTabs = ['DAY', 'WEEK', 'MONTH']
+const chartTabs = ['DAY', 'WEEK', 'MONTH'];
+const dateModes = ['Monthly Sales', 'Annual Sales', 'Sales of Custom Range']
 const today = format(new Date(), "yyyy-MM-dd");
 const columns = [
     { title: "Order ID", style: "" },
@@ -31,6 +33,7 @@ export function SalesPage({ branchId }: {
     branchId?: number;
 }) {
     const { claims, loading: authLoading, isFranchisor } = useAuth();
+    const [dateMode, setDateMode] = useState(dateModes[0]);
     const [chartTab, setChartTab] = useState(chartTabs[0]);
     const [selectedDay, setSelectedDay] = useState(new Date().toISOString().split("T")[0]);
     const [startDate, setStartDate] = useState<string>(today);
@@ -105,22 +108,44 @@ export function SalesPage({ branchId }: {
 
     return (
         <section className="stack-md animate-fade-in-up">
-            <div className="flex-center-y justify-between">
+            <div className="flex-center-y justify-between max-md:flex-col max-sm:gap-2">
                 <div className="text-lg font-semibold pl-2 scale-x-110 origin-left">
                     { formatSummaryDate(startDate, endDate) }
                 </div>
-                <DateRangePicker 
-                    startDate={ startDate }
-                    endDate={ endDate }
-                    setStartDate={ setStartDate }
-                    setEndDate={ setEndDate }
-                />
+                <div className="flex-center-y gap-2">
+                    {dateMode === dateModes[0] && (
+                        <MonthPicker 
+                            startDate={ startDate }
+                            endDate={ endDate }
+                            setStartDate={ setStartDate }
+                            setEndDate={ setEndDate }
+                        />
+                    )}
+                    {dateMode === dateModes[1] && (
+                        <DateRangePicker 
+                            startDate={ startDate }
+                            endDate={ endDate }
+                            setStartDate={ setStartDate }
+                            setEndDate={ setEndDate }
+                        />
+                    )}                    
+                    <ShadcnTooltip>
+                        <TooltipTrigger>
+                            <CalendarSync 
+                                className="text-gray w-4 h-4" 
+                                onClick={() => setDateMode(dateMode === dateModes[0] ? dateModes[1] : dateModes[0])} 
+                            />
+                        </TooltipTrigger>
+                        <TooltipContent>{dateMode === dateModes[0] ? "Select Custom Date" : "Select Mobnthly Sales"}</TooltipContent>
+                    </ShadcnTooltip>
+                </div>
+   
             </div>
 
-            <div className="flex items-stretch gap-2">
+            <div className="flex items-stretch gap-2 max-md:overflow-x-auto">
                 {Object.entries(grouped).map(([key, value]) => (
                     <div 
-                        className="flex flex-col gap-2 flex-1 w-full p-4 bg-white shadow-sm rounded-md"
+                        className="flex flex-col gap-2 flex-1 w-full p-4 bg-white shadow-sm rounded-md  max-md:flex-none"
                         key={key}
                     >
                         <div className="font-semibold flex items-center justify-between">
@@ -153,9 +178,9 @@ export function SalesPage({ branchId }: {
             </div>
 
             <div className="shadow-sm bg-white rounded-xl overflow-hidden">
-                <div className="w-full flex items-center justify-between bg-slate-50 px-5 py-4">
+                <div className="w-full flex items-center justify-between bg-slate-50 px-5 py-4 max-md:block">
                     <div className="text-lg scale-x-110 font-semibold text-darkbrown px-2">Sales Revenue</div>
-                    <div className="flex items-center gap-4 mr-12">
+                    <div className="flex items-center gap-4 mr-12 max-md:mr-0 max-md:justify-center max-md:mt-2">
                         {chartTabs.map((item, index) => (
                             <button
                                 onClick={ () => setChartTab(item) }

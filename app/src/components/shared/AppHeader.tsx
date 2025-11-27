@@ -20,7 +20,7 @@ export function AppHeader({ label, className, hidePapiverseLogo }: {
                     alt="KP Logo"
                     width={100}
                     height={100}
-                    className="ms-auto"
+                    className="ms-auto max-sm:hidden"
                 />
             )}
         </div>

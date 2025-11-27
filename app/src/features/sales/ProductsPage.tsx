@@ -25,10 +25,10 @@ import { NotificationSheet } from "@/components/shared/NotificationSheet";
 
 const columns = [
     { title: 'Product Name', style: '' },
-    { title: 'Price', style: '' },
     { title: 'Category', style: '' },
     { title: 'Items Needed', style: '' },
-    { title: 'Action', style: '' },
+    { title: 'Price', style: 'text-right' },
+    { title: 'Action', style: 'text-center' },
 ]
 
 const franchiseeColumns = [
@@ -86,7 +86,6 @@ export function ProductsPage() {
                         paginated.map((item, i) => (
                             <div className={`tdata grid ${isFranchisor ? "grid-cols-5" : "grid-cols-4"}`} key={i}>
                                 <div className="td">{ item.name.toUpperCase() }</div>
-                                <div className="td">{ formatToPeso(item.price) }</div>
                                 <div className="td">{ item.category }</div>
                                 <Select>
                                     <SelectTrigger className="td font-semibold underline text-dark data-[state=open]:text-dark">
@@ -131,8 +130,9 @@ export function ProductsPage() {
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
+                                <div className="td text-right">{ formatToPeso(item.price) }</div>
                                 {isFranchisor && (
-                                    <div className="td flex-center-y gap-2">
+                                    <div className="td flex-center-y gap-2 mx-auto">
                                         <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
                                         <button><Info className="w-4 h-4" /></button>
                                         <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>

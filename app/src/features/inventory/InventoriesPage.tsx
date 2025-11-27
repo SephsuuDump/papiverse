@@ -23,8 +23,8 @@ const columns = [
     { title: 'Supply Name', style: '' },
     { title: 'Base Stock', style: '' },
     { title: 'Converted Stock', style: '' },
-    { title: 'Unit Price', style: '' },
-    { title: 'Action', style: '' },
+    { title: 'Unit Price', style: 'text-right' },
+    { title: 'Action', style: 'text-center' },
 ]
 
 const filters = ['All', 'Meat', 'Snow Frost', 'Non Deliverables'];
@@ -100,10 +100,10 @@ export function InventoriesPage() {
                                 <div className="td">
                                     <span className="text-darkbrown font-semibold">{ item.convertedQuantity ?? 'N/A' }</span> { item.convertedMeasurement }
                                 </div>
-                                <div className="td">
+                                <div className="td text-right">
                                     { item.category === 'NONDELIVERABLES' ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPrice!) }
                                 </div>
-                                <div className="td flex-center-y gap-2">
+                                <div className="td flex-center-y gap-2 mx-auto">
                                     <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
                                     <button><Info className="w-4 h-4" /></button>
                                 </div>

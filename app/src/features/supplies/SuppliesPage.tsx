@@ -27,9 +27,9 @@ const columns = [
     { title: "Supply Name", style: "" },
     { title: "Base Measurement", style: "" },
     { title: "Converted Measurement", style: "" },
-    { title: "Internal Price", style: "" },
-    { title: "External Price", style: "" },
-    { title: 'Action', style: '' }
+    { title: "Internal Price", style: "text-right" },
+    { title: "External Price", style: "text-right" },
+    { title: 'Action', style: 'text-center' }
 ]
 
 const franchiseeColumns = [
@@ -37,7 +37,7 @@ const franchiseeColumns = [
     { title: "Supply Name", style: "" },
     { title: "Base Measurement", style: "" },
     { title: "Converted Measurement", style: "" },
-    { title: "Price", style: "" },
+    { title: "Price", style: "text-right" },
 ]
 
 
@@ -118,13 +118,13 @@ export function SuppliesPage() {
                                     </div>
                                 )}
                                 {isFranchisor && (
-                                    <><div className="td">
+                                    <><div className="td text-right">
                                         { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceInternal!) }
                                     </div>
-                                    <div className="td">
+                                    <div className="td text-right">
                                         { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceExternal!) }
                                     </div>
-                                    <div className="td flex-center-y gap-2">
+                                    <div className="td flex-center-y gap-2 mx-auto">
                                         <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
                                         <button><Info className="w-4 h-4" /></button>
                                         <button

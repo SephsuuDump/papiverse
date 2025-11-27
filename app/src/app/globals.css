@@ -11,6 +11,10 @@
   font-stretch: ultra-expanded;
 }
 
+.test {
+  color: #f2dcb8;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
