@@ -35,7 +35,7 @@ export function LogsPage() {
         [claims.branch.branchId],
         [claims.branch.branchId, tab],
     );
-    const { setSearch, filteredItems } = useSearchFilter(data, ['dateTime', 'orderId']);
+    const { setSearch, filteredItems } = useSearchFilter(data, ['date', 'logs[].dateTime']);
     const { page, setPage, size, setSize, paginated } = usePagination(filteredItems, 100);
 
     useEffect(() => {

@@ -53,26 +53,27 @@ export function useSupplyOrderApproval(
         }
 
         if (meatApproved && snowApproved) {
-            await SupplyOrderService.updateOrderStatus(
+            const orderData = await SupplyOrderService.updateOrderStatus(
                 selectedOrder.orderId!,
                 "APPROVED",
                 meatApproved,
                 snowApproved
             );
-            toast.success(
-                `Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to APPROVED`
-            );
-
-            return await InventoryService.createInventoryOrder({
+            const logsData = await InventoryService.createInventoryOrder({
                 branchId: claims.branch.branchId,
                 type: "OUT",
                 source: "ORDER",
                 orderId: selectedOrder.orderId,
             });
+            if (logsData && orderData) {
+                return toast.success(
+                    `Order ${selectedOrder.meatCategory!.meatOrderId} and ${selectedOrder.snowfrostCategory!.snowFrostOrderId} updated status to APPROVED`
+                );
+            }
         }
 
         if (!meatApproved && !snowApproved) {
-                await SupplyOrderService.updateOrderStatus(
+            await SupplyOrderService.updateOrderStatus(
                 selectedOrder.orderId!,
                 "PENDING",
                 meatApproved,

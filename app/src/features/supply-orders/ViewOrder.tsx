@@ -7,11 +7,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FormLoader, PapiverseLoading, SectionLoading } from "@/components/ui/loader";
 import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { useFetchOne } from "@/hooks/use-fetch-one";
 import { useSupplyOrderApproval } from "@/hooks/use-supply-order-approval";
-import { formatDateToWords, formatToPeso } from "@/lib/formatter";
+import { formatCompactNumber, formatDateToWords, formatToPeso } from "@/lib/formatter";
 import { InventoryService } from "@/services/inventory.service";
 import { SupplyOrderService } from "@/services/supplyOrder.service"
 import { Inventory } from "@/types/inventory";
@@ -98,14 +99,14 @@ export function ViewOrderPage({ id }: { id: number }) {
 
             <div className="relative p-4 bg-white rounded-md shadow-sm animate-fade-in-up" key={tab}>
                 {claims.roles[0] === 'FRANCHISOR' && (
-                    <div className="top-2 left-2 flex items-center gap-1">
+                    <div className="top-2 left-2 flex-center-y gap-2">
                         <Checkbox id="meat" 
-                            className="rounded-full border-gray data-[state=checked]:bg-darkgreen" 
+                            className="border-1 border-gray shadow-sm w-5 h-5 data-[state=checked]:bg-darkgreen" 
                             checked={ tab === 'Snow Order' ? snowApproved : meatApproved }
                             onCheckedChange={(checked: boolean) => { tab === 'Snow Order' ? setSnowApproved(checked) : setMeatApproved(checked)}}
                             disabled={ ["APPROVED", "DELIVERED", "REJECTED"].includes(data!.status!) }
                         />
-                        <label htmlFor="meat" className={`text-sm font-semibold ${["APPROVED", "DELIVERED", "REJECTED"].includes(data!.status!) && "text-gray"}`}>
+                        <label htmlFor="meat" className={`text-[16px] font-semibold ${["APPROVED", "DELIVERED", "REJECTED"].includes(data!.status!) && "text-gray"}`}>
                             {tab === 'Snow Order' ? 
                                 snowApproved ? 'Approved' : 'Not Approved'
                                 : meatApproved ? 'Approved' : 'Not Approved'
@@ -140,7 +141,7 @@ export function ViewOrderPage({ id }: { id: number }) {
                 </div>
 
                 <div className="mt-4 table-wrapper">
-                    <div className="thead grid grid-cols-[60px_1fr_1fr_90px_1fr_1fr]">
+                    <div className="thead grid grid-cols-[60px_1fr_1fr_100px_1fr_1fr]">
                         {columns.map((item, _) => (
                             <div key={_} className={`th ${item.style}`}>{ item.title }</div>
                         ))}
@@ -204,14 +205,25 @@ function Orders({ orders, inventories }: {
             {orders.map((item, i) => {
                 const currentStock = inventories.find(i => i.code === item.rawMaterialCode)?.quantity;
                 return (
-                    <div className="tdata grid grid-cols-[60px_1fr_1fr_90px_1fr_1fr]" key={i}>
+                    <div className="tdata grid grid-cols-[60px_1fr_1fr_100px_1fr_1fr]" key={i}>
                         <div className="td text-center">{ i + 1 }</div>
                         <div className="td">{ item.rawMaterialCode }</div>
                         <div className="td">{ item.rawMaterialName }</div>
-                        <div className="td text-center flex-center-y gap-2">
-                            { item.quantity } 
-                            <Badge className="text-[10px] rounded-full">{ currentStock }</Badge>
+                        <div className="td flex-center-y gap-2">
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    { formatCompactNumber(item.quantity) } 
+                                </TooltipTrigger>
+                                <TooltipContent>Quantity: { item.quantity }</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Badge className="text-[10px] rounded-full">{ formatCompactNumber(currentStock!) }</Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>Current Stock</TooltipContent>
+                            </Tooltip>
                         </div>
+                        
                         <div className="td">{ formatToPeso(item.price) }</div>
                         <div className="td">{ formatToPeso(item.price * item.quantity) }</div>
                     </div>

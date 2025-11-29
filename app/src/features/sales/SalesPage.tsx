@@ -31,7 +31,7 @@ const columns = [
 
 export function SalesPage({ branchId }: {
     branchId?: number;
-}) {
+}) {    
     const { claims, loading: authLoading, isFranchisor } = useAuth();
     const [dateMode, setDateMode] = useState(dateModes[0]);
     const [chartTab, setChartTab] = useState(chartTabs[0]);
@@ -41,11 +41,11 @@ export function SalesPage({ branchId }: {
 
     const branch = branchId ?? claims.branch.branchId;
 
-    const salesGraphService = !isFranchisor
+    const salesGraphService = !isFranchisor || branchId
         ? SalesService.generateGraph
         : SalesService.generateFranchisorGraph;
 
-    const graphParams = !isFranchisor
+    const graphParams = !isFranchisor || branchId
         ? [branch, startDate, endDate, chartTab]
         : [startDate, endDate, chartTab];
 
@@ -55,11 +55,11 @@ export function SalesPage({ branchId }: {
         graphParams
     )
 
-    const params = !isFranchisor
+    const params = !isFranchisor || branchId
         ? [branch, startDate, endDate]
         : [startDate, endDate];
 
-    const service = !isFranchisor
+    const service = !isFranchisor || branchId
         ? SalesService.getSalesByBranch
         : SalesService.getOverallSummary;
 
