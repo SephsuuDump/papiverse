@@ -22,6 +22,7 @@ import { useAuth } from "@/hooks/use-auth";
 import useNotifications from "@/hooks/use-notification";
 import { NotificationSheet } from "@/components/shared/NotificationSheet";
 
+const pageKey = "supplyPage";
 const columns = [
     { title: "SKU ID", style: "" },
     { title: "Supply Name", style: "" },
@@ -31,7 +32,6 @@ const columns = [
     { title: "External Price", style: "text-right" },
     { title: 'Action', style: 'text-center' }
 ]
-
 const franchiseeColumns = [
     { title: "SKU ID", style: "" },
     { title: "Supply Name", style: "" },
@@ -60,7 +60,7 @@ export function SuppliesPage() {
         return true;
     });
 
-    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20);    
+    const { page, setPage, size, setSize, paginated } = usePagination(filteredData, 20, pageKey);    
     const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete, showNotif, setShowNotif } = useCrudState<Supply>();
 
     if (loading || authLoading) return <PapiverseLoading />
@@ -149,6 +149,7 @@ export function SuppliesPage() {
                 setPage={ setPage }
                 search={ search }
                 filter={ filter }
+                pageKey={ pageKey }
             />
 
             {open && (

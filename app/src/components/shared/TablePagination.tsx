@@ -6,28 +6,30 @@ import {
     PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef } from "react";
 
-export function TablePagination<T>({ data, page, size, setPage, paginated, search, filter }: {
+export function TablePagination<T>({ data, page, size, setPage, paginated, search, filter, pageKey }: {
     data: T[];
     paginated: T[];
     page: number;
     size: number;
     setPage: Dispatch<SetStateAction<number>>;
     search?: string;
-    filter?:  string;
+    filter?: string;
+    pageKey?: string
 }) {
     const totalPages = Math.ceil((data?.length ?? 0) / size);
+    const isInitialMount = useRef(true);
+    const prevFilter = useRef(filter);
+    const prevSearch = useRef(search);
 
     const createPageNumbers = () => {
         const pages: (number | string)[] = [];
 
-        // Always include First part (0)
         if (page > 2) {
-            pages.push("start-ellipsis"); // leading ellipsis
+            pages.push("start-ellipsis");
         }
 
-        // Determine window around current page
         const start = Math.max(0, page - 1);
         const end = Math.min(totalPages - 1, page + 1);
 
@@ -35,7 +37,6 @@ export function TablePagination<T>({ data, page, size, setPage, paginated, searc
             pages.push(i);
         }
 
-        // Ending ellipsis
         if (page < totalPages - 3) {
             pages.push("end-ellipsis");
         }
@@ -46,8 +47,29 @@ export function TablePagination<T>({ data, page, size, setPage, paginated, searc
     const pageNumbers = createPageNumbers();
 
     useEffect(() => {
-        setPage(0);
-    }, [filter, search, data.length]);
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            prevFilter.current = filter;
+            prevSearch.current = search;
+            return;
+        }
+
+        if (filter !== undefined && filter !== prevFilter.current) {
+            setPage(0);
+            prevFilter.current = filter;
+        }
+
+        if (search !== undefined && search !== prevSearch.current) {
+            setPage(0);
+            prevSearch.current = search;
+        }
+    }, [filter, search, setPage]);
+
+    useEffect(() => {
+        if (pageKey) {
+            localStorage.setItem(pageKey, String(page));
+        }
+    }, [page, pageKey]);
 
     return (
         <div className="flex-center-y justify-between max-md:flex-col max-sm:gap-2">
@@ -61,8 +83,6 @@ export function TablePagination<T>({ data, page, size, setPage, paginated, searc
 
             <Pagination className="justify-end">
                 <PaginationContent>
-
-                    {/* First */}
                     <PaginationItem className="cursor-pointer">
                         <PaginationLink
                             onClick={() => setPage(0)}
@@ -72,7 +92,6 @@ export function TablePagination<T>({ data, page, size, setPage, paginated, searc
                         </PaginationLink>
                     </PaginationItem>
 
-                    {/* Prev */}
                     <PaginationItem className="cursor-pointer">
                         <PaginationPrevious
                             onClick={() => setPage(p => Math.max(p - 1, 0))}
@@ -80,7 +99,6 @@ export function TablePagination<T>({ data, page, size, setPage, paginated, searc
                         />
                     </PaginationItem>
 
-                    {/* Page window */}
                     {pageNumbers.map((p, i) => (
                         <PaginationItem key={i}>
                             {(p === "start-ellipsis" || p === "end-ellipsis") ? (
@@ -89,7 +107,7 @@ export function TablePagination<T>({ data, page, size, setPage, paginated, searc
                                 <PaginationLink
                                     onClick={() => setPage(p as number)}
                                     isActive={p === page}
-                                    className={ `cursor-pointer ${p === page && "!bg-darkbrown text-white"}` }
+                                    className={`cursor-pointer ${p === page && "!bg-darkbrown text-white"}`}
                                 >
                                     {(p as number) + 1}
                                 </PaginationLink>
@@ -97,7 +115,6 @@ export function TablePagination<T>({ data, page, size, setPage, paginated, searc
                         </PaginationItem>
                     ))}
 
-                    {/* Next */}
                     <PaginationItem className="cursor-pointer">
                         <PaginationNext
                             onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
@@ -105,7 +122,6 @@ export function TablePagination<T>({ data, page, size, setPage, paginated, searc
                         />
                     </PaginationItem>
 
-                    {/* Last */}
                     <PaginationItem className="cursor-pointer">
                         <PaginationLink
                             onClick={() => setPage(totalPages - 1)}
@@ -114,7 +130,6 @@ export function TablePagination<T>({ data, page, size, setPage, paginated, searc
                             Last
                         </PaginationLink>
                     </PaginationItem>
-
                 </PaginationContent>
             </Pagination>
         </div>

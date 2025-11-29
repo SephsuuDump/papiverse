@@ -96,7 +96,7 @@ export function AppSidebar() {
                                 height={120}
                                 className="mx-auto mt-4"
                             />
-                        </Link>
+                                               </Link>
                         <SheetTrigger className="h-full">
                             <Menu />
                         </SheetTrigger>
@@ -116,8 +116,8 @@ export function AppSidebar() {
                                 <Image
                                     src="/images/papiverse_logo.png"
                                     alt="Papiverse Logo"
-                                    width={150}
-                                    height={150}
+                                    width={120}
+                                    height={120}
                                     className="mx-auto mt-4"
                                 />
                             </Link>
@@ -164,6 +164,7 @@ export function AppSidebar() {
                             <SidebarFooter className="mt-auto mb-1">
                                 <DropdownFooter 
                                     open={ show }
+                                    sidebarOpen={ open }
                                     setShow={ setShow }
                                     claims={ claims }
                                     handleLogout={ handleLogout }
@@ -190,13 +191,23 @@ export function AppSidebar() {
                     style={{ backgroundImage: "url(/images/sidebar_bg.svg)" }}
                 >
                     <Link href="/">
-                        <Image
-                            src="/images/papiverse_logo.png"
-                            alt="Papiverse Logo"
-                            width={150}
-                            height={150}
-                            className="mx-auto mt-4"
-                        />
+                        {open ? (
+                            <Image
+                                src="/images/papiverse_logo.png"
+                                alt="Papiverse Logo"
+                                width={120}
+                                height={120}
+                                className="mx-auto mt-4"
+                            />
+                        ) : (
+                            <Image
+                                src="/images/kp_logo.png"
+                                alt="Papiverse Logo"
+                                width={80}
+                                height={80}
+                                className="mx-auto mt-4 w-10 h-10"
+                            />
+                        )}
                     </Link>
                     <SidebarMenu className={`mt-4 ${!open && "flex-center"}`}>
                         {route?.map((item, i) => (
@@ -280,6 +291,7 @@ export function AppSidebar() {
                     <SidebarFooter className="mt-auto mb-1">
                         <DropdownFooter 
                             open={ show }
+                            sidebarOpen={ open }
                             setShow={ setShow }
                             claims={ claims }
                             handleLogout={ handleLogout }
@@ -292,8 +304,9 @@ export function AppSidebar() {
     )
 }
 
-function DropdownFooter({ open, setShow, claims, handleLogout }: {
+function DropdownFooter({ open, sidebarOpen, setShow, claims, handleLogout }: {
     open: boolean
+    sidebarOpen: boolean
     setShow: Dispatch<SetStateAction<boolean>>
     claims: Claim
     handleLogout: () => void;
@@ -302,7 +315,7 @@ function DropdownFooter({ open, setShow, claims, handleLogout }: {
         <DropdownMenu open={open} onOpenChange={setShow}>
             <DropdownMenuTrigger asChild>
                 <button 
-                    className={`flex-center-y gap-2 hover:bg-slate-50 rounded-md p-1.5`}
+                    className={`flex-center-y gap-2 hover:bg-slate-50 rounded-md ${sidebarOpen ? "p-1.5" : "p-0"}`}
                 >
                     <AppAvatar fallback="KP"/>
                     <div>
@@ -314,7 +327,7 @@ function DropdownFooter({ open, setShow, claims, handleLogout }: {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent side="right" align="end" className="w-56">
-                <div className="flex items-center gap-2 p-2">
+                <div className="flex-center gap-2 p-2">
                     <AppAvatar fallback="KP"/>
                     <div>
                     <div className="font-semibold text-start">{ claims.username }</div>

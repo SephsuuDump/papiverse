@@ -12,7 +12,6 @@ const tabs = ["Products", "Modifier Groups"];
 export function ProductEntitiesPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
-
     const initialTab = searchParams.get("tab") ?? tabs[0];
     const [tab, setTab] = useState(initialTab);
 

@@ -9,7 +9,7 @@ import { NotificationResponse } from "@/types/notification";
 
 const pages = [10, 20, 30, 40, 50, 100]
 
-export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel, size, setSize, removeAdd, filters, filter,  setFilter, removeFilter, filteredNotifications, setShowNotif }: {
+export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel, size, setSize, removeAdd, filters, filter,  setFilter, removeFilter, filteredNotifications, setShowNotif, pageKey }: {
     setSearch: (i: string) => void;
     searchPlaceholder: string;
     size: number;
@@ -23,6 +23,7 @@ export function TableFilter({ setSearch, searchPlaceholder, setOpen, buttonLabel
     setFilter?: (value: string) => void;
     filteredNotifications?: NotificationResponse[];
     setShowNotif?: Dispatch<SetStateAction<boolean>>;
+    pageKey?: string
 }) {
     return (
         <div className={`flex items-center max-md:flex-col max-md:gap-2`}>

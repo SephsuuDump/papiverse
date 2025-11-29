@@ -18,6 +18,7 @@ import { UpdateInventory } from "./components/UpdateInventory";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { OrderStatusBadge } from "@/components/ui/badge";
 
+const pageKey = "inventoryPage";
 const columns = [
     { title: 'SKU ID', style: '' },
     { title: 'Supply Name', style: '' },
@@ -26,7 +27,6 @@ const columns = [
     { title: 'Unit Price', style: 'text-right' },
     { title: 'Action', style: 'text-center' },
 ]
-
 const filters = ['All', 'Meat', 'Snow Frost', 'Non Deliverables'];
 
 export function InventoriesPage() {
@@ -51,7 +51,7 @@ export function InventoriesPage() {
     console.log(data);
     
 
-    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20);
+    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20, pageKey);
     const { toUpdate, setUpdate } = useCrudState<Inventory>();
 
     if (loading || authLoading) return <PapiverseLoading />
@@ -122,6 +122,7 @@ export function InventoriesPage() {
                 setPage={ setPage }
                 search={ search }
                 filter={ filter }
+                pageKey={ pageKey }
             />
 
             {toUpdate && (

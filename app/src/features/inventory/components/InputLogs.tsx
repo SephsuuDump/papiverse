@@ -16,7 +16,7 @@ interface Props {
 
 export function InputLogs({ logs }: Props) {
     return(
-        <section>
+        <section className="animate-fade-in-up">
             {logs.map((item, index) => (
                 <div className="my-1" key={ item.date }>
                     <Accordion type="multiple">

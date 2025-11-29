@@ -17,13 +17,13 @@ import { DeleteBranch } from "./DeleteBranch";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { useCrudState } from "@/hooks/use-crud-state";
 
+const pageKey = "branchPage";
 const columns = [
     { title: "Branch Name", style: "" },
     { title: "Full Address", style: "col-span-2" },
     { title: "Branch Type", style: "" },
     { title: "Actions", style: "" },
 ]
-
 const filters = ['All', 'Internal Branch', 'External Branch'];
 
 export function BranchesPage() {
@@ -39,7 +39,7 @@ export function BranchesPage() {
         return true;
     });
 
-    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20);
+    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20, pageKey);
     const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Branch>();
 
     if (loading) return <PapiverseLoading />
@@ -99,6 +99,7 @@ export function BranchesPage() {
                 page={ page }
                 size={ size }
                 setPage={ setPage }
+                pageKey={ pageKey }
             />
 
             {open && (

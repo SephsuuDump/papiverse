@@ -77,10 +77,11 @@ export function UpdateSupply({ toUpdate, setUpdate, setReload }: Props) {
                             <div>SKU ID</div>
                             <Input    
                                 className="w-full border-1 border-gray rounded-md max-md:w-full" 
-                                placeholder="e.g. RAW001"
-                                name ="code"  
+                                // placeholder="e.g. RAW001"
+                                // name ="code"  
                                 value={supply.code}
-                                onChange={ e => handleChange(e, setSupply)}
+                                // onChange={ e => handleChange(e, setSupply)}
+                                disabled
                             />  
                         </div>
                         <div className="flex flex-col gap-1">

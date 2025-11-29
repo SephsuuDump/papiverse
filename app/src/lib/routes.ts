@@ -24,8 +24,8 @@ export const adminRoute = [
         icon: Container,
         children: [
             { title: 'Inventories', href: '/inventory/inventories' },
-            { title: 'Inventory Logs', href: '/inventory/logs' },
             { title: 'Supply Orders', href: '/inventory/supply-orders' },
+            { title: 'Inventory Logs', href: '/inventory/logs' },
         ]
     },
     { 
