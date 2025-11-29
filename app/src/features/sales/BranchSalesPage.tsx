@@ -63,7 +63,7 @@ export function BranchSalesPage() {
             {/* -------------------- */}
             <ScrollArea className="flex-1 h-[95vh]">
                 {selectedBranch ? (
-                    <div>
+                    <div className="pr-2.5">
                         <AppHeader label={`${branches.find((b) => b.branchId === selectedBranch)?.branchName} Sales`} />
                         <SalesPage branchId={ selectedBranch } />
                     </div>

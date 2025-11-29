@@ -248,7 +248,7 @@ export function SalesPage({ branchId }: {
 
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-2 pb-4">
+            <div className={`grid grid-cols-1 gap-4 mt-2 pb-4 ${!branchId && "xl:grid-cols-2"}`}>
                 <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
                     <div className="px-5 py-4 border-b bg-gray-50">
                         <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
