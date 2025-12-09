@@ -108,13 +108,14 @@ export function AccountPage() {
       };
 
       const res = await UserService.updateUser(payload);
-      if (res) toast.success("Profile updated!");
+      if (res) {
+        toast.success("Profile updated!");
+        setOpenEdit(false);
+        setRefresh(!refresh);
+      }
     } catch (e) {
       toast.error(String(e));
-    } finally {
-      setOpenEdit(false);
-      setRefresh(!refresh);
-    }
+    } 
   };
 
   /* -------------------- Update Credentials -------------------- */
@@ -146,8 +147,6 @@ export function AccountPage() {
 
   return (
     <SidebarProvider>
-      <Toaster />
-
       <div className="w-full p-3 sm:p-5">
 
         {/* HEADER */}
@@ -365,7 +364,7 @@ function AccountInfo(props: AccountInfoProps) {
       </div>
 
       <Dialog open={openCreds} onOpenChange={setOpenCreds}>
-        <DialogContent className="max-w-[90%] sm:max-w-lg">
+        <DialogContent className="max-w-[90%] sm:max-w-lg max-h-10/11 overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Account Credentials</DialogTitle>
           </DialogHeader>

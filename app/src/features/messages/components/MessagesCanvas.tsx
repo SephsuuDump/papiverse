@@ -32,6 +32,7 @@ import {
     MessagingService,
     WSMessage, // assumes you have REST methods here (e.g., getMessages)
 } from "@/services/messaging.service";
+import { AppAvatar } from "@/components/shared/AppAvatar";
 
 interface Props {
     claims: Claim;
@@ -206,12 +207,11 @@ export function MessagesCanvas({ claims, selected }: Props) {
                 </div>
             </div>
 
-            {/* Messages */}
-            <div className="flex-col w-full flex-1 bg-white overflow-y-auto pb-13 pt-2">
+            <div className="flex-col w-full flex-1 bg-white overflow-y-auto pb-13 pt-2 px-2">
                 {messages.map((message, index) => {
                     const isOwn = message.senderId === claims.userId;
                     const prev = index > 0 ? messages[index - 1] : null;
-                    const showSenderName =
+                    const showSender =
                         !prev || prev.senderId !== message.senderId;
 
                     const sender = selected.participants.find(
@@ -220,23 +220,37 @@ export function MessagesCanvas({ claims, selected }: Props) {
 
                     return (
                         <Fragment key={message.id ?? index}>
-                            {showSenderName && (
+                            {/* ✅ Sender Name */}
+                            {showSender && (
                                 <div
                                     className={`text-gray text-[10px] -mb-1.5 ${
                                         isOwn
-                                            ? "text-end pr-2"
-                                            : "pl-2 text-start"
+                                            ? "text-end pr-10"
+                                            : "pl-10 text-start"
                                     }`}
                                 >
                                     {sender?.firstName}
                                 </div>
                             )}
 
+                            {/* ✅ Message Row */}
                             <div
-                                className={`flex ${
+                                className={`flex items-end ${
                                     isOwn ? "justify-end" : "justify-start"
                                 } my-2`}
                             >
+                                {/* ✅ LEFT AVATAR SPACE (ALWAYS RESERVED) */}
+                                {!isOwn && (
+                                    <div className="w-8 flex justify-center">
+                                        {showSender && (
+                                            <AppAvatar
+                                                fallback={`${sender?.firstName[0]}${sender?.lastName[0]}`}
+                                            />
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* ✅ MESSAGE BUBBLE */}
                                 <div
                                     className={`w-fit max-w-[60%] text-xs p-2 ${
                                         isOwn
@@ -246,14 +260,25 @@ export function MessagesCanvas({ claims, selected }: Props) {
                                 >
                                     {message.content}
                                 </div>
+
+                                {/* ✅ RIGHT AVATAR SPACE (ALWAYS RESERVED) */}
+                                {isOwn && (
+                                    <div className="w-8 flex justify-center">
+                                        {showSender && (
+                                            <AppAvatar
+                                                fallback={`${sender?.firstName[0]}${sender?.lastName[0]}`}
+                                            />
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </Fragment>
                     );
                 })}
 
-                {/* Typing indicator */}
+                {/* ✅ Typing Indicator */}
                 {typingUsers.length > 0 && (
-                    <div className="w-fit max-w-[60%] text-xs bg-gray-200 p-2 my-2 ml-2 rounded-t-lg rounded-br-lg italic">
+                    <div className="w-fit max-w-[60%] text-xs bg-gray-200 p-2 my-2 ml-10 rounded-t-lg rounded-br-lg italic">
                         {typingUsers.map((u) => u.name).join(", ")}{" "}
                         {typingUsers.length === 1 ? "is" : "are"} typing...
                     </div>
@@ -261,6 +286,7 @@ export function MessagesCanvas({ claims, selected }: Props) {
 
                 <div ref={messagesEndRef} />
             </div>
+
 
             {/* Message input */}
             <form

@@ -19,7 +19,7 @@ export function DeleteUser({ toDelete, setDelete, setReload }: Props) {
         try {
             setProcess(true);
             await UserService.deleteUser(toDelete.id!);
-            toast.success(`Employee ${toDelete?.firstName} ${toDelete.lastName} deleted successfully.`)
+            toast.success(`User ${toDelete?.firstName} ${toDelete.lastName} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { 
             setProcess(false); 

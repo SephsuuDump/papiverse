@@ -2,39 +2,51 @@
 
 import { useMemo } from "react";
 
-export function useToday() {
-    // Generate today's date only once (memoized)
-    const today = useMemo(() => new Date(), []);
-    
-    // Day of the month, always 2 digits (e.g., "08")
-    const day = String(today.getDate()).padStart(2, "0");
+export function useToday(inputDate?: string) {
+    const dateObj = useMemo(() => {
+        if (inputDate) {
+            return new Date(inputDate + "T00:00:00+08:00");
+        }
 
-    // Numeric month, always 2 digits (e.g., "11")
-    const monthNumber = String(today.getMonth() + 1).padStart(2, "0");
+        const phNow = new Date(
+            new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" })
+        );
 
-    // Full year (e.g., 2025)
-    const year = today.getFullYear();
+        return phNow;
+    }, [inputDate]);
 
-    // Short month name (e.g., "Nov")
-    const monthShort = today.toLocaleString("en-US", { month: "short" });
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const monthNumber = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const year = dateObj.getFullYear();
 
-    // Full month name (e.g., "November")
-    const monthLong = today.toLocaleString("en-US", { month: "long" });
+    const monthShort = dateObj.toLocaleString("en-US", {
+        month: "short",
+        timeZone: "Asia/Manila",
+    });
 
-    // Short day of the week (e.g., "Tue")
-    const dayShort = today.toLocaleString("en-US", { weekday: "short" });
+    const monthLong = dateObj.toLocaleString("en-US", {
+        month: "long",
+        timeZone: "Asia/Manila",
+    });
 
-    // Full day of the week (e.g., "Tuesday")
-    const dayLong = today.toLocaleString("en-US", { weekday: "long" });
+    const dayShort = dateObj.toLocaleString("en-US", {
+        weekday: "short",
+        timeZone: "Asia/Manila",
+    });
+
+    const dayLong = dateObj.toLocaleString("en-US", {
+        weekday: "long",
+        timeZone: "Asia/Manila",
+    });
 
     return {
-        dateObj: today,   // Raw Date object for flexibility
-        day,              // "08"
-        monthNumber,      // "11"
-        year,             // 2025
-        monthShort,       // "Nov"
-        monthLong,        // "November"
-        dayShort,         // "Tue"
-        dayLong,          // "Tuesday"
+        dateObj,
+        day,
+        monthNumber,
+        year,
+        monthShort,
+        monthLong,
+        dayShort,
+        dayLong,
     };
 }

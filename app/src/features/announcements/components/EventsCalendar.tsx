@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { BellRing, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { BellRing, Calendar, CalendarX, ChevronLeft, ChevronRight, Ellipsis, Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Claim } from "@/types/claims";
 import { SectionLoading } from "@/components/ui/loader";
@@ -13,6 +13,13 @@ import useNotifications from "@/hooks/use-notification";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NotificationSheet } from "@/components/shared/NotificationSheet";
+import { useCrudState } from "@/hooks/use-crud-state";
+import { CreateEvent } from "./CreateEvent";
+import { useFetchData } from "@/hooks/use-fetch-data";
+import { KPEvent } from "@/types/event";
+import { EventService } from "@/services/event.service";
+import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
+import { UpdateEvent } from "./UpdateEvent";
 
 const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -22,19 +29,36 @@ const monthNames = [
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export function EventsCalendar() {
-    const today = new Date();
-    const todayFormatted = new Date().toISOString().split("T")[0];
+    const phNow = new Date(
+        new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" })
+    );
+
+    const today = phNow;
+
+    const todayFormatted = `${phNow.getFullYear()}-${String(
+        phNow.getMonth() + 1
+    ).padStart(2, "0")}-${String(phNow.getDate()).padStart(2, "0")}`;
+
     const isMobile = useIsMobile();
+    const [reload, setReload] = useState(false);
 
     const { claims, loading } = useAuth();
-    const { filteredNotifications, loading: notifLoading } = useNotifications({claims, type: "ANNOUNCEMENT"}); 
-    const { monthShort, dayLong, day } = useToday();
+    const { filteredNotifications, loading: notifLoading } = useNotifications({claims, type: "ANNOUNCEMENT"});
+    const { open, setOpen } = useCrudState(); 
 
     const [showNotif, setShowNotif] =  useState(false);
     const [selectedDay, setSelectedDay] = useState(todayFormatted);
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
 
+    const { monthShort, dayLong, day } = useToday(selectedDay);
+    const { data: events, loading: eventsLoading } = useFetchData<KPEvent>(
+        EventService.getEventsByDate,
+        [selectedDay, reload],
+        [selectedDay]
+    )
+    const { toUpdate, setUpdate, toDelete, setDelete } = useCrudState<KPEvent | undefined>();
+    
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
 
@@ -153,18 +177,64 @@ export function EventsCalendar() {
                 </div>
             </div>
 
-            <div className="bg-slate-50 flex-center-y gap-4 rounded-md shadow-sm py-2">
-                <div className="flex-center-y flex-col border-r-1 px-4">
+            <div className="bg-slate-50 flex-center-y gap-2 rounded-md shadow-sm py-2 px-4">
+                <div className="flex-center-y flex-col border-r-1 pr-2">
                     <div className="font-extrabold uppercase text-sm">{ monthShort }</div>
                     <div className="text-xl font-extrabold">{ day }</div>
                 </div>
-                <div className="font-semibold uppercase scale-x-110 origin-left">{ dayLong }</div>
+                <div className="flex-center-y w-full">
+                    <div className="font-semibold uppercase scale-x-110 origin-left">{ dayLong }</div>
+                    <button 
+                        onClick={ () => setOpen(true) }
+                        className="bg-darkgreen p-1.5 rounded-full ms-auto"
+                    >
+                        <Plus className="w-4 h-4 text-white" />
+                    </button>
+                </div>
             </div>
 
-            <div className="flex-center flex-col h-50 bg-slate-50 rounded-md shadow-sm">
-                <Calendar className="w-20 h-20 text-gray" />
-                <div className="text-gray">Events Coming Soon</div>
-            </div>
+            {events.length === 0 && (
+                <div className="flex-center flex-col h-50 bg-slate-50 rounded-md shadow-sm">
+                    <CalendarX className="w-20 h-20 text-gray" />
+                    <div className="text-gray text-sm">no events for this date</div>
+                </div>
+            )}
+
+            {eventsLoading ? (
+                <SectionLoading />
+            ) : (
+                events.map((item) => (
+                    <div 
+                        className="p-4 rounded-md bg-light shadow-sm mt-2 space-y-2 relative" 
+                        key={ item.id }
+                    >
+                        <AppRUDSelection 
+                            className="absolute top-4 right-4"
+                            icon={Ellipsis}
+                            item={ item }
+                            setUpdate={ setUpdate }
+                            setDelete={ setDelete }
+                        />
+                        <div className="text-xs font-semibold">{ item.title }</div>
+                        <div className="text-[11px] text-gray-800">{ item.description }</div>
+                    </div>
+                ))
+            )}
+
+            {open && (
+                <CreateEvent 
+                    setOpen={ setOpen }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toUpdate && (
+                <UpdateEvent 
+                    toUpdate={ toUpdate }
+                    setUpdate={ setUpdate }
+                    setReload={ setReload }
+                />
+            )}
 
             {showNotif && (
                 <NotificationSheet

@@ -13,7 +13,6 @@ export interface User {
     branchId?: string | undefined;
     role?: string;
     hasLoggedIn?: boolean;
-    
 
     imageUrl?: string;
     confirmPassword?: string;
@@ -66,6 +65,7 @@ export const userFields: (keyof User)[] = [
     "username",
     "firstName",
     "lastName",
+    "position",
     "dateOfBirth",
     "gender",
     "contactNumber",

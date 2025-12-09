@@ -20,7 +20,7 @@ export function DeleteProduct({ toDelete, setDelete, setReload }: Props) {
         try {
             setProcess(true);
             await ProductService.deleteProduct(toDelete.id!);
-            toast.success(`Employee ${toDelete.name} deleted successfully.`)
+            toast.success(`Product ${toDelete.name} deleted successfully.`)
         } catch (error) { toast.error(`${error}`) }
         finally { 
             setProcess(false); 

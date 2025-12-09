@@ -235,21 +235,15 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                                     value={item.quantity ?? ""}
                                                     onChange={(e) => {
                                                         const value = e.target.value;
-
-                                                        // Allow empty
                                                         if (value === "") {
                                                             handleQuantityChange(item.id!, "");
                                                             return;
                                                         }
-
-                                                        // Allow decimal point patterns: . | .digits | digits | digits. | digits.digits
                                                         if (/^\d*\.?\d*$/.test(value)) {
                                                             handleQuantityChange(item.id!, value);
                                                         }
-                                                        // If regex fails, the input is rejected (no state update = no render)
                                                     }}
                                                     onKeyDown={(e) => {
-                                                        // Allow navigation and deletion keys
                                                         if (
                                                             e.key === 'Backspace' ||
                                                             e.key === 'Delete' ||
@@ -280,7 +274,6 @@ export function CreateProduct({ setOpen, setReload }: Props) {
                                                     checked={ item.forTakeOut! }
                                                     onCheckedChange={ () => handleForTakeout(item.id!) }
                                                 >
-
                                                 </Checkbox>
                                                 Take-out
                                             </div>      

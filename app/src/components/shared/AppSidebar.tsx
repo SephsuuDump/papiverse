@@ -41,7 +41,7 @@ export function AppSidebar() {
     });
     const [show, setShow] = useState(false);
     
-    if (pathName === "/auth" || pathName === "/unauthorized") return null;
+    if (pathName === "/auth" || pathName === "/unauthorized" || pathName === "/inquiries/form") return null;
     if (loading) return <SidebarLoading />;
     if (!claims?.roles?.length) return null;
 

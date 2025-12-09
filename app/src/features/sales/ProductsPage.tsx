@@ -23,6 +23,7 @@ import useNotifications from "@/hooks/use-notification";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { NotificationSheet } from "@/components/shared/NotificationSheet";
 
+const pageKey = "productPage";
 const columns = [
     { title: 'Product Name', style: '' },
     { title: 'Category', style: '' },
@@ -30,7 +31,6 @@ const columns = [
     { title: 'Price', style: 'text-right' },
     { title: 'Action', style: 'text-center' },
 ]
-
 const franchiseeColumns = [
     { title: 'Product Name', style: '' },
     { title: 'Price', style: '' },
@@ -53,7 +53,7 @@ export function ProductsPage() {
         return i.category === filter;
     });
 
-    const { page, setPage, size, setSize, paginated } = usePagination(filteredData, 20);
+    const { page, setPage, size, setSize, paginated } = usePagination(filteredData, 20, pageKey);
 
     const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete, showNotif, setShowNotif } = useCrudState<Product>();
 
@@ -153,6 +153,7 @@ export function ProductsPage() {
                 setPage={ setPage }
                 search={ search }
                 filter={ filter }
+                pageKey={ pageKey }
             />
 
             {open && 

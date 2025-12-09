@@ -87,7 +87,7 @@ export function CreateConversation({
 
     return (
         <Dialog open onOpenChange={setOpen}>
-            <DialogContent>
+            <DialogContent className="max-h-10/11 overflow-y-auto">
                 <DialogTitle className="flex items-center gap-2">
                     <Image
                         src="/images/kp_logo.png"
@@ -105,7 +105,6 @@ export function CreateConversation({
                 />
 
                 <div className="grid grid-cols-2 gap-2">
-                    {/* AVAILABLE USERS */}
                     <div>
                         {users.map((item, index) => (
                             <div

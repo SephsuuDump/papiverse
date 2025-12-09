@@ -37,8 +37,8 @@ const columns = [
 export function ViewOrderPage({ id }: { id: number }) {
     const [reload, setReload] = useState(false);
     const { claims, loading: authLoading } = useAuth();
-    const { data, loading, error } = useFetchOne<SupplyOrder>(SupplyOrderService.getSupplyOrderById, [id], [id, reload]);
-    const { data: inventories, loading: inventoryLoading } = useFetchData(InventoryService.getInventoryByBranch, [claims.branch.branchId], [claims.branch.branchId])
+    const { data, loading } = useFetchOne<SupplyOrder>(SupplyOrderService.getSupplyOrderById, [id, reload], [id]);
+    const { data: inventories, loading: inventoryLoading } = useFetchData(InventoryService.getInventoryByBranch, [claims.branch.branchId, reload], [claims.branch.branchId])
     const { onProcess, enableSave, handleSubmit } = useSupplyOrderApproval(data!, claims, setReload);
     
     const [tab, setTab] = useState('Meat Order');
@@ -52,10 +52,7 @@ export function ViewOrderPage({ id }: { id: number }) {
             setMeatApproved(data.meatCategory?.isApproved ?? false);
             setSnowApproved(data.snowfrostCategory?.isApproved ?? false);
         }
-    }, [data]);
-
-    console.log(inventories);
-    
+    }, [data]);    
 
     if (loading || authLoading || inventoryLoading) return <PapiverseLoading /> 
     return (
@@ -220,7 +217,7 @@ function Orders({ orders, inventories }: {
                                 <TooltipTrigger>
                                     <Badge className="text-[10px] rounded-full">{ formatCompactNumber(currentStock!) }</Badge>
                                 </TooltipTrigger>
-                                <TooltipContent>Current Stock</TooltipContent>
+                                <TooltipContent>Current Stock: { currentStock }</TooltipContent>
                             </Tooltip>
                         </div>
                         

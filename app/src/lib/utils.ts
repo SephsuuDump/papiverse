@@ -28,3 +28,14 @@ export function hasEmptyField<T extends Record<string, any>>(
         return false;
     });
 }
+
+export function updateField<T>(
+    setState: React.Dispatch<React.SetStateAction<T>>,
+    key: keyof T,
+    value: T[keyof T]
+) {
+    setState((prev) => ({
+        ...prev,
+        [key]: value,
+    }));
+}

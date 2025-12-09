@@ -1,22 +1,12 @@
 "use client"
 
-import { AppHeader } from "@/components/shared/AppHeader";
 import { TableFilter } from "@/components/shared/TableFilter";
 import { TablePagination } from "@/components/shared/TablePagination";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger } from "@/components/ui/select";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePagination } from "@/hooks/use-pagination";
 import { useSearchFilter } from "@/hooks/use-search-filter";
-import { formatToPeso } from "@/lib/formatter";
-import { ProductService } from "@/services/product.service";
-import { Product } from "@/types/products";
-import { Info, Salad, SquarePen, Trash2, X } from "lucide-react";
-import { useCallback, useState } from "react";
-import { CreateProduct } from "./components/CreateProduct";
-import { UpdateProduct } from "./components/UpdateProduct";
-import { DeleteProduct } from "./components/DeleteProduct";
-import { PapiverseLoading, SectionLoading } from "@/components/ui/loader";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info, Search, SquarePen, Trash2 } from "lucide-react";
+import { SectionLoading } from "@/components/ui/loader";
 import { Modifier } from "@/types/modifier";
 import { ModifierGroupService } from "@/services/modifier.service";
 import { CreateModifierGroup } from "./components/CreateModifierGroup";
@@ -24,13 +14,14 @@ import Link from "next/link";
 import { UpdateModifierGroup } from "./components/UpdateModifierGroup";
 import { DeleteModifierGroup } from "./components/DeleteModifierGroup";
 import { useAuth } from "@/hooks/use-auth";
+import { useState } from "react";
 
+const pageKey = "modifierGroupPage"
 const columns = [
     { title: 'Name', style: '' },
     { title: 'Description', style: 'col-span-2' },
     { title: 'Actions', style: '' },
 ]
-
 const franchiseeColumns = [
     { title: 'Name', style: '' },
     { title: 'Description', style: 'col-span-2' },
@@ -40,8 +31,8 @@ export function ModifierGroupsPage() {
     const { loading: authLoading, isFranchisor } = useAuth();
     const [reload, setReload] = useState(false);
     const { data, loading } = useFetchData<Modifier>(ModifierGroupService.getAllModifierGroups, [reload]);
-    const { setSearch, filteredItems } = useSearchFilter(data, ['name']);
-    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
+    const { search, setSearch, filteredItems } = useSearchFilter(data, ['name']);
+    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20, pageKey);
 
     const [open, setOpen] = useState(false);
     const [toUpdate, setUpdate] = useState<Modifier | undefined>();
@@ -97,6 +88,8 @@ export function ModifierGroupsPage() {
                 page={ page }
                 size={ size }
                 setPage={ setPage }
+                search={ search }
+                pageKey={ pageKey }
             />
 
             {open && 
