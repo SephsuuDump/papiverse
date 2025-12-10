@@ -63,18 +63,6 @@ export function InsertPaidOrdersExcel({ setOpen, setPaidOrdersPreview }: Props) 
                         handleSubmit();
                     }}
                 >
-                    <div className="flex border-1 border-gray rounded-md">
-                        <input 
-                            className="w-30 px-2 text-sm"
-                            value="Paid order for:" 
-                            readOnly 
-                        />
-                        <Input 
-                            className="w-full border-0"
-                            value={ displayCurrentDate()  }
-                            readOnly
-                        />
-                    </div>
                     <input
                         type="file"
                         accept=".xlsx,.xls"
