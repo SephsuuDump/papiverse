@@ -30,9 +30,11 @@ interface Props {
     onSelect: (i: string) => void;
     onQuantityChange: (code: string, quantity: number) => void;
     onRemove: (i: string) => void;
+    toEdit?: false | boolean,
+    className?: string;
 }
 
-export function MeatOrder({ supplies, selectedItems, setActiveForm, onSelect, onQuantityChange, onRemove }: Props) {
+export function MeatOrder({ supplies, selectedItems, setActiveForm, onSelect, onQuantityChange, onRemove, toEdit, className }: Props) {
     const { search, setSearch, filteredItems: filteredSupplies } = useSearchFilter(supplies, ['name', 'code'])
 
     const handleSubmit = async () => {
@@ -43,8 +45,12 @@ export function MeatOrder({ supplies, selectedItems, setActiveForm, onSelect, on
     };
 
     return(
-        <section className="stack-md animate-fade-in-up">
-            <AppHeader label="Meat Order Form" />
+        <section className={`stack-md animate-fade-in-up ${className}`}>
+            {toEdit ? (
+                <div className="text-lg font-semibold">Edit Meat Order</div>
+            ) : (
+                <AppHeader label="Meat Order Form" />
+            )}
 
             <div>
                 <div className="thead grid grid-cols-8 !bg-[#ead09f]">
@@ -115,17 +121,19 @@ export function MeatOrder({ supplies, selectedItems, setActiveForm, onSelect, on
                 </div>
             </div>
 
-            <div className="w-full justify-end flex gap-2">
-                <Link href="/inventory?tab=summary">
-                    <Button variant="secondary">Return</Button>
-                </Link>
-                <Button 
-                    onClick={ () => handleSubmit() } 
-                    className="!bg-darkbrown text-light hover:opacity-90"
-                >
-                    Proceed
-                </Button>
-            </div>
+            {!toEdit && (
+                <div className="w-full justify-end flex gap-2">
+                    <Link href="/inventory?tab=summary">
+                        <Button variant="secondary">Return</Button>
+                    </Link>
+                    <Button 
+                        onClick={ () => handleSubmit() } 
+                        className="!bg-darkbrown text-light hover:opacity-90"
+                    >
+                        Proceed
+                    </Button>
+                </div>
+            )}
         </section>
     );
 }

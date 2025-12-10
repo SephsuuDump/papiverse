@@ -57,6 +57,7 @@ export function useSupplySelection(claims: Claim, supplyItems: Supply[]) {
     return {
         supplies,
         selectedItems,
+        setSelectedItems,
         handleSelect,
         handleQuantityChange,
         handleRemove,

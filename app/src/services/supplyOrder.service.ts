@@ -71,7 +71,7 @@ export class SupplyOrderService {
         );
     }
 
-    static async updateMeatOrder(meatOrder: SupplyItem[], id: number) {
+    static async updateMeatOrder(meatOrder: SupplyItem[], id: string) {
         const payload = {
             id: id,
             categoryItems: meatOrder,
@@ -85,7 +85,7 @@ export class SupplyOrderService {
         );
     }
 
-    static async updateSnowOrder(snowOrder: SupplyItem[], id: number) {
+    static async updateSnowOrder(snowOrder: SupplyItem[], id: string) {
         const payload = {
             id: id,
             categoryItems: snowOrder,

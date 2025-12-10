@@ -22,6 +22,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { EditOrderForm } from "./order-form/EditOrderForm";
 
 const tabs = ['Meat Order', 'Snow Order']
 
@@ -36,13 +37,16 @@ const columns = [
 
 export function ViewOrderPage({ id }: { id: number }) {
     const [reload, setReload] = useState(false);
-    const { claims, loading: authLoading } = useAuth();
+    const { claims, loading: authLoading, isFranchisor } = useAuth();
     const { data, loading } = useFetchOne<SupplyOrder>(SupplyOrderService.getSupplyOrderById, [id, reload], [id]);
     const { data: inventories, loading: inventoryLoading } = useFetchData(InventoryService.getInventoryByBranch, [claims.branch.branchId, reload], [claims.branch.branchId])
     const { onProcess, enableSave, handleSubmit } = useSupplyOrderApproval(data!, claims, setReload);
+    console.log(data);
+    
     
     const [tab, setTab] = useState('Meat Order');
     const [open, setOpen] = useState(false);
+    const [toEdit, setEdit] = useState(false);
     const [toReject, setReject] = useState(false);
     const [meatApproved, setMeatApproved] = useState<boolean | undefined>(undefined);
     const [snowApproved, setSnowApproved] = useState<boolean | undefined>(undefined);
@@ -55,6 +59,32 @@ export function ViewOrderPage({ id }: { id: number }) {
     }, [data]);    
 
     if (loading || authLoading || inventoryLoading) return <PapiverseLoading /> 
+    if (toEdit) return <EditOrderForm 
+        orderId={ data!.orderId! }
+        meatId={ data!.meatCategory!.meatOrderId }
+        snowId={ data!.snowfrostCategory!.snowFrostOrderId }
+        meatApproved={ data!.meatCategory!.isApproved }
+        snowApproved={ data!.snowfrostCategory!.isApproved }
+        toEditItems={[
+            ...(data?.meatCategory?.meatItems ?? []).map((item) => ({
+                code: item.rawMaterialCode,
+                quantity: item.quantity,
+                name: item.rawMaterialName,
+                unitMeasurement: item.unitMeasurement,
+                unitPrice: item.price,
+                category: "MEAT"
+            })),
+            ...(data?.snowfrostCategory?.snowFrostItems ?? []).map((item) => ({
+                code: item.rawMaterialCode,
+                quantity: item.quantity,
+                name: item.rawMaterialName,
+                unitMeasurement: item.unitMeasurement,
+                unitPrice: item.price,
+                category: "SNOWFROST"
+            })),
+        ]}
+
+    />
     return (
         <section className="stack-md animate-fade-in-up overflow-hidden max-md:mt-12">
             <AppHeader label={ `${data!.meatCategory?.meatOrderId} | ${data!.snowfrostCategory?.snowFrostOrderId}`  } />
@@ -88,9 +118,19 @@ export function ViewOrderPage({ id }: { id: number }) {
                             </Button>
                         </>
                     )}
-                    <Link href='/inventory/supply-orders'>
-                        <Button>Back to Orders</Button>
-                    </Link>
+                    <div className="flex-center-y gap-2">
+                        <Link href='/inventory/supply-orders'>
+                            <Button>Back to Orders</Button>
+                        </Link>
+                        {!isFranchisor && data?.status === "TO FOLLOW" && ( 
+                            <Button
+                                onClick={ () => setEdit(true) }
+                                className="!bg-darkgreen hover:opacity-90"
+                            >
+                                Edit Order
+                            </Button>
+                        )}
+                    </div>
                 </div>
             </div>
 

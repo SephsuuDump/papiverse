@@ -29,9 +29,11 @@ interface Props {
     onSelect: (i: string) => void;
     onQuantityChange: (code: string, quantity: number) => void;
     onRemove: (i: string) => void;
+    toEdit?: false | boolean
+    className?: string;
 }
 
-export function SnowOrder({ supplies, selectedItems, setActiveForm, onSelect, onQuantityChange, onRemove }: Props) {
+export function SnowOrder({ supplies, selectedItems, setActiveForm, onSelect, onQuantityChange, onRemove, toEdit, className }: Props) {
     const { search, setSearch, filteredItems: filteredSupplies } = useSearchFilter(supplies, ['name', 'code'])
 
     const handleSubmit = async () => {
@@ -43,8 +45,12 @@ export function SnowOrder({ supplies, selectedItems, setActiveForm, onSelect, on
     };
 
     return(
-        <section className="stack-md animate-fade-in-up">
-            <AppHeader label="Snow Order Form" />
+        <section className={`stack-md animate-fade-in-up ${className}`}>
+            {toEdit ? (
+                <div className="text-lg font-semibold">Edit Snow Order</div>
+            ) : (
+                <AppHeader label="Snow Order Form" />
+            )}
 
             <div>
                 <div className="thead grid grid-cols-8 !bg-[#c4d1ef]">
@@ -115,20 +121,22 @@ export function SnowOrder({ supplies, selectedItems, setActiveForm, onSelect, on
                 </div>
             </div>
 
-            <div className="w-full justify-end flex gap-2">
-                <Button 
-                    onClick={ () => setActiveForm('meat') }
-                    variant="secondary"
-                >
-                    Back to Meat Order
-                </Button>
-                <Button 
-                    onClick={ () => handleSubmit() } 
-                    className="!bg-darkbrown text-light hover:opacity-90"
-                >
-                    Proceed
-                </Button>
-            </div>
+            {!toEdit && (
+                <div className="w-full justify-end flex gap-2">
+                    <Button 
+                        onClick={ () => setActiveForm('meat') }
+                        variant="secondary"
+                    >
+                        Back to Meat Order
+                    </Button>
+                    <Button 
+                        onClick={ () => handleSubmit() } 
+                        className="!bg-darkbrown text-light hover:opacity-90"
+                    >
+                        Proceed
+                    </Button>
+                </div>
+            )}
         </section>
     );
 }

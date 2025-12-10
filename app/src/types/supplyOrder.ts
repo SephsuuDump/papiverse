@@ -10,7 +10,7 @@ export interface SupplyOrder {
     completeOrderTotalAmount: number;
 
     meatCategory?: {
-        meatOrderId: number;
+        meatOrderId: string;
         isApproved: boolean;
         categoryTotal: number;
         meatItems: {
@@ -23,7 +23,7 @@ export interface SupplyOrder {
     }
 
     snowfrostCategory?: {
-        snowFrostOrderId: number;
+        snowFrostOrderId: string;
         isApproved: boolean;
         categoryTotal: number;
         snowFrostItems: {
