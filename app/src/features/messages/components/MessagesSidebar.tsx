@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { NotificationService } from "@/services/notification.service";
 import { useAuth } from "@/hooks/use-auth";
 import { messages } from "@/lib/data-array";
+import { NEXT_URL } from "@/lib/urls";
 
 interface Props {
     claims: Claim;
@@ -150,7 +151,10 @@ export function MessagesSidebar({
                             return null;
                         })()}
 
-                        <AppAvatar fallback="KP" />
+                        <AppAvatar 
+                            fallback="KP"
+                            src={ `${NEXT_URL}/${item.participants.find(u => u.id === claims.userId)?.imageUrl}` }
+                        />
                         <div className="w-full pl-1">
                             <div className="text-start font-semibold text-sm">
                                 {renderConversationName(item)}

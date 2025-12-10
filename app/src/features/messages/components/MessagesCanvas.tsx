@@ -32,6 +32,7 @@ import {
 } from "@/services/messaging.service";
 import { AppAvatar } from "@/components/shared/AppAvatar";
 import useNotifications from "@/hooks/use-notification";
+import { NEXT_URL } from "@/lib/urls";
 
 interface Props {
     claims: Claim;
@@ -239,7 +240,8 @@ export function MessagesCanvas({ claims, selected }: Props) {
                                     <div className="w-8 flex justify-center">
                                         {showSender && (
                                             <AppAvatar
-                                                fallback={`${sender?.firstName[0]}${sender?.lastName[0]}`}
+                                                fallback={`${sender!.firstName![0]}${sender!.lastName![0]}`}
+                                                src={`${NEXT_URL}/${sender?.imageUrl}`}
                                             />
                                         )}
                                     </div>
@@ -261,7 +263,8 @@ export function MessagesCanvas({ claims, selected }: Props) {
                                     <div className="w-8 flex justify-center">
                                         {showSender && (
                                             <AppAvatar
-                                                fallback={`${sender?.firstName[0]}${sender?.lastName[0]}`}
+                                                fallback={`${sender!.firstName![0]}${sender!.lastName![0]}`}
+                                                src={`${NEXT_URL}/${sender?.imageUrl}`}
                                             />
                                         )}
                                     </div>

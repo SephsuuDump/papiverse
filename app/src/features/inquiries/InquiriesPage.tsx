@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Phone, Search, User, MessageCircle, Ellipsis } from "lucide-react";
+import { Mail, Phone, Search, User, MessageCircle, Ellipsis, BellRing } from "lucide-react";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { InquiryService } from "@/services/inquiry.service";
@@ -17,21 +17,25 @@ import { useCrudState } from "@/hooks/use-crud-state";
 import { UpdateInquiry } from "./components/UpdateInquiry";
 import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
 import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import useNotifications from "@/hooks/use-notification";
+import { NotificationSheet } from "@/components/shared/NotificationSheet";
 
 const tabs = ["NEW", "RESOLVED", "IN_PROGRESS"];
 
 export function InquiriesPage() {
     const [reload, setReload] = useState(false);
     const [tab, setTab] = useState(tabs[0])
+    
+    const { claims, loading: authLoading } = useAuth();
     const { data: inquiries, loading: inquiriesLoading } = useFetchData<Inquiry>(
         InquiryService.getInquiriesByStatus,
         [reload],
         [tab]
     )    
     const { setSearch, filteredItems: filtered } = useSearchFilter<Inquiry>(inquiries, ["fullName"]);
-    const { toUpdate, setUpdate } = useCrudState<Inquiry>();
-
-
+    const { toUpdate, setUpdate, showNotif, setShowNotif } = useCrudState<Inquiry>();
+    const { filteredNotifications, loading: notifLoading } = useNotifications({ claims, type: "INQUIRY" })
 
     return (
         <section className="stack-md reveal">
@@ -42,11 +46,26 @@ export function InquiriesPage() {
                     placeholder="Find an inquiry"
                     onChange={ e => setSearch(e.target.value) }
                 />
-                <AppTabSwitcher 
-                    tabs={ tabs }
-                    selectedTab={ tab }
-                    setSelectedTab={ setTab }
-                />
+                <div className="flex-center-y gap-2">
+                    <AppTabSwitcher 
+                        tabs={ tabs }
+                        selectedTab={ tab }
+                        setSelectedTab={ setTab }
+                    />
+                    {filteredNotifications && (
+                        <Button 
+                            onClick={ () => setShowNotif?.(true) }
+                            className="my-auto bg-light shadow-sm border-1 hover:bg-slate-200"
+                            size="sm"
+                        >   
+                            <BellRing className="text-dark" />
+                            {filteredNotifications.length > 0 && (
+                                <Badge className="bg-darkred">{ filteredNotifications.length }</Badge>
+                            )}
+                            
+                        </Button>
+                    )}
+                </div>
             </div>
 
             <div className="flex flex-1 flex-col rounded-2xl border border-slate-100 bg-white/80 shadow-sm backdrop-blur-sm">
@@ -149,6 +168,13 @@ export function InquiriesPage() {
                     toUpdate={ toUpdate }
                     setUpdate={ setUpdate }
                     setReload={ setReload }
+                />
+            )}
+
+            {showNotif && (
+                <NotificationSheet
+                    notifications={ filteredNotifications }
+                    setOpen={ setShowNotif }
                 />
             )}
         </section>

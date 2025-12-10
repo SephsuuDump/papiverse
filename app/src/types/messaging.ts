@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export interface Conversation {
     id: number;
     type: string;
@@ -5,11 +7,7 @@ export interface Conversation {
     updatedAt: string,
     updated_message: string,
     updatedMessage: string,
-    participants: {
-        id: number;
-        firstName: string;
-        lastName: string;
-    }[];
+    participants: User[];
 }
 
 export interface Message {
