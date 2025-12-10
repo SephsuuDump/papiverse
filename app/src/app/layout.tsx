@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "@/styles/styles.css";
 import "@/styles/table.css";
@@ -10,15 +9,6 @@ import { AppSidebar } from "@/components/shared/AppSidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { AppCanvas } from "@/components/shared/AppCanvas";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Papiverse",
@@ -36,7 +26,7 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`antialiased`}
       >
         <AuthProvider>
           <SidebarProvider className="bg-slate-100 max-w-[2560px] mx-auto">
