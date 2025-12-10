@@ -68,6 +68,7 @@ export function MessagesSidebar({
 
 
     const renderConversationName = (conversation: Conversation) => {
+        if (conversation.name === "" && conversation.type === "group") return "Group Convo";
         if (conversation.name !== "none") return conversation.name;
 
         if (conversation.participants.length > 2) {
