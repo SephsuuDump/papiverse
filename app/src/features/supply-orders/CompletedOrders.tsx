@@ -2,7 +2,7 @@
 
 import { SupplyOrder } from "@/types/supplyOrder"
 import { Download, FileSpreadsheet, MessageSquare, MessageSquareMore, SquareMinus, TableOfContents, Truck } from "lucide-react";
-import { TableDataTooltip } from "../users/TableDataTooltip";
+import { TableDataTooltip } from "../users/components/TableDataTooltip";
 import { formatDateTime, formatToPeso } from "@/lib/formatter";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { FormLoader, SectionLoading } from "@/components/ui/loader";

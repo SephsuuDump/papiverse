@@ -20,6 +20,7 @@ import { KPEvent } from "@/types/event";
 import { EventService } from "@/services/event.service";
 import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { UpdateEvent } from "./UpdateEvent";
+import { DeleteEvent } from "./DeleteEvent";
 
 const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -193,7 +194,7 @@ export function EventsCalendar() {
                 </div>
             </div>
 
-            {events.length === 0 && (
+            {!eventsLoading || events.length === 0 && (
                 <div className="flex-center flex-col h-50 bg-slate-50 rounded-md shadow-sm">
                     <CalendarX className="w-20 h-20 text-gray" />
                     <div className="text-gray text-sm">no events for this date</div>
@@ -225,6 +226,7 @@ export function EventsCalendar() {
                 <CreateEvent 
                     setOpen={ setOpen }
                     setReload={ setReload }
+                    selectedDay={ selectedDay }
                 />
             )}
 
@@ -232,6 +234,14 @@ export function EventsCalendar() {
                 <UpdateEvent 
                     toUpdate={ toUpdate }
                     setUpdate={ setUpdate }
+                    setReload={ setReload }
+                />
+            )}
+
+            {toDelete && (
+                <DeleteEvent 
+                    toDelete={ toDelete }
+                    setDelete={ setDelete }
                     setReload={ setReload }
                 />
             )}

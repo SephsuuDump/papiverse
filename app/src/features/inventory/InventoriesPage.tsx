@@ -101,7 +101,7 @@ export function InventoriesPage() {
                                     <span className="text-darkbrown font-semibold">{ item.convertedQuantity ?? 'N/A' }</span> { item.convertedMeasurement }
                                 </div>
                                 <div className="td text-right">
-                                    { item.category === 'NONDELIVERABLES' ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPrice!) }
+                                    { item.category === 'NONDELIVERABLES' ? <OrderStatusBadge className="ms-auto scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPrice!) }
                                 </div>
                                 <div className="td flex-center-y gap-2 mx-auto">
                                     <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>

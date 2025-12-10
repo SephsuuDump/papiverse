@@ -4,4 +4,5 @@ export type KPEvent = {
     description: string;
     date: string;
     time: string;
+    createdBy: number;
 }

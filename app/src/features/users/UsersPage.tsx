@@ -5,14 +5,14 @@ import { User } from "@/types/user";
 import { Info, Mails, SquarePen, Trash2 } from "lucide-react";
 import { Fragment, useState } from "react";
 import { useSearchFilter } from "@/hooks/use-search-filter";
-import { CreateUser } from "./CreateUser";
-import { UpdateUser } from "./UpdateUser";
-import { DeleteUser } from "./DeleteUser";
+import { CreateUser } from "./components/CreateUser";
+import { UpdateUser } from "./components/UpdateUser";
+import { DeleteUser } from "./components/DeleteUser";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { UserService } from "@/services/user.service";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { TableFilter } from "@/components/shared/TableFilter";
-import { TableDataTooltip } from "./TableDataTooltip";
+import { TableDataTooltip } from "./components/TableDataTooltip";
 import { usePagination } from "@/hooks/use-pagination";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { useCrudState } from "@/hooks/use-crud-state";
@@ -20,6 +20,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { toast } from "sonner";
 import { AuthService } from "@/services/auth.service";
 import { useAuth } from "@/hooks/use-auth";
+import { ViewUser } from "./components/ViewUser";
 
 const columns = [
     { title: "Full Name", style: "" },
@@ -46,7 +47,7 @@ export function UsersPage() {
     });
 
     const { page, setPage, size, setSize, paginated } = usePagination(filteredData, 20);
-    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<User>();
+    const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<User>();
 
     async function handleSendEmail(id: number) {
         try {   
@@ -97,7 +98,7 @@ export function UsersPage() {
                                             <div className="td break-words">{ item.branch?.branchName }</div>
                                             <div className="td flex-center-y gap-2">
                                                 <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                                <button><Info className="w-4 h-4" /></button>
+                                                <button onClick={ () => setView(item) }><Info className="w-4 h-4" /></button>
                                                 <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
                                                 <Tooltip>
                                                     <TooltipTrigger 
@@ -135,6 +136,13 @@ export function UsersPage() {
                 <CreateUser 
                     setOpen={ setOpen }
                     setReload={ setReload }
+                />
+            )}
+
+            {toView && (
+                <ViewUser
+                    toView={ toView }
+                    setView={ setView }
                 />
             )}
 

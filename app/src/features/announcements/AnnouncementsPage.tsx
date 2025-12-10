@@ -19,7 +19,6 @@ import { Ellipsis } from "lucide-react";
 import { DeleteAnnouncement } from "./components/DeleteAnnouncement";
 import { NotificationSection } from "./components/NotificationSection";
 import useNotifications from "@/hooks/use-notification";
-import { toast } from "sonner";
 import { NotificationResponse } from "@/types/notification";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EventsCalendar } from "./components/EventsCalendar";

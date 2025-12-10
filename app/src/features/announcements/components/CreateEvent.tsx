@@ -1,10 +1,12 @@
 import { ModalTitle } from "@/components/shared/ModalTitle";
-import { AddButton, Button, UpdateButton } from "@/components/ui/button";
+import { AddButton, Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { ModalLoader } from "@/components/ui/loader";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/use-auth";
 import { handleChange } from "@/lib/form-handle";
 import { cn, hasEmptyField, updateField } from "@/lib/utils";
 import { EventService } from "@/services/event.service";
@@ -16,22 +18,32 @@ import { toast } from "sonner";
 
 export function CreateEvent({
     setOpen,
-    setReload
+    setReload,
+    selectedDay
 }: {
     setOpen: (i: boolean) => void
     setReload: Dispatch<SetStateAction<boolean>>
+    selectedDay: string
 }) {
+    const { claims, loading: authLoading } = useAuth();
     const [onProcess, setProcess] = useState(false);
 
     const [event, setEvent] = useState<Partial<KPEvent>>({
         title: "",
         description: "",
-        date: "",
-        time: ""
+        date: selectedDay,
+        time: "",
+        createdBy: claims.userId
     });
 
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [dateOpen, setDateOpen] = useState(false);
+
+    useEffect(() => {
+        if (!selectedDay) return;
+        setDate(new Date(selectedDay + "T00:00:00"));
+    }, [selectedDay]);
+
 
     useEffect(() => {
         if (!date) return;
@@ -55,6 +67,8 @@ export function CreateEvent({
             setProcess(false)
         }
     }
+
+    if (authLoading) return <ModalLoader />
     return (
         <Dialog open onOpenChange={setOpen}>
             <DialogContent>
