@@ -96,7 +96,7 @@ export function InventoriesPage() {
                                     <span className="text-darkbrown font-semibold">{ item.quantity }</span> { item.unitMeasurement }
                                 </div>
                                 <div className="td">
-                                    <span className="text-darkbrown font-semibold">{ item.convertedQuantity ?? 'N/A' }</span> { item.convertedMeasurement }
+                                    <span className="text-darkbrown font-semibold">{ item.convertedQuantity?.toFixed(2) ?? 'N/A' }</span> { item.convertedMeasurement }
                                 </div>
                                 <div className="td text-right">
                                     { item.category === 'NONDELIVERABLES' ? <OrderStatusBadge className="ms-auto scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPrice!) }

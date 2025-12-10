@@ -98,7 +98,7 @@ export function  ViewModifierItemsPage() {
                     {paginated.length > 0 ?
                         paginated.map((item, i) => (
                             <div className={`tdata grid ${isFranchisor ? "grid-cols-4" : "grid-cols-3"}`} key={i}>
-                                <div className="td">{ item.name }</div>
+                                <div onClick={ () => setView(item) } className="td">{ item.name }</div>
                                 <div className="td">{ item.description }</div>
                                 <Select>
                                     <SelectTrigger className="td font-semibold underline text-dark data-[state=open]:text-dark">

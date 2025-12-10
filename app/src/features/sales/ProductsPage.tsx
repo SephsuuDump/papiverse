@@ -86,7 +86,7 @@ export function ProductsPage() {
                     {paginated.length > 0 ?
                         paginated.map((item, i) => (
                             <div className={`tdata grid ${isFranchisor ? "grid-cols-5" : "grid-cols-4"}`} key={i}>
-                                <div className="td">{ item.name.toUpperCase() }</div>
+                                <div onClick={ () => setView(item) } className="td">{ item.name.toUpperCase() }</div>
                                 <div className="td">{ item.category }</div>
                                 <Select>
                                     <SelectTrigger className="td font-semibold underline text-dark data-[state=open]:text-dark">

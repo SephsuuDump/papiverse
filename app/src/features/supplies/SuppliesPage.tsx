@@ -94,7 +94,7 @@ export function SuppliesPage() {
                     {paginated.length > 0 ?
                         paginated.map((item, index) => (
                             <div className={`tdata grid max-md:!w-250 ${isFranchisor ? "grid-cols-7" : "grid-cols-5"}`} key={ index }>
-                                <div className="td">{ item.code }</div>
+                                <div onClick={ () => setView(item) } className="td">{ item.code }</div>
                                 <div className="td flex gap-2">
                                     <Tooltip>
                                         <TooltipTrigger>
@@ -107,10 +107,10 @@ export function SuppliesPage() {
                                     </Tooltip>
                                     <div>{ item.name }</div>
                                 </div>
-                                <div className="td flex gap-2">{ `${item.unitQuantity} ${item.unitMeasurement}` }</div>
+                                <div className="td flex gap-2">{ `${item.unitQuantity?.toFixed(2)} ${item.unitMeasurement}` }</div>
                                <div className="td flex gap-2 ">
                                     {item.convertedQuantity && item.convertedMeasurement
-                                        ? `${item.convertedQuantity} ${item.convertedMeasurement}`
+                                        ? `${item.convertedQuantity.toFixed(2)} ${item.convertedMeasurement}`
                                         : <div className="text-darkred font-semibold">N/A</div>}
                                 </div>
                                 {!isFranchisor && (
