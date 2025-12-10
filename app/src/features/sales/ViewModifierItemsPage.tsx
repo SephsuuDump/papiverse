@@ -2,24 +2,16 @@
 
 import { AppHeader } from "@/components/shared/AppHeader";
 import { TableFilter } from "@/components/shared/TableFilter";
-import { TablePagination } from "@/components/shared/TablePagination";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger } from "@/components/ui/select";
-import { useFetchData } from "@/hooks/use-fetch-data";
 import { usePagination } from "@/hooks/use-pagination";
 import { useSearchFilter } from "@/hooks/use-search-filter";
-import { formatToPeso } from "@/lib/formatter";
-import { ProductService } from "@/services/product.service";
 import { Product } from "@/types/products";
 import { ArrowLeft, Info, Salad, SquarePen, Trash2, X } from "lucide-react";
 import { useState } from "react";
-import { CreateProduct } from "./components/CreateProduct";
-import { UpdateProduct } from "./components/UpdateProduct";
-import { DeleteProduct } from "./components/DeleteProduct";
-import { PapiverseLoading, SectionLoading } from "@/components/ui/loader";
+import { PapiverseLoading } from "@/components/ui/loader";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Modifier, ModifierItem } from "@/types/modifier";
-import { ModifierGroupService, ModifierItemService } from "@/services/modifier.service";
-import { CreateModifierGroup } from "./components/CreateModifierGroup";
+import { ModifierItem } from "@/types/modifier";
+import { ModifierItemService } from "@/services/modifier.service";
 import { CreateModifierItem } from "./components/CreateModifierItem";
 import { useParams } from "next/navigation";
 import { useFetchOne } from "@/hooks/use-fetch-one";
@@ -27,6 +19,8 @@ import Link from "next/link";
 import { UpdateModifierItem } from "./components/UpdateModifierItem";
 import { DeleteModifierItem } from "./components/DeleteModifierItem";
 import { useAuth } from "@/hooks/use-auth";
+import { useCrudState } from "@/hooks/use-crud-state";
+import { ViewModifierItem } from "./components/ViewModifierItem";
 
 type ModifierGroupItems = {
     group: {
@@ -69,9 +63,7 @@ export function  ViewModifierItemsPage() {
     const { search, setSearch, filteredItems } = useSearchFilter(data?.modifierItems, ['name']);
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
 
-    const [open, setOpen] = useState(false);
-    const [toUpdate, setUpdate] = useState<ModifierItem | undefined>();
-    const [toDelete, setDelete]  = useState<ModifierItem | undefined>();
+    const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<ModifierItem>();
 
     if (loading || !data || authLoading) return <PapiverseLoading />
     return (
@@ -141,7 +133,7 @@ export function  ViewModifierItemsPage() {
                                 {isFranchisor && (
                                     <div className="td flex-center-y gap-2">
                                         <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                        <button><Info className="w-4 h-4" /></button>
+                                        <button onClick={ () => setView(item) }><Info className="w-4 h-4" /></button>
                                         <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
                                     </div>
                                 )}
@@ -184,6 +176,13 @@ export function  ViewModifierItemsPage() {
                     setReload={ setReload }
                 />
             }
+
+            {toView && (
+                <ViewModifierItem
+                    toView={ toView }
+                    setView={ setView }
+                />
+            )}
 
             {toUpdate && (
                 <UpdateModifierItem 

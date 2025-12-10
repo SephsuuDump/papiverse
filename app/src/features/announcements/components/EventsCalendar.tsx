@@ -29,7 +29,9 @@ const monthNames = [
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-export function EventsCalendar() {
+export function EventsCalendar({ isFranchisor }: {
+    isFranchisor: boolean
+}) {
     const phNow = new Date(
         new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" })
     );
@@ -185,12 +187,14 @@ export function EventsCalendar() {
                 </div>
                 <div className="flex-center-y w-full">
                     <div className="font-semibold uppercase scale-x-110 origin-left">{ dayLong }</div>
-                    <button 
-                        onClick={ () => setOpen(true) }
-                        className="bg-darkgreen p-1.5 rounded-full ms-auto"
-                    >
-                        <Plus className="w-4 h-4 text-white" />
-                    </button>
+                    {isFranchisor && (
+                        <button 
+                            onClick={ () => setOpen(true) }
+                            className="bg-darkgreen p-1.5 rounded-full ms-auto"
+                        >
+                            <Plus className="w-4 h-4 text-white" />
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -209,13 +213,15 @@ export function EventsCalendar() {
                         className="p-4 rounded-md bg-light shadow-sm mt-2 space-y-2 relative" 
                         key={ item.id }
                     >
-                        <AppRUDSelection 
-                            className="absolute top-4 right-4"
-                            icon={Ellipsis}
-                            item={ item }
-                            setUpdate={ setUpdate }
-                            setDelete={ setDelete }
-                        />
+                        {isFranchisor && (
+                            <AppRUDSelection 
+                                className="absolute top-4 right-4"
+                                icon={Ellipsis}
+                                item={ item }
+                                setUpdate={ setUpdate }
+                                setDelete={ setDelete }
+                            />
+                        )}
                         <div className="text-xs font-semibold">{ item.title }</div>
                         <div className="text-[11px] text-gray-800">{ item.description }</div>
                     </div>

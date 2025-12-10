@@ -1,6 +1,8 @@
 import { BranchSalesPage } from "@/features/sales/BranchSalesPage";
+import { requireRole } from "@/lib/auth";
 
-export default function Branches() {
+export default async function Branches() {
+    await requireRole(['FRANCHISOR']);
     return (
         <BranchSalesPage />
     )

@@ -15,6 +15,8 @@ import { UpdateModifierGroup } from "./components/UpdateModifierGroup";
 import { DeleteModifierGroup } from "./components/DeleteModifierGroup";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
+import { useCrudState } from "@/hooks/use-crud-state";
+import { ViewModifierGroup } from "./components/ViewModifierGroup";
 
 const pageKey = "modifierGroupPage"
 const columns = [
@@ -34,9 +36,7 @@ export function ModifierGroupsPage() {
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['name']);
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20, pageKey);
 
-    const [open, setOpen] = useState(false);
-    const [toUpdate, setUpdate] = useState<Modifier | undefined>();
-    const [toDelete, setDelete]  = useState<Modifier | undefined>();
+    const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Modifier>();
 
     if (loading || authLoading) return <SectionLoading />
     return (
@@ -71,7 +71,7 @@ export function ModifierGroupsPage() {
                                 {isFranchisor && (
                                     <div className="td flex-center-y gap-2">
                                         <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                        <button><Info className="w-4 h-4" /></button>
+                                        <button onClick={ () => setView(item) }><Info className="w-4 h-4" /></button>
                                         <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
                                     </div>
                                 )}
@@ -98,6 +98,13 @@ export function ModifierGroupsPage() {
                     setReload={ setReload }
                 />
             }
+
+            {toView && (
+                <ViewModifierGroup
+                    toView={ toView }
+                    setView={ setView }
+                />
+            )}
 
             {toUpdate && (
                 <UpdateModifierGroup 

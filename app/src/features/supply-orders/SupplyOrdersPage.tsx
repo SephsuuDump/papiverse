@@ -30,7 +30,7 @@ export default function SupplyOrdersPage() {
     const [reload, setReload] = useState(false);
     const [tab, setTab] = useState('Pending');
 
-    const { claims, loading: authLoading } = useAuth();
+    const { claims, loading: authLoading, isFranchisor } = useAuth();
     const { open, setOpen, showNotif, setShowNotif } = useCrudState();
     const isCommisary = claims.branch.branchId === 1;
     const fetchAll = useFetchData<SupplyOrder>(SupplyOrderService.getAllSupply, [reload, claims]);
@@ -78,6 +78,7 @@ export default function SupplyOrdersPage() {
                 filter={ filter }
                 filters={ filters }
                 setFilter={ setFilter }
+                removeFilter={ !isFranchisor }
                 filteredNotifications={ filteredNotifications }
                 setShowNotif={ setShowNotif }
             />
