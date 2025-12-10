@@ -11,11 +11,12 @@ import { TableFilter } from "@/components/shared/TableFilter";
 import { usePagination } from "@/hooks/use-pagination";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { BranchService } from "@/services/branch.service";
-import { CreateBranch } from "./CreateBranch";
-import { UpdateBranch } from "./UpdateBranch";
-import { DeleteBranch } from "./DeleteBranch";
+import { CreateBranch } from "./components/CreateBranch";
+import { UpdateBranch } from "./components/UpdateBranch";
+import { DeleteBranch } from "./components/DeleteBranch";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { useCrudState } from "@/hooks/use-crud-state";
+import { ViewBranch } from "./components/ViewBranch";
 
 const pageKey = "branchPage";
 const columns = [
@@ -40,7 +41,7 @@ export function BranchesPage() {
     });
 
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20, pageKey);
-    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Branch>();
+    const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete } = useCrudState<Branch>();
 
     if (loading) return <PapiverseLoading />
     return (
@@ -82,7 +83,7 @@ export function BranchesPage() {
                                 </div>
                                 <div className="td flex-center-y gap-2">
                                     <button onClick={() => setUpdate(item)}><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                    <button><Info className="w-4 h-4" /></button>
+                                    <button onClick={() => setView(item)}><Info className="w-4 h-4" /></button>
                                     <button onClick={() => setDelete(item)}><Trash2 className="w-4 h-4 text-darkred" /></button>
                                 </div>
                             </div>
@@ -106,6 +107,13 @@ export function BranchesPage() {
                 <CreateBranch 
                     setOpen={ setOpen }
                     setReload={ setReload }
+                />
+            )}
+
+            {toView && (
+                <ViewBranch
+                    toView={ toView }
+                    setView={ setView }
                 />
             )}
 

@@ -17,6 +17,7 @@ import { TablePagination } from "@/components/shared/TablePagination";
 import { UpdateInventory } from "./components/UpdateInventory";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { OrderStatusBadge } from "@/components/ui/badge";
+import { ViewInventory } from "./components/ViewInventory";
 
 const pageKey = "inventoryPage";
 const columns = [
@@ -46,13 +47,10 @@ export function InventoriesPage() {
         if (filter === 'Snow Frost') return i.category === 'SNOWFROST';
         if (filter === 'Non Deliverables') return i.category === 'NONDELIVERABLES';
         return true;
-    });
-
-    console.log(data);
-    
+    });    
 
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20, pageKey);
-    const { toUpdate, setUpdate } = useCrudState<Inventory>();
+    const { toView, setView, toUpdate, setUpdate } = useCrudState<Inventory>();
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
@@ -105,7 +103,7 @@ export function InventoriesPage() {
                                 </div>
                                 <div className="td flex-center-y gap-2 mx-auto">
                                     <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                    <button><Info className="w-4 h-4" /></button>
+                                    <button onClick={() => setView(item) }><Info className="w-4 h-4" /></button>
                                 </div>
                             </div>
                         ))
@@ -124,6 +122,13 @@ export function InventoriesPage() {
                 filter={ filter }
                 pageKey={ pageKey }
             />
+
+            {toView && (
+                <ViewInventory 
+                    toView={ toView }
+                    setView={ setView }
+                />
+            )}
 
             {toUpdate && (
                 <UpdateInventory

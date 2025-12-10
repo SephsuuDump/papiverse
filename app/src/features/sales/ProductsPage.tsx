@@ -22,6 +22,7 @@ import { useAuth } from "@/hooks/use-auth";
 import useNotifications from "@/hooks/use-notification";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { NotificationSheet } from "@/components/shared/NotificationSheet";
+import { ViewProduct } from "./components/ViewProduct";
 
 const pageKey = "productPage";
 const columns = [
@@ -55,7 +56,7 @@ export function ProductsPage() {
 
     const { page, setPage, size, setSize, paginated } = usePagination(filteredData, 20, pageKey);
 
-    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete, showNotif, setShowNotif } = useCrudState<Product>();
+    const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete, showNotif, setShowNotif } = useCrudState<Product>();
 
     if (loading || authLoading) return <SectionLoading />
     return (
@@ -134,7 +135,7 @@ export function ProductsPage() {
                                 {isFranchisor && (
                                     <div className="td flex-center-y gap-2 mx-auto">
                                         <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                        <button><Info className="w-4 h-4" /></button>
+                                        <button onClick={ () => setView(item) }><Info className="w-4 h-4" /></button>
                                         <button onClick={ () => setDelete(item) }><Trash2 className="w-4 h-4 text-darkred" /></button>
                                     </div>
                                 )}
@@ -162,6 +163,13 @@ export function ProductsPage() {
                     setReload={ setReload }
                 />
             }
+
+            {toView && (
+                <ViewProduct
+                    toView={ toView }
+                    setView={ setView }
+                />
+            )}
 
             {toUpdate && 
                 <UpdateProduct

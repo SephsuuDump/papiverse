@@ -7,20 +7,21 @@ import { Ham, Info, PackageX, Snowflake, SquarePen, Trash2, Truck } from "lucide
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSearchFilter } from "@/hooks/use-search-filter";
-import { CreateSupply } from "./CreateSupply";
+import { CreateSupply } from "./components/CreateSupply";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { SupplyService } from "@/services/supply.service";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { TableFilter } from "@/components/shared/TableFilter";
 import { usePagination } from "@/hooks/use-pagination";
 import { TablePagination } from "@/components/shared/TablePagination";
-import { UpdateSupply } from "./UpdateSupply";
-import { DeleteSupply } from "./DeleteSupply";
+import { UpdateSupply } from "./components/UpdateSupply";
+import { DeleteSupply } from "./components/DeleteSupply";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { useAuth } from "@/hooks/use-auth";
 import useNotifications from "@/hooks/use-notification";
 import { NotificationSheet } from "@/components/shared/NotificationSheet";
+import { ViewSupply } from "./components/ViewSupply";
 
 const pageKey = "supplyPage";
 const columns = [
@@ -61,7 +62,7 @@ export function SuppliesPage() {
     });
 
     const { page, setPage, size, setSize, paginated } = usePagination(filteredData, 20, pageKey);    
-    const { open, setOpen, toUpdate, setUpdate, toDelete, setDelete, showNotif, setShowNotif } = useCrudState<Supply>();
+    const { open, setOpen, toView, setView, toUpdate, setUpdate, toDelete, setDelete, showNotif, setShowNotif } = useCrudState<Supply>();
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
@@ -113,8 +114,8 @@ export function SuppliesPage() {
                                         : <div className="text-darkred font-semibold">N/A</div>}
                                 </div>
                                 {!isFranchisor && (
-                                    <div className="td">
-                                        { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceExternal!) }
+                                    <div className="td text-right">
+                                        { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(claims.branch.isInternal ? item.unitPriceInternal! : item.unitPriceExternal!) }
                                     </div>
                                 )}
                                 {isFranchisor && (
@@ -126,7 +127,7 @@ export function SuppliesPage() {
                                     </div>
                                     <div className="td flex-center-y gap-2 mx-auto">
                                         <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
-                                        <button><Info className="w-4 h-4" /></button>
+                                        <button onClick={ () => setView(item) }><Info className="w-4 h-4" /></button>
                                         <button
                                             onClick={ () => setDelete(item) }
                                         >
@@ -156,6 +157,13 @@ export function SuppliesPage() {
                 <CreateSupply 
                     setOpen={ setOpen }
                     setReload={ setReload }
+                />
+            )}
+
+            {toView && (
+                <ViewSupply
+                    toView={ toView }
+                    setView={ setView }
                 />
             )}
 
