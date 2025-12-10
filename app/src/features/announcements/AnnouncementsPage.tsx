@@ -25,7 +25,7 @@ export function AnnouncementPage() {
     const [reload, setReload] = useState(false);
     const [selectedTab, setSelectedTab] = useState("Announcements");
 
-    const { claims, loading: authLoading } = useAuth();
+    const { claims, loading: authLoading, isFranchisor } = useAuth();
     const { data: announcements, loading } = useFetchData<Announcement>(
         AnnouncementService.getAllAnnouncements,
         [reload],
@@ -60,7 +60,7 @@ export function AnnouncementPage() {
 
                 {selectedTab === "Events" && (
                     <div className="mt-2">
-                        <EventsCalendar />
+                        <EventsCalendar isFranchisor={ isFranchisor } />
                     </div>
                 )}
             </div>
@@ -76,7 +76,7 @@ export function AnnouncementPage() {
                     />
                 </ScrollArea>
 
-                <EventsCalendar />
+                <EventsCalendar isFranchisor={ isFranchisor } />
             </div>
 
             {open && (
