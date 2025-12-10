@@ -99,7 +99,7 @@ export function InquiriesPage() {
                                                         <User className="w-5 h-5 text-darkbrown" />
                                                         {inq.fullName}
                                                     </span>
-                                                    <span className="flex items-center gap-1 text-xs text-slate-500">
+                                                    <span className="m-1.5 flex items-center gap-1 text-xs text-slate-500">
                                                         <Mail className="h-4 w-4 text-slate-400" />
                                                         {inq.email}
                                                     </span>
