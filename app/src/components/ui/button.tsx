@@ -1,9 +1,11 @@
+"use client"
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
+import { CalendarSync, Plus, Trash2 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { CalendarSync, Plus, Trash2 } from "lucide-react"
 import { FormLoader } from "./loader"
 
 const buttonVariants = cva(
@@ -36,106 +38,111 @@ const buttonVariants = cva(
   }
 )
 
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
-  const Comp = asChild ? Slot : "button"
-
-  return (
-    <Comp
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
 }
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+
+    return (
+      <Comp
+        ref={ref}
+        data-slot="button"
+        className={cn(buttonVariants({ variant, size, className }))}
+        {...props}
+      />
+    )
+  }
+)
+
+Button.displayName = "Button"
 
 function AddButton({
   type,
-  handleSubmit,
   onProcess,
   label,
   loadingLabel,
-} : {
-  type: 'submit' | 'button';
-  handleSubmit?: () => void;
-  onProcess: boolean,
-  label?: string;
-  loadingLabel?: string;
+}: {
+  type: "submit" | "button"
+  onProcess: boolean
+  label?: string
+  loadingLabel?: string
 }) {
-  return(
-    <Button 
-        type={ type }
-        // onClick={ handleSubmit }
-        disabled={ onProcess }
-        size="sm"
-        className="!bg-darkgreen hover:opacity-90"
+  return (
+    <Button
+      type={type}
+      disabled={onProcess}
+      size="sm"
+      className="!bg-darkgreen hover:opacity-90"
     >
-        {!onProcess && <Plus className="w-4 h-4 text-light" />}
-        <FormLoader onProcess={ onProcess } label={ label ?? "Yes, I'm sure." } loadingLabel={ loadingLabel || "Loading" } />
+      {!onProcess && <Plus className="w-4 h-4 text-light" />}
+      <FormLoader
+        onProcess={onProcess}
+        label={label ?? "Yes, I'm sure."}
+        loadingLabel={loadingLabel || "Loading"}
+      />
     </Button>
-  );
+  )
 }
 
 function UpdateButton({
   type,
-  handleSubmit,
   onProcess,
   label,
   loadingLabel,
-} : {
-  type: 'submit' | 'button';
-  handleSubmit?: () => void;
-  onProcess: boolean,
-  label?: string;
-  loadingLabel?: string;
+}: {
+  type: "submit" | "button"
+  onProcess: boolean
+  label?: string
+  loadingLabel?: string
 }) {
-  return(
-    <Button 
-        type={ type }
-        // onClick={ handleSubmit }
-        disabled={ onProcess }
-        size="sm"
-        className="!bg-darkgreen hover:opacity-90"
+  return (
+    <Button
+      type={type}
+      disabled={onProcess}
+      size="sm"
+      className="!bg-darkgreen hover:opacity-90"
     >
-        {!onProcess && <CalendarSync className="w-4 h-4 text-light" />}
-        <FormLoader onProcess={ onProcess } label={ label ?? "Yes, I'm sure." } loadingLabel={ loadingLabel || "Loading" } />
+      {!onProcess && <CalendarSync className="w-4 h-4 text-light" />}
+      <FormLoader
+        onProcess={onProcess}
+        label={label ?? "Yes, I'm sure."}
+        loadingLabel={loadingLabel || "Loading"}
+      />
     </Button>
-  );
+  )
 }
 
 function DeleteButton({
   type,
-  handleDelete,
   onProcess,
   label,
   loadingLabel,
-} : {
-  type: 'submit' | 'button';
-  handleDelete?: () => void;
-  onProcess: boolean,
-  label?: string;
-  loadingLabel?: string;
+}: {
+  type: "submit" | "button"
+  onProcess: boolean
+  label?: string
+  loadingLabel?: string
 }) {
-  return(
-    <Button 
-        type={ type }
-        // onClick={ () => handleDelete() }
-        disabled={ onProcess }
-        size="sm"
-        className="!bg-darkred hover:opacity-90"
+  return (
+    <Button
+      type={type}
+      disabled={onProcess}
+      size="sm"
+      className="!bg-darkred hover:opacity-90"
     >
-        {!onProcess && <Trash2 className="w-4 h-4 text-light" />}
-        <FormLoader onProcess={ onProcess } label={ label ?? 'Delete' } loadingLabel={ loadingLabel ?? "Deleting" } /> 
+      {!onProcess && <Trash2 className="w-4 h-4 text-light" />}
+      <FormLoader
+        onProcess={onProcess}
+        label={label ?? "Delete"}
+        loadingLabel={loadingLabel ?? "Deleting"}
+      />
     </Button>
-  );
+  )
 }
 
 export { Button, buttonVariants, AddButton, UpdateButton, DeleteButton }

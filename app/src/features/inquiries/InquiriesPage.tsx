@@ -9,7 +9,7 @@ import { Mail, Phone, Search, User, MessageCircle, Ellipsis } from "lucide-react
 import { AppHeader } from "@/components/shared/AppHeader";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { InquiryService } from "@/services/inquiry.service";
-import { PapiverseLoading } from "@/components/ui/loader";
+import { PapiverseLoading, SectionLoading } from "@/components/ui/loader";
 import { useSearchFilter } from "@/hooks/use-search-filter";
 import { formatDateTime } from "@/lib/formatter";
 import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
@@ -25,7 +25,7 @@ export function InquiriesPage() {
     const { data: inquiries, loading: inquiriesLoading } = useFetchData<Inquiry>(
         InquiryService.getInquiriesByStatus,
         [reload],
-        ["NEW"]
+        [tab]
     )    
     const { setSearch, filteredItems: filtered } = useSearchFilter<Inquiry>(inquiries, ["fullName"]);
     const { toUpdate, setUpdate } = useCrudState<Inquiry>();
@@ -33,7 +33,6 @@ export function InquiriesPage() {
     const total = inquiries.length;
     const newCount = inquiries.filter((i) => i.status === "NEW").length;
 
-    if (inquiriesLoading) return <PapiverseLoading />
     return (
         <section className="stack-md reveal">
             <AppHeader label="All Inquiries" />
@@ -66,7 +65,7 @@ export function InquiriesPage() {
                             <MessageCircle className="h-6 w-6" />
                             <span>No inquiries found.</span>
                         </div>
-                    ) : (
+                    ) : !inquiriesLoading ? (
                         <div className="flex flex-col gap-2 md:gap-3">
                             {filtered.map((inq) => (
                                 <div
@@ -139,6 +138,8 @@ export function InquiriesPage() {
                                 </div>
                             ))}
                         </div>
+                    ) : (
+                        <SectionLoading />
                     )}
                 </ScrollArea>
             </div>

@@ -2,7 +2,7 @@ import { ModalTitle } from "@/components/shared/ModalTitle";
 import { UpdateButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
 import { InquiryService } from "@/services/inquiry.service";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const statuses = [
@@ -35,6 +35,11 @@ export function UpdateInquiry({ toUpdate, setUpdate, setReload }: {
             setProcess(false);
         }
     }
+
+    useEffect(() => {
+        console.log(selectedStatus);
+        
+    }, [selectedStatus])
     return (
         <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined) }}>
             <DialogContent>
