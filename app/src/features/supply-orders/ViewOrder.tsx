@@ -135,22 +135,20 @@ export function ViewOrderPage({ id }: { id: number }) {
             </div>
 
             <div className="relative p-4 bg-white rounded-md shadow-sm animate-fade-in-up" key={tab}>
-                {claims.roles[0] === 'FRANCHISOR' && (
-                    <div className="top-2 left-2 flex-center-y gap-2">
-                        <Checkbox id="meat" 
-                            className="border-1 border-gray shadow-sm w-5 h-5 data-[state=checked]:bg-darkgreen" 
-                            checked={ tab === 'Snow Order' ? snowApproved : meatApproved }
-                            onCheckedChange={(checked: boolean) => { tab === 'Snow Order' ? setSnowApproved(checked) : setMeatApproved(checked)}}
-                            disabled={ ["APPROVED", "DELIVERED", "REJECTED"].includes(data!.status!) }
-                        />
-                        <label htmlFor="meat" className={`text-[16px] font-semibold ${["APPROVED", "DELIVERED", "REJECTED"].includes(data!.status!) && "text-gray"}`}>
-                            {tab === 'Snow Order' ? 
-                                snowApproved ? 'Approved' : 'Not Approved'
-                                : meatApproved ? 'Approved' : 'Not Approved'
-                            }
-                        </label>
-                    </div>
-                )}
+                <div className="top-2 left-2 flex-center-y gap-2">
+                    <Checkbox id="meat" 
+                        className="border-1 border-gray shadow-sm w-5 h-5 data-[state=checked]:bg-darkgreen" 
+                        checked={ tab === 'Snow Order' ? snowApproved : meatApproved }
+                        onCheckedChange={(checked: boolean) => { tab === 'Snow Order' ? setSnowApproved(checked) : setMeatApproved(checked)}}
+                        disabled={ ["APPROVED", "DELIVERED", "REJECTED"].includes(data!.status!) || !isFranchisor }
+                    />
+                    <label htmlFor="meat" className={`text-[16px] font-semibold ${["APPROVED", "DELIVERED", "REJECTED"].includes(data!.status!) && "text-gray"}`}>
+                        {tab === 'Snow Order' ? 
+                            snowApproved ? 'Approved' : 'Not Approved'
+                            : meatApproved ? 'Approved' : 'Not Approved'
+                        }
+                    </label>
+                </div>
                 <Image src="/images/kp_logo.png" alt="KP Logo" width={60} height={60} className="top-2 right-2 absolute" />
                 <div className="flex justify-center items-center gap-2">
                     { tab === 'Snow Order' ? <Snowflake /> : <Ham /> }
