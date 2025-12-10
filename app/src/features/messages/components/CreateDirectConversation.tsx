@@ -25,7 +25,11 @@ export function CreateDirectConversation({ setOpen, users, claims, conversations
     console.log(conversations);
     const convoParticipants: number[][] = conversations
         .filter(item => item.participants.length === 2)
-        .map(item => item.participants.map(p => p.id));
+        .map(item =>
+            item.participants
+            .map(p => p.id)
+            .filter((id): id is number => id !== undefined)
+        );
     const [onProcess, setProcess] = useState(false)
     const [selectedConvo, setSelectedConvo] = useState<number | undefined>(undefined); 
 

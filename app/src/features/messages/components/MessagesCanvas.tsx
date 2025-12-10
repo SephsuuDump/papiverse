@@ -187,9 +187,25 @@ export function MessagesCanvas({ claims, selected }: Props) {
         <section className="relative flex flex-col col-span-3 border-1 h-[95vh]">
             {/* Header */}
             <div className="flex px-4 py-2 gap-2 sticky top-0 shadow-sm bg-light z-10">
-                <div className="flex font-semibold justify-center items-center bg-darkbrown text-light w-9 h-9 rounded-full">
-                    KP
-                </div>
+                <AppAvatar
+                    fallback={
+                        selected.participants.length === 2 &&
+                        selected.participants.find(u => u.id !== claims.userId)?.firstName &&
+                        selected.participants.find(u => u.id !== claims.userId)?.lastName
+                            ? `${selected.participants.find(u => u.id !== claims.userId)!.firstName?.[0] ?? ""}${
+                                selected.participants.find(u => u.id !== claims.userId)!.lastName?.[0] ?? ""
+                            }`
+                            : "KP"
+                    }
+                    src={
+                        selected.participants.length === 2
+                            ? selected.participants.find(u => u.id !== claims.userId)?.imageUrl
+                                ? `${NEXT_URL}/${selected.participants.find(u => u.id !== claims.userId)?.imageUrl}`
+                                : undefined
+                            : "/images/kp_logo.png"
+                    }
+                />
+
                 <div className="my-auto font-semibold text-sm truncate text-[16px]">
                     {renderHeaderTitle()}
                 </div>
@@ -240,7 +256,11 @@ export function MessagesCanvas({ claims, selected }: Props) {
                                     <div className="w-8 flex justify-center">
                                         {showSender && (
                                             <AppAvatar
-                                                fallback={`${sender!.firstName![0]}${sender!.lastName![0]}`}
+                                                fallback={
+                                                    sender?.firstName && sender?.lastName
+                                                        ? `${sender.firstName[0]}${sender.lastName[0]}`
+                                                        : "KP"
+                                                }
                                                 src={`${NEXT_URL}/${sender?.imageUrl}`}
                                             />
                                         )}
@@ -263,7 +283,11 @@ export function MessagesCanvas({ claims, selected }: Props) {
                                     <div className="w-8 flex justify-center">
                                         {showSender && (
                                             <AppAvatar
-                                                fallback={`${sender!.firstName![0]}${sender!.lastName![0]}`}
+                                                fallback={
+                                                    sender?.firstName && sender?.lastName
+                                                        ? `${sender.firstName[0]}${sender.lastName[0]}`
+                                                        : "KP"
+                                                }
                                                 src={`${NEXT_URL}/${sender?.imageUrl}`}
                                             />
                                         )}
