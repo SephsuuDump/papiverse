@@ -74,6 +74,7 @@ export function AppSidebar() {
         ANNOUNCEMENT: notifications.filter(n => n.type === "ANNOUNCEMENT").length,
         MESSAGE: notifications.filter(n => n.type === "MESSAGE").length,
         SYSTEM: notifications.filter(n => n.type === "SYSTEM").length,
+        INQUIRY: notifications.filter(n => n.type === "INQUIRY").length,
     };
 
 
@@ -280,6 +281,11 @@ export function AppSidebar() {
                                         { item.title === "Announcements" && notifCounts.ANNOUNCEMENT > 0 && (
                                             <Badge className="bg-darkred">
                                                 { notifCounts.ANNOUNCEMENT }
+                                            </Badge>
+                                        )}
+                                        { item.title === "Inquiries" && notifCounts.INQUIRY > 0 && (
+                                            <Badge className="bg-darkred">
+                                                { notifCounts.INQUIRY }
                                             </Badge>
                                         )}
                                     </SidebarMenuButton>

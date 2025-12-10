@@ -1,4 +1,4 @@
-import { BookMarked, ChartNoAxesCombined, Container, Ham, Megaphone, MessageCircleMore, Store, UserRound, UsersRound, Wallet } from "lucide-react";
+import { BookMarked, ChartNoAxesCombined, CircleQuestionMark, Container, Ham, Megaphone, MessageCircleMore, MessageCircleQuestionMark, Store, UserRound, UsersRound, Wallet } from "lucide-react";
 
 export const adminRoute = [
     { 
@@ -49,6 +49,12 @@ export const adminRoute = [
             { title: 'Supplies', href: '/supplies' },
             { title: 'Products', href: '/products' },
         ]
+    },
+    { 
+        title: 'Inquiries', 
+        icon: MessageCircleQuestionMark,
+        href: '/inquiries',
+        children: []
     },
     
     

@@ -38,7 +38,7 @@ function InquiryLeftSide() {
             </div>
             <div className="text-4xl font-extrabold text-shadow-2xs text-darkbrown">Krispy Papi Inquiry</div>
             <div className="text-gray-900 text-[16px] scale-x-105 origin-left w-100">
-                Have a question or inquiry to Krispy Papi? Reach us out using this form. We're here to help!
+                Have a question or inquiry to Krispy Papi? Reach us out using this form. We&apos;re here to help!
             </div>  
             <div className="text-[16px] text-gray-900 mt-8 scale-x-105 origin-left">
                 <div className="text-sm text-gray scale-x-105 origin-left">Our main location:</div>
