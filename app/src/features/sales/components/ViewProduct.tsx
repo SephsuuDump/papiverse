@@ -13,7 +13,7 @@ export function ViewProduct({
 }) {
     return (
         <Dialog open onOpenChange={(open) => { if (!open) setView(undefined); }}>
-            <DialogContent className="max-w-2xl max-h-10/11 overflow-y-auto">
+            <DialogContent className="max-h-10/11 overflow-y-auto">
                 <ModalTitle
                     label="Product Information"
                     spanLabel={toView.name}

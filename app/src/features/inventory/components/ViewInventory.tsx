@@ -14,7 +14,7 @@ export function ViewInventory({
     const { day, monthLong, dayLong, year } = useToday(); 
     return (
         <Dialog open onOpenChange={(open) => { if (!open) setView(undefined); }}>
-            <DialogContent className="max-w-md">
+            <DialogContent>
                 <ModalTitle
                     label="Inventory Information"
                     spanLabel={toView.name}

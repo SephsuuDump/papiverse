@@ -21,9 +21,9 @@ export class InquiryService {
         );
     }
 
-    static async updateInquiryStatus(id: number, status: string) {
+    static async updateInquiryStatus(id: number, status: string, userId: number) {
         return await requestData(
-            `${url}/update-by-id?id=${id}&status=${status}`,
+            `${url}/update-by-id?id=${id}&status=${status}&userId=${userId}`,
             "POST",
         );
     } 

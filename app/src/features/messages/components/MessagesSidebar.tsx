@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { Plus, Search, UserRoundPlus, UsersRound } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,13 @@ import { Claim } from "@/types/claims";
 import { Conversation } from "@/types/messaging";
 import { fromatMessageDateTime } from "@/lib/formatter";
 import { useSearchFilter } from "@/hooks/use-search-filter";
+import { Badge } from "@/components/ui/badge";
+import useNotifications from "@/hooks/use-notification";
+import { SectionLoading } from "@/components/ui/loader";
+import { toast } from "sonner";
+import { NotificationService } from "@/services/notification.service";
+import { useAuth } from "@/hooks/use-auth";
+import { messages } from "@/lib/data-array";
 
 interface Props {
     claims: Claim;
@@ -29,11 +36,39 @@ export function MessagesSidebar({
     setSelected,
 }: Props) {
     const { setSearch, filteredItems } = useSearchFilter(conversations, ["name"]);
+    const { filteredNotifications, loading: notifLoading } = useNotifications({ claims, type: "MESSAGE" })
+    console.log('Filtered notif', filteredNotifications);
+    console.log('Conversations', conversations);
+    
+    
+    
+    useEffect(() => {
+        if (!selected?.id) return;
+        if (!filteredNotifications.length) return;
+
+        async function handleDelete() {
+            try {
+                const ids = filteredNotifications
+                    .filter(item => Number(item.metadata) === selected?.id)
+                    .map(item => item.notificationId);
+
+                if (!ids.length) return;
+
+                await NotificationService.bulkDelete({
+                    toDelete: ids
+                });
+            } catch (error) {
+                toast.error(String(error));
+            }
+        }
+
+        handleDelete();
+    }, [selected?.id, filteredNotifications]);
+
 
     const renderConversationName = (conversation: Conversation) => {
         if (conversation.name !== "none") return conversation.name;
 
-        // Direct / group name fallback
         if (conversation.participants.length > 2) {
             return conversation.participants
                 .slice(0, 3)
@@ -50,6 +85,7 @@ export function MessagesSidebar({
         return `${other?.firstName ?? ""} ${other?.lastName ?? ""}`.trim();
     };
 
+    if (notifLoading) return <SectionLoading />
     return (
         <section className="flex flex-col border-1 py-2.5 h-[95vh]">
             {/* Header + Search */}
@@ -82,7 +118,7 @@ export function MessagesSidebar({
 
             {/* Conversation List */}
             <div className="mt-2 px-4 pb-4 overflow-y-auto flex-1">
-                {filteredItems.map((item, index) => (
+                {conversations.map((item, index) => (
                     <button
                         key={index}
                         onClick={() => setSelected(item)}
@@ -90,6 +126,30 @@ export function MessagesSidebar({
                             selected?.id === item.id && "!bg-orange-200"
                         }`}
                     >
+                        
+                        {(() => {
+                            const count = filteredNotifications.filter(n => {
+                                // console.log("claims.userId:", claims.userId);
+                                // console.log("selected item.id:", item.id);
+                                // console.log("n.recipientId:", n.recipientId);
+                                // console.log("n.metadata:", n.metadata);
+                                // console.log(item);
+                                
+
+                                return Number(n.metadata) === item?.id && claims.userId === n.recipientId;
+                            }).length;
+
+                            if (count > 0) {
+                                return (
+                                    <Badge className="absolute top-2 right-2 bg-darkred text-light text-[10px] w-4 h-4 p-1.5">
+                                        {count}
+                                    </Badge>
+                                );
+                            }
+
+                            return null;
+                        })()}
+
                         <AppAvatar fallback="KP" />
                         <div className="w-full pl-1">
                             <div className="text-start font-semibold text-sm">

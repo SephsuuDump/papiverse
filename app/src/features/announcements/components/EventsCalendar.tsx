@@ -92,7 +92,7 @@ export function EventsCalendar() {
     return (
         <ScrollArea className="space-y-2 h-[95vh]">
             <div className="flex-center-y justify-between">
-                <div className="flex-center-y gap-1 text-lg font-bold">Events Calendar</div>
+                <div className="flex-center-y gap-1 text-lg font-bold max-md:hidden">Events Calendar</div>
                 <Button 
                     onClick={ () => setShowNotif?.(true) }
                     className="my-auto bg-light shadow-sm border-1 hover:bg-slate-200"

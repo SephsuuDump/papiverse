@@ -23,8 +23,18 @@ export function DateRangePicker({
     const toYMD = (d: Date | undefined) =>
         d ? format(d, "yyyy-MM-dd") : "";
 
-    const displayDate = (iso: string) =>
-        iso ? format(new Date(iso), "PPP") : "Select date";
+    const displayDate = (iso: string) => {
+        if (!iso) return "Select date";
+
+        const date = new Date(iso);
+
+        const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+        return isMobile
+            ? format(date, "MM/dd/yyyy") 
+            : format(date, "PPP");        
+    };
+
 
     const today = new Date();
     const currentYear = today.getFullYear();
@@ -64,7 +74,7 @@ export function DateRangePicker({
                     <Button
                         variant="outline"
                         className={cn(
-                            "w-[180px] justify-between text-left font-normal",
+                            "w-[180px] justify-between text-left font-normal max-sm:w-[120px]",
                             !startDate && "text-muted-foreground"
                         )}
                     >
@@ -76,7 +86,7 @@ export function DateRangePicker({
                 <PopoverContent className="p-0">
                     <Calendar
                         mode="single"
-                        disabled={disableFutureDates}  // <<< DISABLE FUTURE MONTHS + DAYS
+                        disabled={disableFutureDates}  
                         selected={startDate ? new Date(startDate) : undefined}
                         onSelect={handleStartChange}
                         fromYear={fromYear}
@@ -90,7 +100,7 @@ export function DateRangePicker({
                     <Button
                         variant="outline"
                         className={cn(
-                            "w-[180px] justify-between text-left font-normal",
+                            "w-[180px] justify-between text-left font-normal max-sm:w-[120px]",
                             !endDate && "text-muted-foreground"
                         )}
                     >

@@ -16,6 +16,7 @@ import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { UpdateInquiry } from "./components/UpdateInquiry";
 import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
+import { useAuth } from "@/hooks/use-auth";
 
 const tabs = ["NEW", "RESOLVED", "IN_PROGRESS"];
 
@@ -30,8 +31,7 @@ export function InquiriesPage() {
     const { setSearch, filteredItems: filtered } = useSearchFilter<Inquiry>(inquiries, ["fullName"]);
     const { toUpdate, setUpdate } = useCrudState<Inquiry>();
 
-    const total = inquiries.length;
-    const newCount = inquiries.filter((i) => i.status === "NEW").length;
+
 
     return (
         <section className="stack-md reveal">
@@ -115,14 +115,14 @@ export function InquiriesPage() {
                                                                 ? "border-emerald-300 bg-emerald-50 text-emerald-700"
                                                                 : inq.status === "RESOLVED"
                                                                 ? "border-slate-200 bg-slate-50 text-slate-500"
-                                                                : "border-slate-200 bg-slate-50 text-slate-600"
+                                                                : "border-yellow-600 bg-slate-50 text-yellow-600"
                                                         }
                                                     >
                                                         {inq.status === "NEW"
                                                             ? "New Inquiry"
                                                             : inq.status === "RESOLVED"
                                                             ? "Resolved"
-                                                            : "Archived"}
+                                                            : "In Progress"}
                                                     </Badge>
                                                 )}
                                             </div>

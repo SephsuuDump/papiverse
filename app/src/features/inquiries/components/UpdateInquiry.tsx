@@ -1,6 +1,8 @@
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { UpdateButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
+import { ModalLoader } from "@/components/ui/loader";
+import { useAuth } from "@/hooks/use-auth";
 import { InquiryService } from "@/services/inquiry.service";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +18,7 @@ export function UpdateInquiry({ toUpdate, setUpdate, setReload }: {
     setUpdate: Dispatch<SetStateAction<Inquiry | undefined>>
     setReload: Dispatch<SetStateAction<boolean>>
 }) {
+    const { claims, loading: authLoading } = useAuth();
     const [onProcess, setProcess] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState<string | undefined>();
 
@@ -23,7 +26,7 @@ export function UpdateInquiry({ toUpdate, setUpdate, setReload }: {
         try {
             setProcess(true)
             if (!selectedStatus) return toast.info("Please select status to update")
-            const data = await InquiryService.updateInquiryStatus(toUpdate.inquiryId, selectedStatus);
+            const data = await InquiryService.updateInquiryStatus(toUpdate.inquiryId, selectedStatus, claims.userId);
             if (data) {
                 toast.success("Inquiry status updated successfully")
                 setReload(prev => !prev)
@@ -36,10 +39,7 @@ export function UpdateInquiry({ toUpdate, setUpdate, setReload }: {
         }
     }
 
-    useEffect(() => {
-        console.log(selectedStatus);
-        
-    }, [selectedStatus])
+    if (authLoading) return <ModalLoader />
     return (
         <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined) }}>
             <DialogContent>

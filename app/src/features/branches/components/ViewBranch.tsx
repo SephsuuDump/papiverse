@@ -12,7 +12,7 @@ export function ViewBranch({
 }) {
     return (
         <Dialog open onOpenChange={(open) => { if (!open) setView(undefined); }}>
-            <DialogContent className="max-w-md max-h-10/11 overflow-y-auto">
+            <DialogContent className="max-h-10/11 overflow-y-auto">
                 <ModalTitle
                     label="Branch Information"
                     spanLabel={toView.branchName}

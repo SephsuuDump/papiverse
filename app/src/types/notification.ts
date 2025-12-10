@@ -10,4 +10,5 @@ export interface NotificationResponse {
     createdAt: string; 
     read: boolean;
     deleted: boolean;
+    metadata: string;
 }

@@ -15,9 +15,7 @@ import {
     EllipsisIcon,
     Info,
     Link as LinkIcon,
-    Mic,
     Send,
-    SmilePlus,
 } from "lucide-react";
 
 import { Claim } from "@/types/claims";
@@ -33,6 +31,7 @@ import {
     WSMessage, // assumes you have REST methods here (e.g., getMessages)
 } from "@/services/messaging.service";
 import { AppAvatar } from "@/components/shared/AppAvatar";
+import useNotifications from "@/hooks/use-notification";
 
 interface Props {
     claims: Claim;
@@ -50,7 +49,6 @@ export function MessagesCanvas({ claims, selected }: Props) {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Initial messages load when conversation changes
     useEffect(() => {
         if (!selected) return;
 
@@ -72,18 +70,15 @@ export function MessagesCanvas({ claims, selected }: Props) {
         fetchMessages();
     }, [selected.id, claims.userId]);
 
-    // WebSocket connection for this conversation
     useEffect(() => {
         if (!selected) return;
 
         connectWebSocket(
             claims.userId,
             selected.id,
-            // onMessageReceived
             (newMessage: Message) => {
                 setMessages((prev) => [...prev, newMessage]);
             },
-            // onTyping
             (typingUser: { userId: number }) => {
                 if (typingUser.userId === claims.userId) return;
 
@@ -220,7 +215,7 @@ export function MessagesCanvas({ claims, selected }: Props) {
 
                     return (
                         <Fragment key={message.id ?? index}>
-                            {/* ✅ Sender Name */}
+                            
                             {showSender && (
                                 <div
                                     className={`text-gray text-[10px] -mb-1.5 ${

@@ -109,7 +109,7 @@ export function SalesPage({ branchId }: {
     return (
         <section className="stack-md animate-fade-in-up">
             <div className="flex-center-y justify-between max-md:flex-col max-sm:gap-2">
-                <div className="text-lg font-semibold pl-2 scale-x-110 origin-left">
+                <div className="text-lg font-semibold pl-2 scale-x-110 origin-left whitespace-normal break-words flex">
                     { formatSummaryDate(startDate, endDate) }
                 </div>
                 <div className="flex-center-y gap-2">
@@ -495,7 +495,9 @@ function formatSummaryDate(start: string, end: string) {
     }
 
     return (
-        <div>From <span className="text-darkorange">{`${startFormatted} - ${endFormatted}`}</span></div>
+        <div className="whitespace-normal break-words">
+            From <span className="text-darkorange break-words">{`${startFormatted} - ${endFormatted}`}</span>
+        </div>
     )
 }
 
