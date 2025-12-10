@@ -152,8 +152,8 @@ export function MessagesSidebar({
                         })()}
 
                         <AppAvatar 
-                            fallback="KP"
-                            src={ `${NEXT_URL}/${item.participants.find(u => u.id === claims.userId)?.imageUrl}` }
+                            fallback={item.participants.length === 2 ? `${item.participants.find(u => u.id !== claims.userId)?.firstName![0]}${item.participants.find(u => u.id !== claims.userId)?.lastName![0]}` : "KP"}
+                            src={item.participants.length === 2 ? `${NEXT_URL}/${item.participants.find(u => u.id === claims.userId)?.imageUrl}` : "/images/kp_logo.png" }
                         />
                         <div className="w-full pl-1">
                             <div className="text-start font-semibold text-sm">
