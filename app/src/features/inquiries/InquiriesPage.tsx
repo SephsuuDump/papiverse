@@ -15,10 +15,13 @@ import { formatDateTime } from "@/lib/formatter";
 import { AppRUDSelection } from "@/components/shared/AppRUDSelection";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { UpdateInquiry } from "./components/UpdateInquiry";
+import { AppTabSwitcher } from "@/components/shared/AppTabSwitcher";
 
+const tabs = ["NEW", "RESOLVED", "IN_PROGRESS"];
 
 export function InquiriesPage() {
     const [reload, setReload] = useState(false);
+    const [tab, setTab] = useState(tabs[0])
     const { data: inquiries, loading: inquiriesLoading } = useFetchData<Inquiry>(
         InquiryService.getInquiriesByStatus,
         [reload],
@@ -40,16 +43,11 @@ export function InquiriesPage() {
                     placeholder="Find an inquiry"
                     onChange={ e => setSearch(e.target.value) }
                 />
-                <div className="flex flex-wrap gap-2 pt-1 text-xs">
-                    <span className="h-8 text-sm inline-flex items-center gap-1 rounded-md bg-darkbrown text-slate-50 px-2.5 py-1">
-                        {total} Total Inquiries
-                    </span>
-                    {newCount > 0 && (
-                        <span className="h-8 inline-flex items-center gap-1 text-sm rounded-md bg-emerald-50 px-2.5 py-1 text-emerald-700 border-darkgreen border">
-                            {newCount} New
-                        </span>
-                    )}
-                </div>
+                <AppTabSwitcher 
+                    tabs={ tabs }
+                    selectedTab={ tab }
+                    setSelectedTab={ setTab }
+                />
             </div>
 
             <div className="flex flex-1 flex-col rounded-2xl border border-slate-100 bg-white/80 shadow-sm backdrop-blur-sm">
