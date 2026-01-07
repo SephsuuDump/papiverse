@@ -196,30 +196,41 @@ export function UpdateSupply({ toUpdate, setUpdate, setReload }: Props) {
                                 />
                             </div>
                         </div>
-                    </div>
-                    <div className="flex flex-col gap-1 col-span-2">
-                        <div className="mt-2">Select Delivery Type</div>
-                        <RadioGroup
-                            className="mt-2 flex"
-                            value={supply.isDeliverables ? "true" : "false"}
-                            name="isDeliverables"
-                            onValueChange={(value: string) => {
-                            setSupply((prev) => ({
-                                    ...prev,
-                                    isDeliverables: value === "true",
-                                }));
-                            }}
+                        <div className="flex flex-col gap-1">
+                        <div>Delivery Type</div>
+                        <Select
+                            value={ supply.isDeliverables ? "true" : "false" }
+                            onValueChange={ (value) => setSupply(prev => ({
+                                ...prev,
+                                isDeliverables: value === "true" ? true : false
+                            })) }
                         >
-                            <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="true" className="border border-gray-300" id="deliverable" />
-                            <Label htmlFor="deliverable">Deliverable</Label>
-                            </div>
-
-                            <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="false" className="border border-gray-300" id="non-deliverable" />
-                            <Label htmlFor="non-deliverable">Non-Deliverable</Label>
-                            </div>
-                        </RadioGroup>
+                            <SelectTrigger className="w-full border-gray">
+                                <SelectValue placeholder="Select option" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="true">DELIVERABLES</SelectItem>
+                                <SelectItem value="false">NON-DELIVERABLES</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                        <div>Minimum Required Stock</div>
+                        <div className="flex border-1 border-gray rounded-md">
+                            <Input 
+                                type="number"
+                                className="w-full border-0 max-md:w-full" 
+                                name ="minStock"  
+                                value={ supply.minStock }
+                                onChange={ e => handleChange(e, setSupply) }
+                            />
+                            <Input 
+                                className="w-full border-0"
+                                value={ supply.unitMeasurement }
+                                readOnly
+                            />
+                        </div>
+                    </div>
                     </div>
                     <div className="flex justify-end gap-4">
                         <DialogClose className="text-sm">Close</DialogClose>

@@ -41,6 +41,20 @@ export class SalesService {
         )
     }
 
+    static async getBranchRankings(start: string, end: string) {
+        return await requestData(
+            `${salesUrl}/branch-ranking?start=${start}&end=${end}`,
+            'GET'
+        )
+    }
+
+    static async getProductRanking(start: string, end: string) {
+        return await requestData(
+            `${salesUrl}/products-ranking?start=${start}&end=${end}`,
+            'GET'
+        )
+    }
+
     static async getSalesCalendar(branchId: number, month: string, year: string) {
         return await requestData(
             `${salesUrl}/get-calendar?branchId=${branchId}&month=${month}&year=${year}`,

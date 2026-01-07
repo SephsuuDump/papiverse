@@ -8,6 +8,11 @@ export interface Employee {
     position: string;
 }
 
+export interface Positiion {
+    id: number;
+    name: string;
+}
+
 export const employeeInit: Employee = {
     firstName: "",
     middleName: "",
@@ -23,3 +28,4 @@ export const employeeFields: (keyof Employee)[] = [
     "email",
     "position"
 ];  
+

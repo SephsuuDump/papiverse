@@ -10,6 +10,8 @@ export interface Inventory {
     category?: string;
     quantity?: number;
     branchId?: number;
+    stockLevel?: string; 
+    minStock?: number;
 
     changedQuantity?: number;
     rawMaterialCode?: string;

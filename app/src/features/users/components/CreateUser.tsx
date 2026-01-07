@@ -183,7 +183,7 @@ export function CreateUser({ setOpen, setReload }: {
                             </Popover>
                         </div>
                         <div className="flex flex-col gap-1">
-                            <div>Gender</div>
+                            <div>Sex</div>
                             <Select 
                                 value={ user.gender ?? "" }
                                 onValueChange={ (value) => setUser(prev => ({

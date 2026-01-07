@@ -10,7 +10,7 @@ export type Supply = {
     convertedQuantity?: number;
     convertedMeasurement?: string;
     category?: string;
-
+    minStock?: number;
     unitPrice?: number; 
 }
 
@@ -25,6 +25,7 @@ export const supplyInit: Supply = {
     unitPriceInternal: 0,
     unitPriceExternal: 0,
     category: "",
+    minStock: 0
 };
 
 export const supplyFields: (keyof Supply)[] = [

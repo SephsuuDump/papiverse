@@ -45,7 +45,7 @@ export function AddRemarks({ claims, order, setOrder, setReload }: Props) {
                 >
                     <div>
                         <Textarea 
-                            value={ remarks }
+                            value={ remarks ? remarks : claims.roles[0] === "FRANCHISEE" ? "No remarks." : remarks  }
                             className="border-1 border-gray"
                             placeholder="Enter your remarks for this supply order"
                             onChange={(e) => setRemarks(e.target.value)}

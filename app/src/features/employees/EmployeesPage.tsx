@@ -12,9 +12,9 @@ import { AppHeader } from "@/components/shared/AppHeader";
 import { TableFilter } from "@/components/shared/TableFilter";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { EmployeeService } from "@/services/employee.service";
-import { CreateEmployee } from "./CreateEmployee";
-import { UpdateEmployee } from "./UpdateEmployee";
-import { DeleteEmployee } from "./DeleteEmployee";
+import { CreateEmployee } from "./components/CreateEmployee";
+import { UpdateEmployee } from "./components/UpdateEmployee";
+import { DeleteEmployee } from "./components/DeleteEmployee";
 import { AppAvatar } from "@/components/shared/AppAvatar";
 
 const columns = [

@@ -52,7 +52,7 @@ export function useFetchData<T>(
         return () => {
             isMounted = false;
         };
-        }, [page, size, ...args, ...deps]);
+        }, [page, size, ...deps]);
 
     const data = Array.isArray(items) ? items : [];
     return { data, loading, error };

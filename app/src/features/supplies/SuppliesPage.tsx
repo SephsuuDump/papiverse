@@ -29,6 +29,7 @@ const columns = [
     { title: "Supply Name", style: "" },
     { title: "Base Measurement", style: "" },
     { title: "Converted Measurement", style: "" },
+    { title: "Minimum Stock Required", style: "" },
     { title: "Internal Price", style: "text-right" },
     { title: "External Price", style: "text-right" },
     { title: 'Action', style: 'text-center' }
@@ -84,7 +85,7 @@ export function SuppliesPage() {
             />
 
             <div className="table-wrapper">
-                <div className={`thead grid max-md:!w-250 ${isFranchisor ? "grid-cols-7" : "grid-cols-5"}`}>
+                <div className={`thead grid max-md:!w-250 ${isFranchisor ? "grid-cols-8" : "grid-cols-6"}`}>
                     {(isFranchisor ? columns : franchiseeColumns).map((item, index) => (
                         <div key={index} className={`th ${item.style}`}>{item.title}</div>
                     ))}                     
@@ -93,7 +94,7 @@ export function SuppliesPage() {
                 <div className="animate-fade-in-up" key={`${page}-${filter}`}>
                     {paginated.length > 0 ?
                         paginated.map((item, index) => (
-                            <div className={`tdata grid max-md:!w-250 ${isFranchisor ? "grid-cols-7" : "grid-cols-5"}`} key={ index }>
+                            <div className={`tdata grid max-md:!w-250 ${isFranchisor ? "grid-cols-8" : "grid-cols-6"}`} key={ index }>
                                 <div onClick={ () => setView(item) } className="td">{ item.code }</div>
                                 <div className="td flex gap-2">
                                     <Tooltip>
@@ -118,6 +119,9 @@ export function SuppliesPage() {
                                         { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(claims.branch.isInternal ? item.unitPriceInternal! : item.unitPriceExternal!) }
                                     </div>
                                 )}
+                                <div className={`td`}>
+                                    { item.minStock } { item.unitMeasurement ?? '' }
+                                </div>
                                 {isFranchisor && (
                                     <><div className="td text-right">
                                         { !item.isDeliverables ? <OrderStatusBadge className="scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPriceInternal!) }

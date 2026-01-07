@@ -19,6 +19,13 @@ export class InventoryService {
     );
   }
 
+  static async getItemAudits(id: number, code: string, page: number, size: number) {
+    return await requestData(
+        `${url}/get-item-audit?branchId=${id}&code=${code}&page=${page}&size=${size}`,
+        "GET"
+    );
+  }
+
   static async createInventory(inventory: Inventory) {
     return await requestData(
         `${url}/create`,

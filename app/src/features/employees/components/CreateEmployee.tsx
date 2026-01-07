@@ -1,56 +1,61 @@
-import { UpdateButton } from "@/components/ui/button";
+import { ModalTitle } from "@/components/shared/ModalTitle";
+import { AddButton } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { ModalLoader } from "@/components/ui/loader";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useFetchData } from "@/hooks/use-fetch-data";
 import { handleChange } from "@/lib/form-handle";
-import { EmployeeService } from "@/services/employee.service";
+import { EmployeeService, PositionService } from "@/services/employee.service";
 import { Claim } from "@/types/claims";
-import { Employee, employeeFields } from "@/types/employee";
+import { Employee, employeeFields, employeeInit, Positiion } from "@/types/employee";
 import Image from "next/image";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
 interface Props {
     claims: Claim;
-    toUpdate: Employee;
-    setUpdate: React.Dispatch<React.SetStateAction<Employee | undefined>>;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function UpdateEmployee({ claims, toUpdate, setUpdate, setReload }: Props) {
+export function CreateEmployee({ claims, setOpen, setReload }: Props) {
     const [onProcess, setProcess] = useState(false);
-    const [employee, setEmployee] = useState<Employee>(toUpdate);
+    const [employee, setEmployee] = useState<Employee>(employeeInit);
+
+    const { data: positions, loading: loadingPositions, error } = useFetchData<Positiion>(
+        PositionService.getAllPositions, 
+    );
 
     async function handleSubmit() {
         try {
             setProcess(true);
+            let invalid = false;
             for (const field of employeeFields) {
-                    if (employee[field] === "" || employee[field] === undefined || employee[field] === 0) {
-                        toast.info("Please fill up all fields!");
-                        return; 
-                    }
+                if (!employee[field]) {
+                    invalid = true;
                 }
-            const data = await EmployeeService.updateEmployee(employee);
-            if (data) toast.success(`${employee.firstName} ${employee.lastName} updated successfully.`)
+            }
+            if (invalid) {
+                toast.info("Please fill up all fields!");
+                setProcess(false);
+                return
+            }
+            const data = await EmployeeService.createEmployee(employee, claims.branch.branchId);
+            if (data)  {
+                toast.success(`${employee.firstName} ${employee.lastName} added successfully.`);
+                setReload(prev => !prev);
+                setOpen(!open);
+            }
         } catch (error) { toast.error(`${error}`) }
-        finally { 
-            setReload(prev => !prev);
-            setProcess(false); 
-            setUpdate(undefined);
-        }
+        finally { setProcess(false); }
     }
 
+    if (loadingPositions) return <ModalLoader />
     return(
-        <Dialog open onOpenChange={ (open) => { if (!open) setUpdate(undefined); } }>
+        <Dialog open onOpenChange={ setOpen }>
             <DialogContent>
-                <DialogTitle className="flex items-center gap-2">  
-                    <Image
-                        src="/images/kp_logo.png"
-                        alt="KP Logo"
-                        width={40}
-                        height={40}
-                    />
-                    <div className="font-semibold text-xl">Edit <span className="text-darkorange">{ `${toUpdate.firstName} ${toUpdate.lastName}` }</span></div>      
-                </DialogTitle>
+                <ModalTitle label="All Employees" />
                 <div className="grid grid-cols-2 gap-2">
                     <div className="col-span-2 flex flex-col gap-1">
                         <div>First Name</div>
@@ -91,12 +96,22 @@ export function UpdateEmployee({ claims, toUpdate, setUpdate, setReload }: Props
                     </div>
                     <div className="flex flex-col gap-1">
                         <div>Position</div>
-                        <Input    
-                            className="w-full border-1 border-gray max-md:w-full" 
-                            name ="position"  
-                            value={employee.position}
-                            onChange={ e => handleChange(e, setEmployee)}
-                        />
+                        <Select
+                            value={ employee.position }
+                            onValueChange={ (value) => setEmployee(prev => ({
+                                ...prev,
+                                position: value
+                            })) }
+                        >
+                            <SelectTrigger className="w-full border-gray">
+                                <SelectValue placeholder="Select Position" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {positions.map((item) => (
+                                    <SelectItem key={item.id} value={item.name}>{item.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
                 <form 
@@ -107,11 +122,11 @@ export function UpdateEmployee({ claims, toUpdate, setUpdate, setReload }: Props
                     }}
                 >
                     <DialogClose className="text-sm">Close</DialogClose>
-                    <UpdateButton 
+                    <AddButton 
                         type="submit"
                         onProcess={ onProcess }
-                        label="Update Employee"
-                        loadingLabel="Updating Employee"
+                        label="Add Employee"
+                        loadingLabel="Adding Employee"
                     />
                 </form>
             </DialogContent>

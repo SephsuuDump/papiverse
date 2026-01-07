@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useAuth } from "@/hooks/use-auth";
 import { formatToPeso } from "@/lib/formatter";
 import { Inventory } from "@/types/inventory";
-import { Ham, Info, PackageX, Snowflake, SquarePen } from "lucide-react";
+import { Ham, Info, LayoutList, List, PackageX, Snowflake, SquarePen } from "lucide-react";
 import { useState } from "react";
 import { useFetchData } from "@/hooks/use-fetch-data";
 import { InventoryService } from "@/services/inventory.service";
@@ -18,6 +18,7 @@ import { UpdateInventory } from "./components/UpdateInventory";
 import { useCrudState } from "@/hooks/use-crud-state";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { ViewInventory } from "./components/ViewInventory";
+import { ViewItemInventoryLog } from "./components/ViewItemInventoryLog";
 
 const pageKey = "inventoryPage";
 const columns = [
@@ -51,6 +52,7 @@ export function InventoriesPage() {
 
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20, pageKey);
     const { toView, setView, toUpdate, setUpdate } = useCrudState<Inventory>();
+    const { toView: toViewItem, setView: setViewItem } = useCrudState<Inventory>();
 
     if (loading || authLoading) return <PapiverseLoading />
     return(
@@ -92,11 +94,21 @@ export function InventoriesPage() {
                                     </Tooltip>
                                     <div>{ item.name }</div>
                                 </div>
-                                <div className="td">
-                                    <span className="text-darkbrown font-semibold">{ item.quantity }</span> { item.unitMeasurement }
-                                </div>
-                                <div className="td">
-                                    <span className="text-darkbrown font-semibold">{ item.convertedQuantity?.toFixed(2) ?? 'N/A' }</span> { item.convertedMeasurement }
+                                <Tooltip>
+                                    <TooltipTrigger 
+                                        className={`td ${item.stockLevel === 'GOOD' ? "!text-darkgreen" : item.stockLevel === 'WARNING' ? "text-darkorange" : item.stockLevel === 'DANGER' ? "text-darkred" : "text-red-950"}`}
+                                    >
+                                        <span className="font-semibold">{ item.quantity?.toFixed(2) }</span> { item.unitMeasurement }
+                                    </TooltipTrigger>
+                                    <TooltipContent className="text-center">
+                                        <div>Required Stock</div> 
+                                        <div className="text-[16px]">{ item.minStock } { item.unitMeasurement ??  '' }</div>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <div 
+                                    className={`td ${item.stockLevel === 'GOOD' ? "!text-darkgreen" : item.stockLevel === 'WARNING' ? "text-darkorange" : item.stockLevel === 'DANGER' ? "text-darkred" : "text-red-950"}`}
+                                >
+                                    <span className="font-semibold">{ item.convertedQuantity?.toFixed(2) ?? 'N/A' }</span> { item.convertedMeasurement }
                                 </div>
                                 <div className="td text-right">
                                     { item.category === 'NONDELIVERABLES' ? <OrderStatusBadge className="ms-auto scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPrice!) }
@@ -104,6 +116,7 @@ export function InventoriesPage() {
                                 <div className="td flex-center-y gap-2 mx-auto">
                                     <button onClick={ () => setUpdate(item) }><SquarePen className="w-4 h-4 text-darkgreen" /></button>
                                     <button onClick={() => setView(item) }><Info className="w-4 h-4" /></button>
+                                    <button onClick={() => setViewItem(item) }><LayoutList className="w-4 h-4" /></button>
                                 </div>
                             </div>
                         ))
@@ -127,6 +140,13 @@ export function InventoriesPage() {
                 <ViewInventory 
                     toView={ toView }
                     setView={ setView }
+                />
+            )}
+
+            {toViewItem && (
+                <ViewItemInventoryLog 
+                    toView={ toViewItem }
+                    setView={ setViewItem }
                 />
             )}
 

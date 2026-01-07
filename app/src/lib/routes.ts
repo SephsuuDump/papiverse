@@ -48,6 +48,7 @@ export const adminRoute = [
         children: [
             { title: 'Supplies', href: '/supplies' },
             { title: 'Products', href: '/products' },
+            { title: 'Employee Positions', href: '/employees/positions' },
         ]
     },
     { 

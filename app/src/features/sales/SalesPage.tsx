@@ -20,6 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { MonthPicker } from "../dashboard/components/MonthPicker";
+import Link from "next/link";
 
 const chartTabs = ['DAY', 'WEEK', 'MONTH'];
 const dateModes = ['Monthly Sales', 'Annual Sales', 'Sales of Custom Range']
@@ -250,10 +251,16 @@ export function SalesPage({ branchId }: {
 
             <div className={`grid grid-cols-1 gap-4 mt-2 pb-4 ${!branchId && "xl:grid-cols-2"}`}>
                 <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-                    <div className="px-5 py-4 border-b bg-gray-50">
+                    <div className="flex-center-y justify-between px-5 py-4 border-b bg-gray-50">
                         <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
                             Top Selling Products
                         </h3>
+                        <Link 
+                            className="hover:font-semibold"
+                            href="/sales/product-ranking"
+                        >
+                            See all
+                        </Link>
                     </div>
 
                     <div className="overflow-x-auto">
@@ -268,50 +275,54 @@ export function SalesPage({ branchId }: {
                             </thead>
 
                             <tbody>
-                                {(!data.topProducts || data.topProducts.length === 0) && (
+                                {(!data.topProducts || data.topProducts.length === 0) ? (
                                     <tr>
                                         <td colSpan={4} className="py-6">
                                             <EmptyState message="No top products available" />
                                         </td>
                                     </tr>
+                                ) : (
+                                    <div>
+                                        {data.topProducts.map((
+                                            item: {
+                                                productName: string,
+                                                amount: number;
+                                                quantity: number;
+                                            }, 
+                                            index: number
+                                        ) => {
+                                            const rankColor =
+                                                index === 0 ? "text-yellow-600" :
+                                                index === 1 ? "text-gray-500" :
+                                                index === 2 ? "text-amber-700" : "text-darkbrown";
+
+                                            return (
+                                                <tr
+                                                    key={index}
+                                                    className="border-b last:border-b-0 hover:bg-gray-50/70 transition-all"
+                                                >
+                                                    <td className={`py-3 px-4 font-bold ${rankColor}`}>
+                                                        {index + 1}
+                                                    </td>
+
+                                                    <td className="py-3 px-4 font-medium text-gray-700">
+                                                        {item.productName}
+                                                    </td>
+
+                                                    <td className="py-3 px-4 font-semibold text-right text-darkbrown">
+                                                        {formatToPeso(item.amount)}
+                                                    </td>
+
+                                                    <td className="py-3 px-4 text-right text-gray-700">
+                                                        {item.quantity}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </div>
                                 )}
 
-                                {data.topProducts.map((
-                                    item: {
-                                        productName: string,
-                                        amount: number;
-                                        quantity: number;
-                                    }, 
-                                    index: number
-                                ) => {
-                                    const rankColor =
-                                        index === 0 ? "text-yellow-600" :
-                                        index === 1 ? "text-gray-500" :
-                                        index === 2 ? "text-amber-700" : "text-darkbrown";
-
-                                    return (
-                                        <tr
-                                            key={index}
-                                            className="border-b last:border-b-0 hover:bg-gray-50/70 transition-all"
-                                        >
-                                            <td className={`py-3 px-4 font-bold ${rankColor}`}>
-                                                {index + 1}
-                                            </td>
-
-                                            <td className="py-3 px-4 font-medium text-gray-700">
-                                                {item.productName}
-                                            </td>
-
-                                            <td className="py-3 px-4 font-semibold text-right text-darkbrown">
-                                                {formatToPeso(item.amount)}
-                                            </td>
-
-                                            <td className="py-3 px-4 text-right text-gray-700">
-                                                {item.quantity}
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
+                                
                             </tbody>
                         </table>
                     </div>
@@ -319,10 +330,16 @@ export function SalesPage({ branchId }: {
 
                 {!branchId && isFranchisor && (
                     <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-                        <div className="px-5 py-4 border-b bg-gray-50">
+                        <div className="flex-center-y justify-between px-5 py-4 border-b bg-gray-50">
                             <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
                                 Top Performing Branches
                             </h3>
+                            <Link 
+                                className="hover:font-semibold"
+                                href="/sales/branch-ranking"
+                            >
+                                See all
+                            </Link>
                         </div>
 
                         <div className="overflow-x-auto">
@@ -336,45 +353,47 @@ export function SalesPage({ branchId }: {
                                 </thead>
 
                                 <tbody>
-                                    {(!data.topBranches || data.topBranches.length === 0) && (
+                                    {(!data.topBranches || data.topBranches.length === 0) ? (
                                         <tr>
                                             <td colSpan={3} className="py-6">
                                                 <EmptyState message="No top branches available" />
                                             </td>
                                         </tr>
+                                    ) : (
+                                        <div>
+                                            {data.topBranches.map((
+                                                item: {
+                                                    branchName: string;
+                                                    totalSales: number
+                                                }, 
+                                                index: number
+                                            ) => {
+                                                const rankColor =
+                                                    index === 0 ? "text-yellow-600" :
+                                                    index === 1 ? "text-gray-500" :
+                                                    index === 2 ? "text-amber-700" : "text-darkbrown";
+
+                                                return (
+                                                    <tr
+                                                        key={index}
+                                                        className="border-b last:border-b-0 hover:bg-gray-50/70 transition-all"
+                                                    >
+                                                        <td className={`py-3 px-4 font-bold ${rankColor}`}>
+                                                            {index + 1}
+                                                        </td>
+
+                                                        <td className="py-3 px-4 font-medium text-gray-700">
+                                                            {item.branchName}
+                                                        </td>
+
+                                                        <td className="py-3 px-4 font-semibold text-right text-darkbrown">
+                                                            {formatToPeso(item.totalSales)}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </div>
                                     )}
-
-                                    {data.topBranches.map((
-                                        item: {
-                                            branchName: string;
-                                            totalSales: number
-                                        }, 
-                                        index: number
-                                    ) => {
-                                        const rankColor =
-                                            index === 0 ? "text-yellow-600" :
-                                            index === 1 ? "text-gray-500" :
-                                            index === 2 ? "text-amber-700" : "text-darkbrown";
-
-                                        return (
-                                            <tr
-                                                key={index}
-                                                className="border-b last:border-b-0 hover:bg-gray-50/70 transition-all"
-                                            >
-                                                <td className={`py-3 px-4 font-bold ${rankColor}`}>
-                                                    {index + 1}
-                                                </td>
-
-                                                <td className="py-3 px-4 font-medium text-gray-700">
-                                                    {item.branchName}
-                                                </td>
-
-                                                <td className="py-3 px-4 font-semibold text-right text-darkbrown">
-                                                    {formatToPeso(item.totalSales)}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
                                 </tbody>
                             </table>
                         </div>
