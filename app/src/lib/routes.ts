@@ -34,6 +34,8 @@ export const adminRoute = [
         children: [
             // { title: 'Paid Orders', href: '/sales/paid-orders' },
             { title: 'Branch Sales', href: '/sales/branches' },
+            { title: 'Product Sales Ranking', href: '/sales/product-ranking' },
+            { title: 'Branch Sales Ranking', href: '/sales/branch-ranking' },
         ]
     },
     { 

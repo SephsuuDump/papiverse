@@ -8,7 +8,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { formatDateTime } from "@/lib/formatter";
 import { InventoryService } from "@/services/inventory.service";
 import { Inventory } from "@/types/inventory";
-import { Inbox } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, Inbox } from "lucide-react";
 import { Dispatch, Fragment, SetStateAction } from "react";
 
 type InventoryItemLog = {
@@ -46,14 +46,14 @@ export function ViewItemInventoryLog({ toView, setView }: {
                         </div>
                         {logs.map((item, i) => (
                             <div className="tdata grid grid-cols-3">
-                                <div className="th">{ item.quantityChanged } { item.unitMeasurement }</div>
+                                <div className="th flex-center-y gap-1">{item.type === "IN" ? <ArrowBigUp className="w-4 h-4 text-darkgreen" fill="#014421" /> : <ArrowBigDown className="w-4 h-4 text-darkred" fill="#731c13" />} { item.quantityChanged } { item.unitMeasurement }</div>
                                 <div className="th">{ item.type }</div>
                                 <div className="th">{ formatDateTime(item.dateTime) }</div>
                             </div>
                         ))}
                     </div>
                 ) : (
-                    <div className="flex-center">
+                    <div className="flex-center flex-col">
                         <Inbox className="w-10 h-10 text-gray" />
                         <div>THERE ARE NO LOGS FOR THIS ITEM</div>
                     </div>

@@ -66,6 +66,7 @@ export function BranchSalesPage() {
                     <div className="pr-2.5">
                         <AppHeader label={`${branches.find((b) => b.branchId === selectedBranch)?.branchName} Sales`} />
                         <SalesPage branchId={ selectedBranch } />
+                        
                     </div>
                 ) : (
                     <div className="text-gray-500">Select a branch to view sales.</div>

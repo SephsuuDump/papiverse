@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -26,6 +26,7 @@ const columns = [
 export function IngestedSales({
     paidOrders,
     selectedDay,
+    setView,
     setOpen,
     className
 }: {
@@ -40,6 +41,16 @@ export function IngestedSales({
         }[];
     }[];
     selectedDay: string;
+    setView: Dispatch<SetStateAction<{
+        orderId: string;
+        cash: number;
+        orderType: string;
+        totalPaid: number;
+        items: {
+            productName: string;
+            quantity: number;
+        }[];
+    }[] | undefined>>
     setOpen?: (i: boolean) => void;
     className?: string;
 }) {
@@ -114,6 +125,13 @@ export function IngestedSales({
                         </SelectGroup>
                     </SelectContent>
                 </Select>
+
+                <button
+                    onClick={ () => setView(paidOrders) }
+                    className="text-sm ms-auto hover:font-semibold hover:underline"
+                >
+                    View Full
+                </button>
             </div>
 
             <ScrollArea className="table-wrapper h-[120vh]">

@@ -20,6 +20,8 @@ import { usePagination } from "@/hooks/use-pagination";
 import { SalesCalendar } from "./components/SalesCalendar";
 import { SectionLoading } from "@/components/ui/loader";
 import { IngestedSales } from "./components/IngestedSales";
+import { useCrudState } from "@/hooks/use-crud-state";
+import { ViewFullPaidOrder } from "./components/ViewFullPaidOrder";
 
 export default function PaidOrdersPage() {
     const today = new Date().toISOString().split("T")[0];
@@ -44,11 +46,15 @@ export default function PaidOrdersPage() {
         [claims.branch.branchId, selectedDay, selectedDay]
     );
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['orderId']);
-    const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredItems, 20);
-    
-    console.log();
-    
+    const { toView, setView } = useCrudState();        
 
+    if (toView) return (
+        <ViewFullPaidOrder 
+            paidOrders={ data }
+            selectedDay={ selectedDay }
+            setView={ setView }
+        />
+    )
     return(
         <section className="flex flex-col gap-2 h-[130vh]">
             <AppHeader label="Paid Orders" />
@@ -68,6 +74,7 @@ export default function PaidOrdersPage() {
                         <IngestedSales 
                             selectedDay={selectedDay}
                             paidOrders={data}
+                            setView={ setView }
                             className="col-span-2 max-md:col-span-5 h-[95vh]"
                             setOpen={setOpen}
                         />

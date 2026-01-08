@@ -75,6 +75,7 @@ export function AppSidebar() {
         SYSTEM: notifications.filter(n => n.type === "SYSTEM").length,
         INQUIRY: notifications.filter(n => n.type === "INQUIRY").length,
         MESSAGE: notifications.filter(n => n.type === "MESSAGE").length,
+        STOCK: notifications.filter(n => n.type === "STOCK").length,
     };
 
 
@@ -224,9 +225,9 @@ export function AppSidebar() {
                                                     { notifCounts.PRODUCT + notifCounts.SUPPLY }
                                                 </Badge>
                                             )}
-                                            { item.title === "Inventory" && notifCounts.SUPPLYORDER > 0 && (
+                                            { item.title === "Inventory" && (notifCounts.SUPPLYORDER + notifCounts.STOCK) > 0 && (
                                                 <Badge className="bg-darkred">
-                                                    { notifCounts.PRODUCT + notifCounts.SUPPLYORDER }
+                                                    { notifCounts.STOCK + notifCounts.SUPPLYORDER }
                                                 </Badge>
                                             )}
                                             <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
@@ -259,6 +260,11 @@ export function AppSidebar() {
                                                         { sub.title === "My Supply Orders" && notifCounts.SUPPLYORDER > 0 && (
                                                             <Badge className="ms-auto bg-darkred text-[8px]">
                                                                 { notifCounts.SUPPLYORDER }
+                                                            </Badge>
+                                                        )}
+                                                        { sub.title === "Inventories" && notifCounts.STOCK > 0 && (
+                                                            <Badge className="ms-auto bg-darkred text-[8px]">
+                                                                { notifCounts.STOCK }
                                                             </Badge>
                                                         )}
                                                     </Link>

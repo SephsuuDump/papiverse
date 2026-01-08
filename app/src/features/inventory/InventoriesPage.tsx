@@ -19,6 +19,8 @@ import { useCrudState } from "@/hooks/use-crud-state";
 import { OrderStatusBadge } from "@/components/ui/badge";
 import { ViewInventory } from "./components/ViewInventory";
 import { ViewItemInventoryLog } from "./components/ViewItemInventoryLog";
+import useNotifications from "@/hooks/use-notification";
+import { NotificationSheet } from "@/components/shared/NotificationSheet";
 
 const pageKey = "inventoryPage";
 const columns = [
@@ -42,6 +44,7 @@ export function InventoriesPage() {
         [claims.branch.branchId]
     );
     const { search, setSearch, filteredItems } = useSearchFilter(data, ['name', 'code']);
+    const { filteredNotifications, loading: notifLoading } = useNotifications({ claims, type: "STOCK" })
 
     const filteredData = filteredItems.filter(i => {
         if (filter === 'Meat') return i.category === 'MEAT';
@@ -51,7 +54,7 @@ export function InventoriesPage() {
     });    
 
     const { page, setPage, size, setSize, paginated, totalPages } = usePagination(filteredData, 20, pageKey);
-    const { toView, setView, toUpdate, setUpdate } = useCrudState<Inventory>();
+    const { toView, setView, toUpdate, setUpdate, showNotif, setShowNotif } = useCrudState<Inventory>();
     const { toView: toViewItem, setView: setViewItem } = useCrudState<Inventory>();
 
     if (loading || authLoading) return <PapiverseLoading />
@@ -68,6 +71,8 @@ export function InventoriesPage() {
                 filters={ filters }
                 filter={ filter }
                 setFilter={ setFilter }
+                filteredNotifications={ filteredNotifications }
+                setShowNotif={ setShowNotif }
             />
 
             <div className="table-wrapper">
@@ -80,7 +85,12 @@ export function InventoriesPage() {
                 <div className="animate-fade-in-up" key={`${page}-${filter}`}>
                     {paginated.length > 0 ?
                         paginated.map((item, index) => (
-                            <div className="tdata grid grid-cols-6 max-md:!w-250" key={ index }>
+                            <div 
+                                className={`tdata grid grid-cols-6 max-md:!w-250 ${item.stockLevel === 'GOOD' ? "" : item.stockLevel === 'WARNING' ? "!bg-orange-100" : item.stockLevel === 'DANGER' ? "!bg-red-100" : "!bg-red-200"}
+
+                                `}
+                                key={ index }
+                            >
                                 <div className="td">{ item.code }</div>
                                 <div className="td flex gap-2">
                                     <Tooltip>
@@ -96,7 +106,7 @@ export function InventoriesPage() {
                                 </div>
                                 <Tooltip>
                                     <TooltipTrigger 
-                                        className={`td ${item.stockLevel === 'GOOD' ? "!text-darkgreen" : item.stockLevel === 'WARNING' ? "text-darkorange" : item.stockLevel === 'DANGER' ? "text-darkred" : "text-red-950"}`}
+                                        className={`td text-start ${item.stockLevel === 'GOOD' ? "!text-darkgreen" : item.stockLevel === 'WARNING' ? "text-darkorange" : item.stockLevel === 'DANGER' ? "text-darkred" : "text-red-950"}`}
                                     >
                                         <span className="font-semibold">{ item.quantity?.toFixed(2) }</span> { item.unitMeasurement }
                                     </TooltipTrigger>
@@ -106,9 +116,17 @@ export function InventoriesPage() {
                                     </TooltipContent>
                                 </Tooltip>
                                 <div 
-                                    className={`td ${item.stockLevel === 'GOOD' ? "!text-darkgreen" : item.stockLevel === 'WARNING' ? "text-darkorange" : item.stockLevel === 'DANGER' ? "text-darkred" : "text-red-950"}`}
+                                    className={`td
+                                        ${item.stockLevel === 'GOOD' 
+                                        ? "text-darkgreen" 
+                                        : item.stockLevel === 'WARNING' 
+                                        ? "text-darkorange" 
+                                        : item.stockLevel === 'DANGER' 
+                                        ? "text-darkred" 
+                                        : "text-red-950"}`}
                                 >
-                                    <span className="font-semibold">{ item.convertedQuantity?.toFixed(2) ?? 'N/A' }</span> { item.convertedMeasurement }
+                                    <span className="font-semibold">
+                                        { item.convertedQuantity?.toFixed(2) ?? 'N/A' }</span> { item.convertedMeasurement }
                                 </div>
                                 <div className="td text-right">
                                     { item.category === 'NONDELIVERABLES' ? <OrderStatusBadge className="ms-auto scale-110 bg-slate-200 !text-dark" status="NON DELIVERABLE" /> : formatToPeso(item.unitPrice!) }
@@ -155,6 +173,13 @@ export function InventoriesPage() {
                     toUpdate={ toUpdate }
                     setUpdate={ setUpdate }
                     setReload={ setReload }
+                />
+            )}
+
+            {showNotif && (
+                <NotificationSheet
+                    notifications={ filteredNotifications }
+                    setOpen={ setShowNotif }
                 />
             )}
        

@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { MonthPicker } from "../dashboard/components/MonthPicker";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const chartTabs = ['DAY', 'WEEK', 'MONTH'];
 const dateModes = ['Monthly Sales', 'Annual Sales', 'Sales of Custom Range']
@@ -33,6 +34,8 @@ const columns = [
 export function SalesPage({ branchId }: {
     branchId?: number;
 }) {    
+    const pathname = usePathname();
+
     const { claims, loading: authLoading, isFranchisor } = useAuth();
     const [dateMode, setDateMode] = useState(dateModes[0]);
     const [chartTab, setChartTab] = useState(chartTabs[0]);
@@ -400,7 +403,7 @@ export function SalesPage({ branchId }: {
                     </div>
                 )}
 
-                {!isFranchisor && (
+                {(!isFranchisor || pathname === "/sales/branches") && (
                     <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
                         <div className="flex-center-y justify-between px-5 py-4 border-b bg-gray-50">
                             <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
