@@ -192,7 +192,7 @@ export function CreateUser({ setOpen, setReload }: {
                                 }))} 
                             >
                                 <SelectTrigger className="w-full border-1 border-gray">
-                                    <SelectValue placeholder="Select Gender" />
+                                    <SelectValue placeholder="Select Sex" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {genders.map((item, index) => (

@@ -22,6 +22,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { MonthPicker } from "../dashboard/components/MonthPicker";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCrudState } from "@/hooks/use-crud-state";
+import { ViewFullPaidOrder } from "./components/ViewFullPaidOrder";
 
 const chartTabs = ['DAY', 'WEEK', 'MONTH'];
 const dateModes = ['Monthly Sales', 'Annual Sales', 'Sales of Custom Range']
@@ -44,6 +46,9 @@ export function SalesPage({ branchId }: {
     const [endDate, setEndDate] = useState<string>(today);
 
     const branch = branchId ?? claims.branch.branchId;
+
+        console.log('id', branchId);
+    console.log('branch', branch);
 
     const salesGraphService = !isFranchisor || branchId
         ? SalesService.generateGraph
@@ -84,14 +89,22 @@ export function SalesPage({ branchId }: {
         } []
     }>(
         SalesService.getPaidOrders, 
-        [selectedDay], 
-        [claims.branch.branchId, selectedDay, selectedDay]
+        [branch, selectedDay, selectedDay], 
+        [branch, selectedDay, selectedDay]
     );
     const { setSearch, filteredItems } = useSearchFilter(paidOrders, ["orderId"])   
     const selectedDate = selectedDay ? parseISO(selectedDay) : undefined;
+    const { toView, setView } = useCrudState();
  
 
     if (loading || authLoading || graphLoading || paidOrdersLoading) return <SectionLoading />
+    if (toView) return (
+        <ViewFullPaidOrder 
+            paidOrders={ paidOrders }
+            selectedDay={ selectedDay } 
+            setView={ setView }
+        />
+    )
     
     const summary = [
         { title: 'Total Orders', date: formatCustomDate('2025-08-21 22:45:19'), count: data.totalOrders ?? 0  },
@@ -407,35 +420,43 @@ export function SalesPage({ branchId }: {
                     <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
                         <div className="flex-center-y justify-between px-5 py-4 border-b bg-gray-50">
                             <h3 className="text-lg font-bold tracking-tight text-darkbrown flex items-center gap-2 scale-x-110 origin-left">
-                                Ingested Sales on { selectedDay }
+                                Ingested Sales on { formatDateToWords(selectedDay) }
                             </h3>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className="w-[220px] justify-start text-left font-normal"
-                                    >
-                                        {selectedDate
-                                            ? format(selectedDate, "MMMM d, yyyy")
-                                            : "Pick a date"}
-                                    </Button>
-                                </PopoverTrigger>
+                            <div className="flex-center-y gap-2">
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            className="w-[220px] justify-start text-left font-normal"
+                                        >
+                                            {selectedDate
+                                                ? format(selectedDate, "MMMM d, yyyy")
+                                                : "Pick a date"}
+                                        </Button>
+                                    </PopoverTrigger>
 
-                                <PopoverContent className="w-auto p-0">
-                                    <Calendar
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={(date) => {
-                                        if (!date) return;
+                                    <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                        mode="single"
+                                        selected={selectedDate}
+                                        onSelect={(date) => {
+                                            if (!date) return;
 
-                                        // convert Date → YYYY-MM-DD
-                                        const formatted = format(date, "yyyy-MM-dd");
-                                        setSelectedDay(formatted);
-                                    }}
-                                    initialFocus
-                                    />
-                                </PopoverContent>
+                                            // convert Date → YYYY-MM-DD
+                                            const formatted = format(date, "yyyy-MM-dd");
+                                            setSelectedDay(formatted);
+                                        }}
+                                        initialFocus
+                                        />
+                                    </PopoverContent>
                                 </Popover>
+                                <button
+                                    onClick={ () => setView(paidOrders) }
+                                    className="text-sm hover:font-medium hover:underline"
+                                >
+                                    View Full
+                                </button>
+                            </div>
 
                         </div>
 
@@ -446,7 +467,7 @@ export function SalesPage({ branchId }: {
                                 ))}
                             </div>
             
-                            {filteredItems.length === 0 ? (
+                            {paidOrders.length === 0 ? (
                                 <div className="flex-center flex-col w-full bg-light h-100 rounded-b-md">
                                     <Inbox className="w-30 h-30 text-gray-300" strokeWidth={2} />
                                     <div className="text-gray text-center text-sm">
@@ -454,7 +475,7 @@ export function SalesPage({ branchId }: {
                                     </div>
                                 </div>
                             ) : (
-                                filteredItems.map((
+                                paidOrders.map((
                                     item: {
                                         orderId: string;
                                         cash: number;
