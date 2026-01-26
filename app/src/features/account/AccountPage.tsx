@@ -31,6 +31,7 @@ import type { User } from "@/types/user";
 import { userInit } from "@/types/user";
 import { format } from "date-fns";
 import { NEXT_URL } from "@/lib/urls";
+import { formatDateToWords } from "@/lib/formatter";
 
 const genders = ["Male", "Female", "Gay", "Lesbian", "Others"];
 
@@ -210,7 +211,7 @@ export function AccountPage() {
             <Info label="Last Name" value={user.lastName} loading={authLoading} />
             <Info label="Middle Name" value={user.middleName} loading={authLoading} />
             <Info label="Phone" value={user.contactNumber} loading={authLoading} />
-            <Info label="Birthdate" value={user.dateOfBirth} loading={authLoading} />
+            <Info label="Birthdate" value={formatDateToWords(user.dateOfBirth!)} loading={authLoading} />
             <Info label="Gender" value={user.gender} loading={authLoading} />
           </div>
         </div>

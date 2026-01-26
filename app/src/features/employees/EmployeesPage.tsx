@@ -16,6 +16,7 @@ import { CreateEmployee } from "./components/CreateEmployee";
 import { UpdateEmployee } from "./components/UpdateEmployee";
 import { DeleteEmployee } from "./components/DeleteEmployee";
 import { AppAvatar } from "@/components/shared/AppAvatar";
+import { ViewEmployee } from "./components/ViewEmployee";
 
 const columns = [
     { title: "Full Name & Position", style: "col-span-2" },
@@ -35,6 +36,7 @@ export function EmployeesPage() {
     const { page, setPage, size, setSize, paginated } = usePagination(filteredItems, 20);
 
     const [open, setOpen] = useState(false);
+    const [toView, setView] = useState<Employee>();
     const [toUpdate, setUpdate] = useState<Employee>();
     const [toDelete, setDelete] = useState<Employee>();
 
@@ -83,7 +85,7 @@ export function EmployeesPage() {
                                     <button onClick={() => setUpdate(item)}>
                                         <SquarePen className="w-4 h-4 text-darkgreen" />
                                     </button>
-                                    <button>
+                                    <button onClick={ () => setView(item) }>
                                         <Info className="w-4 h-4" />
                                     </button>
                                     <button onClick={() => setDelete(item)}>
@@ -113,6 +115,13 @@ export function EmployeesPage() {
                     claims={claims}
                     setOpen={setOpen}
                     setReload={ setReload }
+                />
+            )}
+
+            {toView && (
+                <ViewEmployee
+                    toView={toView}
+                    setView={ setView }
                 />
             )}
 

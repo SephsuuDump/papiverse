@@ -91,7 +91,7 @@ export function ViewFullPaidOrder({
         setPage,
         size,
         paginated,
-    } = usePagination(filteredItems, 5, pageKey);
+    } = usePagination(filteredItems, 10, pageKey);
 
     if (!paidOrders) return <PapiverseLoading />;
 
@@ -114,14 +114,14 @@ export function ViewFullPaidOrder({
                     onChange={e => setSearch(e.target.value)}
                 />
 
-                <Button
+                {/* <Button
                     onClick={() => setOpen?.(true)}
                     className="bg-darkgreen"
                     size="sm"
                     disabled={paidOrders.length > 0}
                 >
                     <Plus /> Insert Excel
-                </Button>
+                </Button> */}
             </div>
 
             {/* Filters */}

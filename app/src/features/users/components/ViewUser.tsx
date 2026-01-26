@@ -1,6 +1,7 @@
 import { AppAvatar } from "@/components/shared/AppAvatar";
 import { ModalTitle } from "@/components/shared/ModalTitle";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
+import { formatDateToWords } from "@/lib/formatter";
 import { NEXT_URL } from "@/lib/urls";
 import { User } from "@/types/user";
 import { Dispatch, SetStateAction } from "react";
@@ -47,11 +48,11 @@ export function ViewUser({
                     <div className="font-medium text-gray-600">Contact</div>
                     <div>{toView.contactNumber}</div>
 
-                    <div className="font-medium text-gray-600">Gender</div>
+                    <div className="font-medium text-gray-600">Sex</div>
                     <div>{toView.gender}</div>
 
                     <div className="font-medium text-gray-600">Birth Date</div>
-                    <div>{toView.dateOfBirth}</div>
+                    <div>{formatDateToWords(toView.dateOfBirth!)}</div>
                 </div>
 
                 <div className="mt-5 rounded-md border p-3 text-sm">
