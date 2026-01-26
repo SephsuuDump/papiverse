@@ -285,7 +285,7 @@ export function SalesPage({ branchId }: {
                                         </td>
                                     </tr>
                                 ) : (
-                                    <div>
+                                    <Fragment>
                                         {data.topProducts.map((
                                             item: {
                                                 productName: string,
@@ -322,7 +322,7 @@ export function SalesPage({ branchId }: {
                                                 </tr>
                                             );
                                         })}
-                                    </div>
+                                    </Fragment>
                                 )}
 
                                 
