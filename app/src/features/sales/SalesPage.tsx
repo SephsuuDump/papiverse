@@ -298,7 +298,8 @@ export function SalesPage({ branchId }: {
                                         </td>
                                     </tr>
                                 ) : (
-                                        data.topProducts.map((
+                                    <div>
+                                        {data.topProducts.map((
                                             item: {
                                                 productName: string,
                                                 amount: number;
@@ -333,7 +334,8 @@ export function SalesPage({ branchId }: {
                                                     </td>
                                                 </tr>
                                             );
-                                        })
+                                        })}
+                                    </div>
                                 )}
 
                                 
