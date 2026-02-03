@@ -298,8 +298,7 @@ export function SalesPage({ branchId }: {
                                         </td>
                                     </tr>
                                 ) : (
-                                    <div>
-                                        {data.topProducts.map((
+                                        data.topProducts.map((
                                             item: {
                                                 productName: string,
                                                 amount: number;
@@ -334,8 +333,7 @@ export function SalesPage({ branchId }: {
                                                     </td>
                                                 </tr>
                                             );
-                                        })}
-                                    </div>
+                                        })
                                 )}
 
                                 
@@ -376,8 +374,7 @@ export function SalesPage({ branchId }: {
                                             </td>
                                         </tr>
                                     ) : (
-                                        <div>
-                                            {data.topBranches.map((
+                                            data.topBranches.map((
                                                 item: {
                                                     branchName: string;
                                                     totalSales: number
@@ -407,8 +404,7 @@ export function SalesPage({ branchId }: {
                                                         </td>
                                                     </tr>
                                                 );
-                                            })}
-                                        </div>
+                                            })
                                     )}
                                 </tbody>
                             </table>
